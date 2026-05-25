@@ -1,0 +1,75 @@
+/* ==========================================
+   HABIB BUTTON SYSTEM (NO EXTRA TAGS NEEDED)
+   ========================================== */
+.habib-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;       /* Chhoto width adjust */
+  height: 38px;       /* Chhoto height adjust */
+  font-size: 13px;    /* Font size perfect scale */
+  font-weight: 600;
+  color: #ffffff !important;
+  background-color: #111522;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  text-decoration: none !important;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+/* --- 1. CHANDAVAI FEED (TYPE ROTATE FIX) --- */
+.habib-button.type-rotate {
+  border-radius: 20px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Background gradient border rotation */
+.habib-button.type-rotate::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  background: conic-gradient(#00f7ff, #7c3aed, #ec4899, #00f7ff);
+  animation: rotateB 4s linear infinite;
+  z-index: -2;
+}
+
+/* Tekhon bhetorer background automatic mask hobe abong upore text thakbe */
+.habib-button.type-rotate::after {
+  content: attr(class); /* Fallback simulation */
+  content: none;        /* Normal button content layer bypass bondho */
+}
+
+/* Element er original text content layer automatic upore anar jonno background overlay */
+.habib-button.type-rotate {
+  box-shadow: inset 0 0 0 2px #111522; /* Fallback border edge */
+  background-image: linear-gradient(#111522, #111522);
+  background-clip: padding-box; /* Border area bad diye text context wrapper */
+  border: 2px solid transparent; /* Gradient visibility padding logic */
+}
+
+.habib-button.type-rotate:hover {
+  color: #00f7ff !important;
+}
+
+/* --- 2. CREATE REPORT (TYPE NEON FIX) --- */
+.habib-button.type-neon {
+  border: 2px solid #00f7ff;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0, 247, 255, 0.2);
+}
+
+.habib-button.type-neon:hover {
+  box-shadow: 0 0 18px #00f7ff;
+  background-color: #152035;
+}
+
+/* Animation */
+@keyframes rotateB {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+

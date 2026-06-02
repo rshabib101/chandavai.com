@@ -44,7 +44,7 @@
                             <!-- Image -->
             @if($report->image)
                 <img src="{{ asset('storage/'.$report->image) }}"
-                     style="width:250px; height:200px; border-radius:10px; margin-bottom:10px;">
+                     style="width:90px; height:100px; border-radius:10px; margin-bottom:10px;">
             @endif
 
                 <p>
@@ -70,6 +70,11 @@
                    class="btn btn-danger btn-sm">
                     ✖ Reject
                 </a>
+                    <a href="/admin/report/delete/{{ $report->id }}"
+                        class="btn btn-dark btn-sm"
+                        onclick="return confirm('Are you sure you want to delete this report?')">
+                        🗑 Delete
+                    </a>
 
             </div>
 

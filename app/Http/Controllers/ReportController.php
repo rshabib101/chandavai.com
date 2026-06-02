@@ -128,6 +128,20 @@ public function reject($id)
     return back();
 }
 
+public function delete($id)
+{
+    $report = Report::findOrFail($id);
+
+    // image delete (optional)
+    if ($report->image && file_exists(public_path('storage/' . $report->image))) {
+        unlink(public_path('storage/' . $report->image));
+    }
+
+    $report->delete();
+
+    return redirect()->back()->with('success', 'Report deleted successfully!');
+}
+
 
 
 }

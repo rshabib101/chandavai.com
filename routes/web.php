@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/admin/reports', [ReportController::class, 'admin']);
 Route::get('/admin/report/approve/{id}', [ReportController::class, 'approve']);
 Route::get('/admin/report/reject/{id}', [ReportController::class, 'reject']);
+Route::get('/admin/report/delete/{id}', [ReportController::class, 'delete']);
 
 
 

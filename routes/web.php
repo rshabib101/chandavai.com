@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
-use App\Models\Report;
+
 use App\Models\User;
 use App\Http\Controllers\DashboardController;
 
@@ -39,4 +39,4 @@ Route::get('/admin/report/delete/{id}', [ReportController::class, 'delete']);
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

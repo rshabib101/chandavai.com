@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
 use App\Models\Report;
 use App\Models\User;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/admin/users', function () {
     $users = User::latest()->get();
@@ -17,10 +18,9 @@ Route::post('/report/store', [ReportController::class, 'store']);
 //     return view('welcome');
 // });
 
-Route::get('/dashboard', function () {
-    $reports = Report::latest()->get();
-    return view('dashboard', compact('reports'));
-})->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -329,15 +329,21 @@ return [
         ],
 
         [
-        'text' => 'Reports',
-        'url'  => 'admin/reports',
-        'icon' => 'fas fa-flag',
+            'text' => 'Reports',
+            'url'  => 'admin/reports',
+            'icon' => 'fas fa-flag',
         ],
 
         [
-        'text' => 'Users',
-        'url'  => 'admin/users',
-        'icon' => 'fas fa-users',
+            'text' => 'Survey Applications',
+            'url'  => 'admin/surveys',
+            'icon' => 'fas fa-users',
+        ],
+
+        [
+            'text' => 'Users',
+            'url'  => 'admin/users',
+            'icon' => 'fas fa-users',
         ],
 
 

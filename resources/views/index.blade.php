@@ -164,7 +164,7 @@
     <!-- TOP BAR -->
     <div class="topbar">
         <h1 class="habib-button type-neon">Chandavai Feed</h1>
-        <a class="habib-button type-neon" href="/report/create" class="btn">+ Create Report</a>
+        <a class="habib-button type-neon" href="/report/create">+ Create Report</a>
     </div>
 
     <!-- FEED CONTAINER -->

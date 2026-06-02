@@ -6,6 +6,7 @@ use App\Http\Controllers\ReportController;
 
 use App\Models\User;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ResellerSurveyController;
 
 Route::get('/admin/users', function () {
     $users = User::latest()->get();
@@ -17,6 +18,10 @@ Route::post('/report/store', [ReportController::class, 'store']);
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+Route::get('/survey', [ResellerSurveyController::class, 'create']);
+Route::post('/survey/store', [ResellerSurveyController::class, 'store']);
+
+
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth'])
@@ -34,8 +39,8 @@ Route::get('/admin/reports', [ReportController::class, 'admin']);
 Route::get('/admin/report/approve/{id}', [ReportController::class, 'approve']);
 Route::get('/admin/report/reject/{id}', [ReportController::class, 'reject']);
 Route::get('/admin/report/delete/{id}', [ReportController::class, 'delete']);
-
-
+Route::get('/admin/surveys', [ResellerSurveyController::class, 'index']);
+Route::get('/admin/surveys', [ResellerSurveyController::class, 'index'])->name('admin.surveys');
 
 
 

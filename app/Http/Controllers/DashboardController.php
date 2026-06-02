@@ -6,15 +6,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 
-use Illuminate\Http\Request;
-
-
-
 class DashboardController extends Controller
 
 {
 
-        public function index()
+    public function index()
 
     {
 
@@ -27,7 +23,5 @@ class DashboardController extends Controller
 
 
         return view('dashboard', compact('pending', 'approved', 'rejected'));
-
     }
-
 }

@@ -50,4 +50,17 @@ Route::get('/admin/survey/{id}', [ResellerSurveyController::class, 'show'])
 
 
 
+
+
+
+
+Route::get('/fifa', function () {
+    return view('frontend.fifa');
+});
+
+
+
+
+
+
 require __DIR__ . '/auth.php';

@@ -38,4 +38,19 @@ class ResellerSurveyController extends Controller
         $surveys = ResellerSurvey::latest()->get();
         return view('admin.survey-admin', compact('surveys'));
     }
+
+    public function show($id)
+    {
+        $survey = ResellerSurvey::findOrFail($id);
+
+        return view('admin.survey-view', compact('survey'));
+    }
+
+    public function destroy($id)
+    {
+        $survey = ResellerSurvey::findOrFail($id);
+        $survey->delete();
+
+        return back()->with('success', 'Deleted successfully!');
+    }
 }

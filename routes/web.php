@@ -21,7 +21,7 @@ Route::post('/report/store', [ReportController::class, 'store']);
 Route::get('/survey', [ResellerSurveyController::class, 'create']);
 Route::post('/survey/store', [ResellerSurveyController::class, 'store']);
 
-
+Route::post('/reseller/store', [ResellerSurveyController::class, 'store'])->name('reseller.store');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth'])
@@ -41,6 +41,12 @@ Route::get('/admin/report/reject/{id}', [ReportController::class, 'reject']);
 Route::get('/admin/report/delete/{id}', [ReportController::class, 'delete']);
 Route::get('/admin/surveys', [ResellerSurveyController::class, 'index']);
 Route::get('/admin/surveys', [ResellerSurveyController::class, 'index'])->name('admin.surveys');
+
+Route::delete('/admin/survey/{id}', [ResellerSurveyController::class, 'destroy'])
+    ->name('survey.delete');
+
+Route::get('/admin/survey/{id}', [ResellerSurveyController::class, 'show'])
+    ->name('survey.show');
 
 
 

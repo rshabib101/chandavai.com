@@ -35,8 +35,19 @@
                     <td>{{ $s->package }}</td>
 
                     <td>
-                        <button class="btn btn-info btn-sm">View</button>
-                        <button class="btn btn-danger btn-sm">Delete</button>
+                        <a href="{{ route('survey.show', $s->id) }}" class="btn btn-info btn-sm">
+                            View
+                        </a>
+
+                        <form action="{{ route('survey.delete', $s->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Are you sure you want to delete this?')">
+                                Delete
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 @endforeach

@@ -61,6 +61,9 @@ Route::get('/fifa', function () {
 Route::get('/cow', function () {
     return view('frontend.cow');
 });
+Route::get('/all', function () {
+    return view('frontend.all');
+});
 
 
 

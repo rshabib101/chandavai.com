@@ -31,22 +31,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/admin/reports', [ReportController::class, 'admin']);
+    Route::get('/admin/report/approve/{id}', [ReportController::class, 'approve']);
+    Route::get('/admin/report/reject/{id}', [ReportController::class, 'reject']);
+    Route::get('/admin/report/delete/{id}', [ReportController::class, 'delete']);
+    Route::get('/admin/surveys', [ResellerSurveyController::class, 'index']);
+    Route::get('/admin/surveys', [ResellerSurveyController::class, 'index'])->name('admin.surveys');
+
+    Route::delete('/admin/survey/{id}', [ResellerSurveyController::class, 'destroy'])
+        ->name('survey.delete');
+
+    Route::get('/admin/survey/{id}', [ResellerSurveyController::class, 'show'])
+        ->name('survey.show');
 });
 
 
 
-Route::get('/admin/reports', [ReportController::class, 'admin']);
-Route::get('/admin/report/approve/{id}', [ReportController::class, 'approve']);
-Route::get('/admin/report/reject/{id}', [ReportController::class, 'reject']);
-Route::get('/admin/report/delete/{id}', [ReportController::class, 'delete']);
-Route::get('/admin/surveys', [ResellerSurveyController::class, 'index']);
-Route::get('/admin/surveys', [ResellerSurveyController::class, 'index'])->name('admin.surveys');
 
-Route::delete('/admin/survey/{id}', [ResellerSurveyController::class, 'destroy'])
-    ->name('survey.delete');
-
-Route::get('/admin/survey/{id}', [ResellerSurveyController::class, 'show'])
-    ->name('survey.show');
 
 
 
@@ -57,8 +58,9 @@ Route::get('/admin/survey/{id}', [ResellerSurveyController::class, 'show'])
 Route::get('/fifa', function () {
     return view('frontend.fifa');
 });
-
-
+Route::get('/cow', function () {
+    return view('frontend.cow');
+});
 
 
 

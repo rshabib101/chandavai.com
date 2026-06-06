@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Admin Dashboard</h1>
+<h1>Admin Dashboard</h1>
 @stop
 
 @section('content')
@@ -50,6 +50,20 @@
                 </div>
                 <div class="icon">
                     <i class="fas fa-times"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+    <!-- Applications -->
+    <div class="col-md-4">
+        <a href="/admin/surveys" style="text-decoration:none; color:inherit;">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3>{{ $applications }}</h3>
+                    <p>Applications Submitted</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-file-alt"></i>
                 </div>
             </div>
         </a>

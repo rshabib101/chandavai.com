@@ -329,6 +329,12 @@ return [
         ],
 
         [
+            'text' => 'Portfolio',
+            'url'  => 'admin/portfolio',
+            'icon' => 'fas fa-briefcase',
+        ],
+
+        [
             'text' => 'Reports',
             'url'  => 'admin/reports',
             'icon' => 'fas fa-flag',

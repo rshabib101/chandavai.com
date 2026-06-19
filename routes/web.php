@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\PortfolioController;
 
 use App\Models\User;
 use App\Http\Controllers\DashboardController;
@@ -13,6 +14,7 @@ Route::get('/admin/users', function () {
     return view('admin.users', compact('users'));
 });
 Route::get('/', [ReportController::class, 'index']);
+Route::get('/portfolio', [PortfolioController::class, 'show'])->name('portfolio.show');
 Route::get('/report/create', [ReportController::class, 'create']);
 Route::post('/report/store', [ReportController::class, 'store']);
 // Route::get('/', function () {
@@ -32,6 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/admin/reports', [ReportController::class, 'admin']);
+    Route::get('/admin/portfolio', [PortfolioController::class, 'edit'])->name('admin.portfolio.edit');
+    Route::put('/admin/portfolio', [PortfolioController::class, 'update'])->name('admin.portfolio.update');
     Route::get('/admin/report/approve/{id}', [ReportController::class, 'approve']);
     Route::get('/admin/report/reject/{id}', [ReportController::class, 'reject']);
     Route::get('/admin/report/delete/{id}', [ReportController::class, 'delete']);

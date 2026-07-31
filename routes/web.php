@@ -30,9 +30,16 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/user/profile', [ProfileController::class, 'show'])->name('user.profile');
+    Route::get('/user/analytics', [ProfileController::class, 'analytics'])->name('user.analytics');
+    Route::get('/settings', [ProfileController::class, 'settings'])->name('user.settings');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/report/{id}/react', [ReportController::class, 'toggleReaction'])->name('report.react');
+    Route::post('/report/{id}/comment', [ReportController::class, 'storeComment'])->name('report.comment');
+
     Route::get('/admin/reports', [ReportController::class, 'admin']);
     Route::get('/admin/portfolio', [PortfolioController::class, 'edit'])->name('admin.portfolio.edit');
     Route::put('/admin/portfolio', [PortfolioController::class, 'update'])->name('admin.portfolio.update');
@@ -48,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/survey/{id}', [ResellerSurveyController::class, 'show'])
         ->name('survey.show');
 });
+
 
 
 

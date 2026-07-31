@@ -12,6 +12,52 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
+     * Display the Facebook/Boipai style user profile view.
+     */
+    public function show(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $reports = \App\Models\Report::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->latest()
+            ->get();
+
+        return view('profile.show', compact('user', 'reports'));
+    }
+
+    /**
+     * Display the settings view.
+     */
+    public function settings(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        return view('profile.settings', compact('user'));
+    }
+
+    /**
+     * Display the dark-themed post engagement analytics dashboard.
+     */
+    public function analytics(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        return view('profile.analytics', compact('user'));
+    }
+
+
+
+    /**
      * Display the user's profile form.
      */
     public function edit(Request $request): View
@@ -58,3 +104,4 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 }
+

@@ -9,7 +9,8 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $reports = Report::where('status', 'approved')
+        $reports = Report::with(['user', 'reactions', 'comments.user'])
+            ->where('status', 'approved')
             ->latest()
             ->paginate(4);
 
@@ -20,13 +21,84 @@ class ReportController extends Controller
         return view('index', compact('reports'));
     }
 
+    public function toggleReaction(Request $request, $id)
+    {
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $userId = auth()->id();
+        $reaction = \App\Models\Reaction::where('user_id', $userId)
+            ->where('report_id', $id)
+            ->first();
+
+        if ($reaction) {
+            $reaction->delete();
+            $loved = false;
+        } else {
+            \App\Models\Reaction::create([
+                'user_id' => $userId,
+                'report_id' => $id,
+                'type' => 'love',
+            ]);
+            $loved = true;
+        }
+
+        $count = \App\Models\Reaction::where('report_id', $id)->count();
+
+        return response()->json([
+            'status' => 'success',
+            'loved' => $loved,
+            'reactions_count' => $count
+        ]);
+    }
+
+    public function storeComment(Request $request, $id)
+    {
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $request->validate([
+            'comment' => 'required|string|max:1000',
+        ]);
+
+        $comment = \App\Models\Comment::create([
+            'user_id' => auth()->id(),
+            'report_id' => $id,
+            'comment' => $request->comment,
+        ]);
+
+        $comment->load('user');
+        $count = \App\Models\Comment::where('report_id', $id)->count();
+
+        return response()->json([
+            'status' => 'success',
+            'comment' => [
+                'id' => $comment->id,
+                'user_name' => $comment->user->name ?? 'User',
+                'text' => $comment->comment,
+                'time_ago' => $comment->created_at->diffForHumans()
+            ],
+            'comments_count' => $count
+        ]);
+    }
+
+
     public function create()
     {
+        if (!auth()->check()) {
+            return redirect()->route('register');
+        }
         return view('create');
     }
 
     public function store(Request $request)
     {
+        if (!auth()->check()) {
+            return redirect()->route('register');
+        }
+
 
 
         $thana = null;
@@ -89,6 +161,7 @@ class ReportController extends Controller
         }
 
         Report::create([
+            'user_id' => auth()->id(),
             'title' => $request->title,
             'description' => $request->description,
             'location' => $fullLocation, // এখানে পুরো বাংলা টেক্সট স্ট্রিং হিসেবে সেভ হচ্ছে
@@ -96,11 +169,12 @@ class ReportController extends Controller
             'image' => $imagePath,
             'video_url' => $request->video_url,
             'status' => 'pending',
-            'is_anonymous' => 1
+            'is_anonymous' => 0
         ]);
 
         return redirect('/');
     }
+
 
 
     public function admin()

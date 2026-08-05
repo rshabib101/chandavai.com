@@ -5,7 +5,7 @@
     @include('partials.gtm')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chandavai Feed</title>
+    <title>chanda vai</title>
     <!-- Dynamic Admin Header Ad Script -->
     @if(\App\Models\Setting::get('ad_script_head'))
         {!! \App\Models\Setting::get('ad_script_head') !!}
@@ -1175,8 +1175,8 @@
     <!-- TOP BAR -->
     <div class="app-topbar">
         <a href="/" class="brand-logo">
-            <span class="brand-badge">b</span>
-            <span class="brand-title">Treend</span>
+            <span class="brand-badge">c</span>
+            <span class="brand-title">chanda vai</span>
         </a>
         <div class="topbar-actions">
             <button class="top-btn-icon" onclick="openCreatePostModal()" title="Create Post">
@@ -1450,16 +1450,27 @@
                         </button>
                     </div>
 
-                    <!-- Image Preview -->
-                    <div id="fbMediaPreviewBox" class="fb-media-preview-box">
-                        <img id="fbMediaPreviewImg" src="" alt="Preview">
+                    <!-- Image Preview Container -->
+                    <div id="fbMediaPreviewBox" class="fb-media-preview-box" style="display:none; position:relative;">
+                        <div id="fbImagePreviewGrid" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;"></div>
                         <button type="button" class="fb-remove-preview-btn" onclick="removeFbImagePreview()">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
 
-                    <!-- Hidden Image File Input -->
-                    <input type="file" id="fbImageInput" name="image" accept="image/*" style="display:none;" onchange="handleFbImageSelect(this)">
+                    <!-- Video Preview Container -->
+                    <div id="fbVideoPreviewBox" class="fb-media-preview-box" style="display:none; position:relative; margin-top:8px;">
+                        <video id="fbVideoPreviewPlayer" controls style="width:100%; max-height:220px; border-radius:10px; background:#000; display:block;"></video>
+                        <button type="button" class="fb-remove-preview-btn" onclick="removeFbVideoPreview()">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Hidden Multiple Images File Input -->
+                    <input type="file" id="fbImageInput" name="images[]" multiple accept="image/*" style="display:none;" onchange="handleFbImageSelect(this)">
+
+                    <!-- Hidden Direct Video File Input -->
+                    <input type="file" id="fbVideoFileInput" name="video" accept="video/*" style="display:none;" onchange="handleFbVideoFileSelect(this)">
 
                     <!-- Optional Extra Fields (Location, Video, Category) -->
                     <div id="fbFieldCategory" class="fb-extra-field">
@@ -1467,7 +1478,7 @@
                     </div>
 
                     <div id="fbFieldVideo" class="fb-extra-field">
-                        <input type="text" name="video_url" class="fb-text-input" placeholder="YouTube Video URL (optional)">
+                        <input type="text" name="video_url" class="fb-text-input" placeholder="YouTube Video URL (optional)" oninput="checkFbPostValidity()">
                     </div>
 
                     <div id="fbFieldLocation" class="fb-extra-field">
@@ -1478,10 +1489,13 @@
                     <div class="fb-add-box">
                         <span class="fb-add-label">Add to your post</span>
                         <div class="fb-add-actions">
-                            <button type="button" class="fb-icon-btn icon-photo" onclick="triggerFbImageUpload()" title="Photo/video">
+                            <button type="button" class="fb-icon-btn icon-photo" onclick="triggerFbImageUpload()" title="Photos">
                                 <i class="fa-solid fa-images"></i>
                             </button>
-                            <button type="button" class="fb-icon-btn icon-tag" onclick="toggleExtraField('category')" title="Tag people">
+                            <button type="button" class="fb-icon-btn icon-video" onclick="triggerFbVideoFileUpload()" title="Upload Video File">
+                                <i class="fa-solid fa-video"></i>
+                            </button>
+                            <button type="button" class="fb-icon-btn icon-tag" onclick="toggleExtraField('category')" title="Tag Category">
                                 <i class="fa-solid fa-user-tag"></i>
                             </button>
                             <button type="button" class="fb-icon-btn icon-feeling" onclick="toggleFbEmojiDrawer()" title="Feeling/activity">
@@ -1490,11 +1504,8 @@
                             <button type="button" class="fb-icon-btn icon-location" onclick="toggleExtraField('location')" title="Check in / Location">
                                 <i class="fa-solid fa-location-dot"></i>
                             </button>
-                            <button type="button" class="fb-icon-btn icon-video" onclick="toggleExtraField('video')" title="Video Link">
-                                <i class="fa-solid fa-video"></i>
-                            </button>
-                            <button type="button" class="fb-icon-btn icon-more" onclick="toggleExtraField('category')" title="More">
-                                <i class="fa-solid fa-ellipsis"></i>
+                            <button type="button" class="fb-icon-btn icon-video" onclick="toggleExtraField('video')" title="YouTube Link">
+                                <i class="fa-brands fa-youtube"></i>
                             </button>
                         </div>
                     </div>
@@ -1664,9 +1675,14 @@
 
         function checkFbPostValidity() {
             const text = document.getElementById('fbPostDescription').value.trim();
-            const hasImg = document.getElementById('fbImageInput').files.length > 0;
+            const hasImg = document.getElementById('fbImageInput') && document.getElementById('fbImageInput').files.length > 0;
+            const videoFileInput = document.getElementById('fbVideoFileInput');
+            const hasVideoFile = videoFileInput && videoFileInput.files.length > 0;
+            const videoUrlInput = document.querySelector('input[name="video_url"]');
+            const hasVideoUrl = videoUrlInput && videoUrlInput.value.trim().length > 0;
+
             const submitBtn = document.getElementById('fbSubmitBtn');
-            if (text.length > 0 || hasImg) {
+            if (text.length > 0 || hasImg || hasVideoFile || hasVideoUrl) {
                 submitBtn.removeAttribute('disabled');
             } else {
                 submitBtn.setAttribute('disabled', 'true');
@@ -1704,22 +1720,51 @@
             document.getElementById('fbImageInput').click();
         }
 
+        function triggerFbVideoFileUpload() {
+            document.getElementById('fbVideoFileInput').click();
+        }
+
         function handleFbImageSelect(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('fbMediaPreviewImg').src = e.target.result;
-                    document.getElementById('fbMediaPreviewBox').style.display = 'block';
-                    checkFbPostValidity();
-                }
-                reader.readAsDataURL(input.files[0]);
+            const grid = document.getElementById('fbImagePreviewGrid');
+            grid.innerHTML = '';
+            if (input.files && input.files.length > 0) {
+                Array.from(input.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.cssText = 'width:60px; height:60px; object-fit:cover; border-radius:8px; border:1px solid #3e4042;';
+                        grid.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
+                document.getElementById('fbMediaPreviewBox').style.display = 'block';
+                checkFbPostValidity();
             }
         }
 
         function removeFbImagePreview() {
             document.getElementById('fbImageInput').value = '';
+            document.getElementById('fbImagePreviewGrid').innerHTML = '';
             document.getElementById('fbMediaPreviewBox').style.display = 'none';
-            document.getElementById('fbMediaPreviewImg').src = '';
+            checkFbPostValidity();
+        }
+
+        function handleFbVideoFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const url = URL.createObjectURL(file);
+                const player = document.getElementById('fbVideoPreviewPlayer');
+                player.src = url;
+                document.getElementById('fbVideoPreviewBox').style.display = 'block';
+                checkFbPostValidity();
+            }
+        }
+
+        function removeFbVideoPreview() {
+            document.getElementById('fbVideoFileInput').value = '';
+            document.getElementById('fbVideoPreviewPlayer').src = '';
+            document.getElementById('fbVideoPreviewBox').style.display = 'none';
             checkFbPostValidity();
         }
 

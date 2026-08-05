@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Models\Reaction;
 use App\Models\Report;
+use App\Models\PostView;
 use App\Models\StarTransaction;
 use App\Models\UserNotification;
 use App\Models\User;
@@ -28,9 +29,27 @@ class ReportController extends Controller
                 $query->whereNull('parent_id')->with(['user', 'replies.user'])->latest();
             }
         ])
+        ->withCount(['views', 'starTransactions'])
         ->where('status', 'approved')
         ->latest()
-        ->paginate(4);
+        ->paginate(6);
+
+        foreach ($reports as $report) {
+            try {
+                if (auth()->check()) {
+                    PostView::firstOrCreate(
+                        ['report_id' => $report->id, 'user_id' => auth()->id()],
+                        ['ip_address' => $request->ip()]
+                    );
+                } else {
+                    PostView::firstOrCreate(
+                        ['report_id' => $report->id, 'ip_address' => $request->ip()]
+                    );
+                }
+            } catch (\Exception $e) {
+                // Ignore duplicate view race condition
+            }
+        }
 
         if ($request->ajax()) {
             return view('partials.posts', compact('reports'))->render();
@@ -260,6 +279,21 @@ class ReportController extends Controller
 
         $this->checkBlockedUser();
 
+        // Check if post has at least text, image(s), or video
+        $hasDescription = !empty(trim($request->description ?? ''));
+        $hasImages = $request->hasFile('images') || $request->hasFile('image');
+        $hasVideo = $request->hasFile('video') || !empty(trim($request->video_url ?? ''));
+
+        if (!$hasDescription && !$hasImages && !$hasVideo) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'পোস্টে অবশ্যই টেক্সট, ছবি অথবা ভিডিও যোগ করুন।'
+                ], 422);
+            }
+            return back()->withErrors(['description' => 'Please enter text, images, or video to post.']);
+        }
+
         $thana = null;
         $district = null;
         $division = null;
@@ -302,23 +336,42 @@ class ReportController extends Controller
             $fullLocation = $request->location;
         }
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('reports', 'public');
+        // Multiple images upload
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                if ($file && $file->isValid()) {
+                    $imagePaths[] = $file->store('reports', 'public');
+                }
+            }
+        }
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $singlePath = $request->file('image')->store('reports', 'public');
+            if (!in_array($singlePath, $imagePaths)) {
+                array_unshift($imagePaths, $singlePath);
+            }
         }
 
-        $title = $request->title;
-        if (empty($title) && !empty($request->description)) {
-            $title = \Illuminate\Support\Str::limit($request->description, 60);
+        $firstImage = $imagePaths[0] ?? null;
+
+        // Video upload
+        $videoPath = null;
+        if ($request->hasFile('video') && $request->file('video')->isValid()) {
+            $videoPath = $request->file('video')->store('videos', 'public');
         }
+
+        // Only set title if explicitly provided; DO NOT auto-fill title from description to prevent duplication
+        $title = !empty(trim($request->title ?? '')) ? trim($request->title) : null;
 
         Report::create([
             'user_id' => auth()->id(),
-            'title' => $title ?: 'Untitled Post',
+            'title' => $title,
             'description' => $request->description,
             'location' => $fullLocation,
             'category' => $request->category,
-            'image' => $imagePath,
+            'image' => $firstImage,
+            'images' => !empty($imagePaths) ? $imagePaths : null,
+            'video' => $videoPath,
             'video_url' => $request->video_url,
             'status' => 'approved', // Auto-approved by default
             'is_anonymous' => 0

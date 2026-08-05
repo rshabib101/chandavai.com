@@ -43,6 +43,61 @@
         flex-shrink: 0;
     }
 
+    /* FACEBOOK MULTI-IMAGE GALLERY STYLES */
+    .fb-gallery-grid {
+        display: grid;
+        gap: 4px;
+        margin-top: 10px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #0f172a;
+    }
+    .fb-gallery-grid.grid-2 {
+        grid-template-columns: 1fr 1fr;
+        height: 220px;
+    }
+    .fb-gallery-grid.grid-3 {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 130px 100px;
+        height: 234px;
+    }
+    .fb-gallery-grid.grid-3 .gallery-item:first-child {
+        grid-column: span 2;
+    }
+    .fb-gallery-grid.grid-4, .fb-gallery-grid.grid-more {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 130px 130px;
+        height: 264px;
+    }
+    .gallery-item {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.2s ease;
+    }
+    .gallery-item:hover img {
+        transform: scale(1.02);
+    }
+    .gallery-more-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.65);
+        color: #ffffff;
+        font-size: 26px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(2px);
+    }
+
     .author-meta {
         display: flex;
         flex-direction: column;
@@ -519,9 +574,13 @@
     <!-- AUTHOR HEADER -->
     <div class="post-author-row">
         <a href="/user/profile" class="author-left" style="text-decoration:none;">
-            <div class="author-avatar-initial">
-                {{ strtoupper(substr($authorName, 0, 1)) }}
-            </div>
+            @if($report->user && $report->user->profile_photo_url)
+                <img src="{{ $report->user->profile_photo_url }}" alt="{{ $authorName }}" class="author-avatar-img">
+            @else
+                <div class="author-avatar-initial">
+                    {{ strtoupper(substr($authorName, 0, 1)) }}
+                </div>
+            @endif
             <div class="author-meta">
                 <div class="author-name-wrap" style="display: flex; align-items: center; gap: 8px;">
                     <span class="author-name">
@@ -543,9 +602,9 @@
         </a>
     </div>
 
-    <!-- TITLE -->
-    @if($report->title)
-        <div class="post-content-title" onclick="openFbPostViewer({{ $report->id }})" style="cursor:pointer;">
+    <!-- TITLE (Render ONLY if distinct from description) -->
+    @if(!empty($report->title) && trim($report->title) !== trim($report->description ?? ''))
+        <div class="post-content-title" onclick="openFbPostViewer({{ $report->id }})" style="cursor:pointer; font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #0f172a;">
             {{ $report->title }}
         </div>
     @endif
@@ -560,25 +619,52 @@
         </button>
     @endif
 
-    <!-- IMAGE MEDIA -->
-    @if($report->image)
-        <div class="post-media-container">
-            <img class="post-media-img"
-                 src="{{ asset('storage/'.$report->image) }}"
-                 alt="Report image"
-                 onclick="openFbPostViewer({{ $report->id }})">
-        </div>
+    <!-- FACEBOOK MULTI-IMAGE GALLERY -->
+    @php
+        $imageList = $report->image_list;
+        $imgCount = count($imageList);
+    @endphp
+
+    @if($imgCount > 0)
+        @if($imgCount == 1)
+            <div class="post-media-container" style="margin-top: 10px;">
+                <img class="post-media-img"
+                     src="{{ asset('storage/' . $imageList[0]) }}"
+                     alt="Post image"
+                     onclick="openFbPostViewer({{ $report->id }})">
+            </div>
+        @else
+            @php
+                $gridClass = $imgCount == 2 ? 'grid-2' : ($imgCount == 3 ? 'grid-3' : ($imgCount == 4 ? 'grid-4' : 'grid-more'));
+                $displayImages = array_slice($imageList, 0, 4);
+                $remainingCount = $imgCount - 4;
+            @endphp
+            <div class="fb-gallery-grid {{ $gridClass }}">
+                @foreach($displayImages as $idx => $imgFile)
+                    <div class="gallery-item" onclick="openFbPostViewer({{ $report->id }})">
+                        <img src="{{ asset('storage/' . $imgFile) }}" alt="Post image {{ $idx + 1 }}">
+                        @if($idx === 3 && $remainingCount > 0)
+                            <div class="gallery-more-overlay">+{{ $remainingCount }}</div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
     @endif
 
     <!-- VIDEO MEDIA -->
-    @if($report->video_url)
+    @if($report->video)
+        <div class="post-media-container" style="margin-top: 10px;">
+            <video controls src="{{ asset('storage/' . $report->video) }}" style="width:100%; max-height:360px; border-radius:12px; background:#000; display:block;"></video>
+        </div>
+    @elseif($report->video_url)
         @php
             preg_match('/(?:youtube\.com.*(?:\\?|&)v=|youtu\.be\\/)([^&\\n?#]+)/', $report->video_url, $matches);
             $videoId = $matches[1] ?? null;
         @endphp
 
         @if($videoId)
-            <div class="post-media-container">
+            <div class="post-media-container" style="margin-top: 10px;">
                 <iframe width="100%" height="260"
                     src="https://www.youtube.com/embed/{{ $videoId }}"
                     frameborder="0"
@@ -599,21 +685,25 @@
         @endif
     </div>
 
-    <!-- INTERACTION BUTTONS (FACEBOOK LOVE REACT, COMMENT, STARS, SHARE) -->
+    <!-- INTERACTION BUTTONS (LOVE REACT, COMMENT, STARS, UNIQUE VIEWS, SHARE) -->
     <div class="post-actions-bar">
-        <button class="action-button love-btn {{ $isLoved ? 'loved' : '' }}" id="react-btn-{{ $report->id }}" onclick="toggleLove({{ $report->id }})">
+        <button class="action-button love-btn {{ $isLoved ? 'loved' : '' }}" id="react-btn-{{ $report->id }}" onclick="toggleLove({{ $report->id }})" title="Love">
             <i class="{{ $isLoved ? 'fa-solid' : 'fa-regular' }} fa-heart" id="react-icon-{{ $report->id }}"></i>
-            <span id="react-text-{{ $report->id }}">Love</span>
-            (<span id="react-count-{{ $report->id }}">{{ $reactionsCount }}</span>)
+            <span id="react-count-{{ $report->id }}">{{ $reactionsCount }}</span>
         </button>
-        <button class="action-button" onclick="toggleComments({{ $report->id }})">
-            <i class="fa-regular fa-comment"></i> Comment (<span id="comment-count-{{ $report->id }}">{{ $commentsCount }}</span>)
+        <button class="action-button" onclick="toggleComments({{ $report->id }})" title="Comment">
+            <i class="fa-regular fa-comment"></i>
+            <span id="comment-count-{{ $report->id }}">{{ $commentsCount }}</span>
         </button>
-        <button class="action-button star-btn" onclick="openStarModal({{ $report->id }}, '{{ addslashes($authorName) }}', {{ $report->user_id ?? 0 }})">
-            ⭐ Send Stars
+        <button class="action-button star-btn" onclick="openStarModal({{ $report->id }}, '{{ addslashes($authorName) }}', {{ $report->user_id ?? 0 }})" title="Send Stars">
+            ⭐ <span id="star-count-{{ $report->id }}">{{ $report->star_transactions_count ?? 0 }}</span>
         </button>
-        <button class="action-button" onclick="sharePost({{ $report->id }})">
-            <i class="fa-regular fa-paper-plane"></i> Share
+        <div class="action-button view-btn" title="Unique Views" style="cursor:default; color:#64748b;">
+            <i class="fa-regular fa-eye"></i>
+            <span>{{ $report->views_count ?? 0 }}</span>
+        </div>
+        <button class="action-button" onclick="sharePost({{ $report->id }})" title="Share">
+            <i class="fa-regular fa-paper-plane"></i>
         </button>
     </div>
 
@@ -631,9 +721,13 @@
                         $isCommentSelf = auth()->check() && auth()->id() == $commentUserId;
                     @endphp
                     <div class="comment-item" id="comment-item-{{ $c->id }}">
-                        <div class="comment-avatar">
-                            {{ strtoupper(substr($c->user->name ?? 'U', 0, 1)) }}
-                        </div>
+                        @if($c->user && $c->user->profile_photo_url)
+                            <img src="{{ $c->user->profile_photo_url }}" class="comment-avatar" style="object-fit:cover;" alt="{{ $c->user->name }}">
+                        @else
+                            <div class="comment-avatar">
+                                {{ strtoupper(substr($c->user->name ?? 'U', 0, 1)) }}
+                            </div>
+                        @endif
                         <div class="comment-body-wrap">
                             <div class="comment-bubble">
                                 <div class="comment-author-name-wrap" style="display: flex; align-items: center; gap: 6px;">
@@ -664,9 +758,13 @@
                                             $isReplySelf = auth()->check() && auth()->id() == $replyUserId;
                                         @endphp
                                         <div class="comment-item reply-item">
-                                            <div class="comment-avatar">
-                                                {{ strtoupper(substr($reply->user->name ?? 'U', 0, 1)) }}
-                                            </div>
+                                            @if($reply->user && $reply->user->profile_photo_url)
+                                                <img src="{{ $reply->user->profile_photo_url }}" class="comment-avatar" style="object-fit:cover;" alt="{{ $reply->user->name }}">
+                                            @else
+                                                <div class="comment-avatar">
+                                                    {{ strtoupper(substr($reply->user->name ?? 'U', 0, 1)) }}
+                                                </div>
+                                            @endif
                                             <div class="comment-bubble">
                                                 <div class="comment-author-name-wrap" style="display: flex; align-items: center; gap: 6px;">
                                                     <span class="comment-author-name">{{ $reply->user->name ?? 'User' }}</span>

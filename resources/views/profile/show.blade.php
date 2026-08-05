@@ -67,12 +67,34 @@
         /* COVER BANNER SECTION */
         .cover-banner {
             width: 100%;
-            height: 150px;
+            height: 160px;
             background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #e0e7ff 100%);
             position: relative;
-            background-image: url('https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=800&q=80');
             background-size: cover;
             background-position: center;
+        }
+
+        .cover-edit-btn {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(15, 23, 42, 0.75);
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .cover-edit-btn:hover {
+            background: rgba(15, 23, 42, 0.95);
         }
 
         .cover-options-icon {
@@ -114,6 +136,29 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-camera-overlay-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            height: 28px;
+            background: rgba(0, 0, 0, 0.65);
+            color: #ffffff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .avatar-camera-overlay-btn:hover {
+            background: rgba(0, 0, 0, 0.85);
         }
 
         .get-verified-badge {
@@ -413,7 +458,16 @@
         </div>
 
         <!-- COVER BANNER -->
-        <div class="cover-banner">
+        <div class="cover-banner" id="coverBanner" style="background-image: url('{{ $user->cover_photo_url ?: 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=800&q=80' }}');">
+            @if(auth()->check() && auth()->id() == $user->id)
+                <button type="button" class="cover-edit-btn" onclick="document.getElementById('coverPhotoInput').click()" title="Edit Cover Photo">
+                    <i class="fa-solid fa-camera"></i> Edit Cover
+                </button>
+                <form id="coverPhotoForm" method="POST" action="{{ route('user.profile.photos') }}" enctype="multipart/form-data" style="display:none;">
+                    @csrf
+                    <input type="file" id="coverPhotoInput" name="cover_photo" accept="image/*" onchange="uploadProfilePhoto(this, 'cover')">
+                </form>
+            @endif
             <a href="/settings" class="cover-options-icon" title="Settings">
                 <i class="fa-solid fa-ellipsis"></i>
             </a>
@@ -421,8 +475,22 @@
 
         <!-- AVATAR & VERIFIED ROW -->
         <div class="avatar-verified-row">
-            <div class="profile-avatar-circle">
-                {{ strtoupper(substr($user->name ?? 'R', 0, 1)) }}
+            <div class="profile-avatar-circle" id="profileAvatarBox">
+                @if($user->profile_photo_url)
+                    <img src="{{ $user->profile_photo_url }}" id="profileAvatarImg" style="width:100%; height:100%; object-fit:cover;" alt="{{ $user->name }}">
+                @else
+                    <span id="profileAvatarInitial">{{ strtoupper(substr($user->name ?? 'R', 0, 1)) }}</span>
+                @endif
+
+                @if(auth()->check() && auth()->id() == $user->id)
+                    <button type="button" class="avatar-camera-overlay-btn" onclick="document.getElementById('profilePhotoInput').click()" title="Update Profile Photo">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+                    <form id="profilePhotoForm" method="POST" action="{{ route('user.profile.photos') }}" enctype="multipart/form-data" style="display:none;">
+                        @csrf
+                        <input type="file" id="profilePhotoInput" name="profile_photo" accept="image/*" onchange="uploadProfilePhoto(this, 'profile')">
+                    </form>
+                @endif
             </div>
             <a href="#" class="get-verified-badge">
                 <i class="fa-solid fa-certificate"></i> Get Verified
@@ -550,6 +618,54 @@
         </a>
     </div>
 
+    <script>
+    function uploadProfilePhoto(input, type) {
+        if (!input.files || !input.files[0]) return;
+
+        const formData = new FormData();
+        formData.append('_token', '{{ csrf_token() }}');
+        if (type === 'profile') {
+            formData.append('profile_photo', input.files[0]);
+        } else {
+            formData.append('cover_photo', input.files[0]);
+        }
+
+        fetch('{{ route("user.profile.photos") }}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                if (type === 'profile' && data.profile_photo_url) {
+                    const box = document.getElementById('profileAvatarBox');
+                    box.innerHTML = `
+                        <img src="${data.profile_photo_url}" id="profileAvatarImg" style="width:100%; height:100%; object-fit:cover;" alt="Avatar">
+                        <button type="button" class="avatar-camera-overlay-btn" onclick="document.getElementById('profilePhotoInput').click()" title="Update Profile Photo">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                        <form id="profilePhotoForm" method="POST" action="{{ route('user.profile.photos') }}" enctype="multipart/form-data" style="display:none;">
+                            @csrf
+                            <input type="file" id="profilePhotoInput" name="profile_photo" accept="image/*" onchange="uploadProfilePhoto(this, 'profile')">
+                        </form>
+                    `;
+                } else if (type === 'cover' && data.cover_photo_url) {
+                    document.getElementById('coverBanner').style.backgroundImage = `url('${data.cover_photo_url}')`;
+                }
+                alert(data.message || 'ছবি আপলোড সফল হয়েছে!');
+            } else {
+                alert(data.message || 'আপলোডে সমস্যা হয়েছে!');
+            }
+        })
+        .catch(err => {
+            console.error('Upload error:', err);
+            alert('ছবি আপলোড করতে সমস্যা হয়েছে!');
+        });
+    }
+    </script>
 </body>
 
 </html>

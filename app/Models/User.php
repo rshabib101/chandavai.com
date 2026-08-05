@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_photo',
+        'cover_photo',
         'role',
         'points',
         'is_monetized',
@@ -195,5 +197,21 @@ class User extends Authenticatable
             'current' => $this->followers_count,
             'required' => $minFollowers,
         ];
+    }
+
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        if (!empty($this->profile_photo)) {
+            return asset('storage/' . $this->profile_photo);
+        }
+        return null;
+    }
+
+    public function getCoverPhotoUrlAttribute(): ?string
+    {
+        if (!empty($this->cover_photo)) {
+            return asset('storage/' . $this->cover_photo);
+        }
+        return null;
     }
 }

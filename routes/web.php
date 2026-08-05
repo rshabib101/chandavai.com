@@ -34,6 +34,7 @@ Route::get('/all', function () {
 // Authenticated User Routes (Regular Users & Admins)
 Route::middleware('auth')->group(function () {
     Route::get('/user/profile', [ProfileController::class, 'show'])->name('user.profile');
+    Route::post('/user/profile/photos', [ProfileController::class, 'updatePhotos'])->name('user.profile.photos');
     Route::get('/user/analytics', [ProfileController::class, 'analytics'])->name('user.analytics');
     Route::get('/settings', [ProfileController::class, 'settings'])->name('user.settings');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

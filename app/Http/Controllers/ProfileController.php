@@ -103,5 +103,57 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Update user profile photo and/or cover photo.
+     */
+    public function updatePhotos(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['error' => 'Unauthenticated'], 401);
+            }
+            return redirect()->route('login');
+        }
+
+        $request->validate([
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'cover_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+        ]);
+
+        $updated = false;
+
+        if ($request->hasFile('profile_photo') && $request->file('profile_photo')->isValid()) {
+            if ($user->profile_photo && file_exists(public_path('storage/' . $user->profile_photo))) {
+                @unlink(public_path('storage/' . $user->profile_photo));
+            }
+            $user->profile_photo = $request->file('profile_photo')->store('profiles', 'public');
+            $updated = true;
+        }
+
+        if ($request->hasFile('cover_photo') && $request->file('cover_photo')->isValid()) {
+            if ($user->cover_photo && file_exists(public_path('storage/' . $user->cover_photo))) {
+                @unlink(public_path('storage/' . $user->cover_photo));
+            }
+            $user->cover_photo = $request->file('cover_photo')->store('covers', 'public');
+            $updated = true;
+        }
+
+        if ($updated) {
+            $user->save();
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'ছবি সফলভাবে আপডেট করা হয়েছে!',
+                'profile_photo_url' => $user->profile_photo_url,
+                'cover_photo_url' => $user->cover_photo_url,
+            ]);
+        }
+
+        return back()->with('success', 'Photo updated successfully!');
+    }
 }
 

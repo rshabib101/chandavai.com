@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create Post</title>
+<title>Create Post - chanda vai</title>
 
 <!-- Fonts & Icons -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -102,7 +102,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    overflow: hidden;
 }
 
 .fb-user-details {
@@ -113,14 +113,12 @@ body {
 
 .fb-user-name {
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     color: #e4e6eb;
-    line-height: 1.2;
 }
 
 .fb-badges-row {
     display: flex;
-    align-items: center;
     gap: 6px;
 }
 
@@ -129,12 +127,12 @@ body {
     color: #e4e6eb;
     border: none;
     border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 13px;
+    padding: 3px 8px;
+    font-size: 12px;
     font-weight: 600;
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     cursor: pointer;
 }
 
@@ -142,25 +140,21 @@ body {
     background: #4e4f50;
 }
 
-/* Post Input Textarea */
+/* Text Area */
 .fb-input-area {
-    position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
 }
 
 .fb-textarea {
     width: 100%;
-    min-height: 130px;
+    min-height: 110px;
     background: transparent;
     border: none;
-    outline: none;
     color: #e4e6eb;
+    font-size: 16px;
     font-family: inherit;
-    font-size: 18px;
-    line-height: 1.4;
     resize: none;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
+    outline: none;
 }
 
 .fb-textarea::placeholder {
@@ -168,21 +162,76 @@ body {
 }
 
 .fb-textarea.bg-post {
-    min-height: 190px;
+    min-height: 180px;
     border-radius: 12px;
     padding: 24px 16px;
-    font-weight: 700;
     font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-gradient-1 { background: linear-gradient(135deg, #ff416c, #ff4b2b) !important; color: #ffffff !important; }
+.bg-gradient-2 { background: linear-gradient(135deg, #8a2387, #e94057, #f27121) !important; color: #ffffff !important; }
+.bg-gradient-3 { background: linear-gradient(135deg, #11998e, #38ef7d) !important; color: #ffffff !important; }
+.bg-gradient-4 { background: linear-gradient(135deg, #00c6ff, #0072ff) !important; color: #ffffff !important; }
+.bg-gradient-5 { background: linear-gradient(135deg, #f857a6, #ff5858) !important; color: #ffffff !important; }
+
+/* Color Background Palette */
+.fb-bg-picker {
+    display: none;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.fb-bg-picker.active {
+    display: flex;
+}
+
+.fb-bg-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.15s;
+}
+
+.fb-bg-circle.selected, .fb-bg-circle:hover {
+    transform: scale(1.1);
+    border-color: #ffffff;
+}
+
+/* Emoji Drawer */
+.fb-emoji-drawer {
+    display: none;
+    background: #3a3b3c;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 14px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
     text-align: center;
 }
 
-.fb-textarea.bg-gradient-1 { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: #ffffff; }
-.fb-textarea.bg-gradient-2 { background: linear-gradient(135deg, #8a2387, #e94057, #f27121); color: #ffffff; }
-.fb-textarea.bg-gradient-3 { background: linear-gradient(135deg, #11998e, #38ef7d); color: #ffffff; }
-.fb-textarea.bg-gradient-4 { background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; }
-.fb-textarea.bg-gradient-5 { background: linear-gradient(135deg, #f857a6, #ff5858); color: #ffffff; }
+.fb-emoji-drawer.active {
+    display: grid;
+}
 
-/* Text Tools Row (Aa & Emoji) */
+.fb-emoji-item {
+    font-size: 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.15s;
+}
+
+.fb-emoji-item:hover {
+    transform: scale(1.2);
+}
+
+/* Input Tools Row */
 .fb-input-tools {
     display: flex;
     justify-content: space-between;
@@ -191,99 +240,63 @@ body {
 }
 
 .fb-aa-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #ff4757, #2563eb, #10b981);
+    background: linear-gradient(135deg, #8a2387, #e94057);
     color: #ffffff;
-    font-weight: 800;
-    font-size: 15px;
     border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 14px;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
 .fb-emoji-trigger {
     background: none;
     border: none;
-    color: #8a8d91;
+    color: #b0b3b8;
     font-size: 22px;
     cursor: pointer;
-    padding: 4px;
-    border-radius: 50%;
-    transition: color 0.2s;
 }
 
-.fb-emoji-trigger:hover {
-    color: #f7b928;
-}
-
-/* Background Color Picker Palette */
-.fb-bg-picker {
-    display: none;
-    gap: 8px;
-    margin-bottom: 12px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-}
-
-.fb-bg-picker.active {
-    display: flex;
-}
-
-.fb-bg-circle {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.fb-bg-circle.selected {
-    border-color: #ffffff;
-}
-
-/* Emoji Drawer */
-.fb-emoji-drawer {
-    display: none;
-    background: #3a3b3c;
-    border-radius: 8px;
-    padding: 10px;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-}
-
-.fb-emoji-drawer.active {
-    display: flex;
-}
-
-.fb-emoji-item {
-    font-size: 22px;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: background 0.15s;
-}
-
-.fb-emoji-item:hover {
-    background: #4e4f50;
-}
-
-/* Add To Your Post Toolbar Box */
-.fb-add-box {
+/* Media Previews */
+.fb-media-preview-box {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
     border: 1px solid #3e4042;
-    border-radius: 8px;
-    padding: 10px 14px;
+    background: #18191a;
+    padding: 8px;
+}
+
+.fb-remove-preview-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    border: none;
     display: flex;
     align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 10;
+}
+
+/* Add Box */
+.fb-add-box {
+    border: 1px solid #3e4042;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 16px;
-    background: #242526;
 }
 
 .fb-add-label {
@@ -294,109 +307,62 @@ body {
 
 .fb-add-actions {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .fb-icon-btn {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: none;
     background: transparent;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 19px;
+    font-size: 18px;
     cursor: pointer;
     transition: background 0.2s;
 }
 
-.fb-icon-btn:hover {
-    background: #3a3b3c;
-}
-
+.fb-icon-btn:hover { background: #3a3b3c; }
 .icon-photo { color: #45bd62; }
 .icon-tag { color: #1877f2; }
 .icon-feeling { color: #f7b928; }
 .icon-location { color: #f5533d; }
-.icon-video { color: #26a69a; }
-.icon-more { color: #b0b3b8; }
+.icon-video { color: #ff0000; }
 
-/* Image Preview Container */
-.fb-media-preview-box {
-    display: none;
-    position: relative;
-    margin-bottom: 14px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #3e4042;
-}
-
-.fb-media-preview-box img {
-    width: 100%;
-    max-height: 280px;
-    object-fit: cover;
-    display: block;
-}
-
-.fb-remove-preview-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.7);
-    color: #ffffff;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-/* Extra Collapsible Inputs */
 .fb-extra-field {
     display: none;
     margin-bottom: 12px;
 }
 
-.fb-extra-field.active {
-    display: block;
-}
+.fb-extra-field.active { display: block; }
 
-.fb-text-input, .fb-select-input {
+.fb-text-input {
     width: 100%;
+    padding: 10px 12px;
     background: #3a3b3c;
     border: 1px solid #4e4f50;
-    color: #e4e6eb;
     border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 14px;
+    color: #e4e6eb;
+    font-size: 13px;
     outline: none;
-    box-sizing: border-box;
 }
 
-/* Submit Post Button */
 .fb-submit-btn {
     width: 100%;
-    height: 40px;
-    border-radius: 6px;
-    background: #2374e1;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 16px;
+    padding: 10px;
+    border-radius: 8px;
     border: none;
+    background: #1877f2;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 15px;
     cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .fb-submit-btn:disabled {
-    background: #505151;
+    background: #505153;
     color: #8a8d91;
     cursor: not-allowed;
 }
@@ -422,24 +388,25 @@ body {
             <!-- User Header -->
             <div class="fb-user-row">
                 <div class="fb-user-avatar">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'R', 0, 1)) }}
+                    @if(auth()->user() && auth()->user()->profile_photo_url)
+                        <img src="{{ auth()->user()->profile_photo_url }}" style="width:100%; height:100%; object-fit:cover;" alt="Avatar">
+                    @else
+                        {{ strtoupper(substr(auth()->user()->name ?? 'R', 0, 1)) }}
+                    @endif
                 </div>
                 <div class="fb-user-details">
-                    <div class="fb-user-name">{{ auth()->user()->name ?? 'Rs Hasan Talukder' }}</div>
+                    <div class="fb-user-name">{{ auth()->user()->name ?? 'User' }}</div>
                     <div class="fb-badges-row">
                         <button type="button" class="fb-badge-btn">
                             <i class="fa-solid fa-earth-americas"></i> Public <i class="fa-solid fa-caret-down"></i>
-                        </button>
-                        <button type="button" class="fb-badge-btn" onclick="toggleExtraField('category')">
-                            <i class="fa-solid fa-plus"></i> AI label off <i class="fa-solid fa-caret-down"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Post Text Area -->
+            <!-- Post Text Area (No required tag) -->
             <div class="fb-input-area">
-                <textarea id="fbPostDescription" name="description" class="fb-textarea" placeholder="What's on your mind, {{ strtok(auth()->user()->name ?? 'Rs', ' ') }}?" oninput="checkFbPostValidity()" required></textarea>
+                <textarea id="fbPostDescription" name="description" class="fb-textarea" placeholder="What's on your mind, {{ strtok(auth()->user()->name ?? 'Rs', ' ') }}?" oninput="checkFbPostValidity()"></textarea>
             </div>
 
             <!-- Color Background Palette -->
@@ -477,15 +444,26 @@ body {
             </div>
 
             <!-- Image Preview Container -->
-            <div id="fbMediaPreviewBox" class="fb-media-preview-box">
-                <img id="fbMediaPreviewImg" src="" alt="Preview">
+            <div id="fbMediaPreviewBox" class="fb-media-preview-box" style="display:none;">
+                <div id="fbImagePreviewGrid" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;"></div>
                 <button type="button" class="fb-remove-preview-btn" onclick="removeFbImagePreview()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <!-- Hidden Image File Input -->
-            <input type="file" id="fbImageInput" name="image" accept="image/*" style="display:none;" onchange="handleFbImageSelect(this)">
+            <!-- Video Preview Container -->
+            <div id="fbVideoPreviewBox" class="fb-media-preview-box" style="display:none; margin-top:8px;">
+                <video id="fbVideoPreviewPlayer" controls style="width:100%; max-height:220px; border-radius:10px; background:#000; display:block;"></video>
+                <button type="button" class="fb-remove-preview-btn" onclick="removeFbVideoPreview()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Multiple Image File Input -->
+            <input type="file" id="fbImageInput" name="images[]" multiple accept="image/*" style="display:none;" onchange="handleFbImageSelect(this)">
+
+            <!-- Direct Video File Input -->
+            <input type="file" id="fbVideoFileInput" name="video" accept="video/*" style="display:none;" onchange="handleFbVideoFileSelect(this)">
 
             <!-- Optional Extra Fields -->
             <div id="fbFieldCategory" class="fb-extra-field">
@@ -493,7 +471,7 @@ body {
             </div>
 
             <div id="fbFieldVideo" class="fb-extra-field">
-                <input type="text" name="video_url" class="fb-text-input" placeholder="YouTube Video URL (optional)">
+                <input type="text" name="video_url" class="fb-text-input" placeholder="YouTube Video URL (optional)" oninput="checkFbPostValidity()">
             </div>
 
             <div id="fbFieldLocation" class="fb-extra-field">
@@ -504,10 +482,13 @@ body {
             <div class="fb-add-box">
                 <span class="fb-add-label">Add to your post</span>
                 <div class="fb-add-actions">
-                    <button type="button" class="fb-icon-btn icon-photo" onclick="triggerFbImageUpload()" title="Photo/video">
+                    <button type="button" class="fb-icon-btn icon-photo" onclick="triggerFbImageUpload()" title="Photos">
                         <i class="fa-solid fa-images"></i>
                     </button>
-                    <button type="button" class="fb-icon-btn icon-tag" onclick="toggleExtraField('category')" title="Tag people">
+                    <button type="button" class="fb-icon-btn icon-video" onclick="triggerFbVideoFileUpload()" title="Upload Video File">
+                        <i class="fa-solid fa-video"></i>
+                    </button>
+                    <button type="button" class="fb-icon-btn icon-tag" onclick="toggleExtraField('category')" title="Tag Category">
                         <i class="fa-solid fa-user-tag"></i>
                     </button>
                     <button type="button" class="fb-icon-btn icon-feeling" onclick="toggleFbEmojiDrawer()" title="Feeling/activity">
@@ -516,17 +497,14 @@ body {
                     <button type="button" class="fb-icon-btn icon-location" onclick="toggleExtraField('location')" title="Check in / Location">
                         <i class="fa-solid fa-location-dot"></i>
                     </button>
-                    <button type="button" class="fb-icon-btn icon-video" onclick="toggleExtraField('video')" title="Video Link">
-                        <i class="fa-solid fa-video"></i>
-                    </button>
-                    <button type="button" class="fb-icon-btn icon-more" onclick="toggleExtraField('category')" title="More">
-                        <i class="fa-solid fa-ellipsis"></i>
+                    <button type="button" class="fb-icon-btn icon-video" onclick="toggleExtraField('video')" title="YouTube Link">
+                        <i class="fa-brands fa-youtube"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Submit / Next Button -->
-            <button type="submit" id="fbSubmitBtn" class="fb-submit-btn" disabled>Next</button>
+            <!-- Submit Button -->
+            <button type="submit" id="fbSubmitBtn" class="fb-submit-btn" disabled>Post</button>
         </div>
     </form>
 </div>
@@ -534,9 +512,14 @@ body {
 <script>
 function checkFbPostValidity() {
     const text = document.getElementById('fbPostDescription').value.trim();
-    const hasImg = document.getElementById('fbImageInput').files.length > 0;
+    const hasImg = document.getElementById('fbImageInput') && document.getElementById('fbImageInput').files.length > 0;
+    const videoFileInput = document.getElementById('fbVideoFileInput');
+    const hasVideoFile = videoFileInput && videoFileInput.files.length > 0;
+    const videoUrlInput = document.querySelector('input[name="video_url"]');
+    const hasVideoUrl = videoUrlInput && videoUrlInput.value.trim().length > 0;
+
     const submitBtn = document.getElementById('fbSubmitBtn');
-    if (text.length > 0 || hasImg) {
+    if (text.length > 0 || hasImg || hasVideoFile || hasVideoUrl) {
         submitBtn.removeAttribute('disabled');
     } else {
         submitBtn.setAttribute('disabled', 'true');
@@ -572,22 +555,51 @@ function triggerFbImageUpload() {
     document.getElementById('fbImageInput').click();
 }
 
+function triggerFbVideoFileUpload() {
+    document.getElementById('fbVideoFileInput').click();
+}
+
 function handleFbImageSelect(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('fbMediaPreviewImg').src = e.target.result;
-            document.getElementById('fbMediaPreviewBox').style.display = 'block';
-            checkFbPostValidity();
-        }
-        reader.readAsDataURL(input.files[0]);
+    const grid = document.getElementById('fbImagePreviewGrid');
+    grid.innerHTML = '';
+    if (input.files && input.files.length > 0) {
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.cssText = 'width:60px; height:60px; object-fit:cover; border-radius:8px; border:1px solid #3e4042;';
+                grid.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        });
+        document.getElementById('fbMediaPreviewBox').style.display = 'block';
+        checkFbPostValidity();
     }
 }
 
 function removeFbImagePreview() {
     document.getElementById('fbImageInput').value = '';
+    document.getElementById('fbImagePreviewGrid').innerHTML = '';
     document.getElementById('fbMediaPreviewBox').style.display = 'none';
-    document.getElementById('fbMediaPreviewImg').src = '';
+    checkFbPostValidity();
+}
+
+function handleFbVideoFileSelect(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const url = URL.createObjectURL(file);
+        const player = document.getElementById('fbVideoPreviewPlayer');
+        player.src = url;
+        document.getElementById('fbVideoPreviewBox').style.display = 'block';
+        checkFbPostValidity();
+    }
+}
+
+function removeFbVideoPreview() {
+    document.getElementById('fbVideoFileInput').value = '';
+    document.getElementById('fbVideoPreviewPlayer').src = '';
+    document.getElementById('fbVideoPreviewBox').style.display = 'none';
     checkFbPostValidity();
 }
 

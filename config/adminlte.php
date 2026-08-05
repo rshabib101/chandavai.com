@@ -315,108 +315,42 @@ return [
             'type' => 'sidebar-menu-search',
             'text' => 'search',
         ],
-        [
-            'text' => 'blog',
-            'url' => 'admin/blog',
-            'can' => 'manage-blog',
-        ],
-        [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
-        ],
 
         [
-            'text' => 'Portfolio',
-            'url'  => 'admin/portfolio',
-            'icon' => 'fas fa-briefcase',
+            'text' => 'Dashboard',
+            'url'  => 'admin/dashboard',
+            'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
 
         [
             'text' => 'Reports',
             'url'  => 'admin/reports',
-            'icon' => 'fas fa-flag',
+            'icon' => 'fas fa-fw fa-flag',
+        ],
+
+        [
+            'text' => 'Users Management',
+            'url'  => 'admin/users',
+            'icon' => 'fas fa-fw fa-user-shield',
         ],
 
         [
             'text' => 'Survey Applications',
             'url'  => 'admin/surveys',
-            'icon' => 'fas fa-users',
+            'icon' => 'fas fa-fw fa-clipboard-list',
         ],
 
         [
-            'text' => 'Users',
-            'url'  => 'admin/users',
-            'icon' => 'fas fa-users',
+            'text' => 'Portfolio',
+            'url'  => 'admin/portfolio',
+            'icon' => 'fas fa-fw fa-briefcase',
         ],
 
-
-        ['header' => 'account_settings'],
+        ['header' => 'ADMIN SETTINGS'],
         [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
-        [
-            'text' => 'multilevel',
-            'icon' => 'fas fa-fw fa-share',
-            'submenu' => [
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                    'submenu' => [
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                        ],
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                            'submenu' => [
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
-            ],
-        ],
-        ['header' => 'labels'],
-        [
-            'text' => 'important',
-            'icon_color' => 'red',
-            'url' => '#',
-        ],
-        [
-            'text' => 'warning',
-            'icon_color' => 'yellow',
-            'url' => '#',
-        ],
-        [
-            'text' => 'information',
-            'icon_color' => 'cyan',
-            'url' => '#',
+            'text' => 'Settings',
+            'url'  => 'admin/settings',
+            'icon' => 'fas fa-fw fa-cog',
         ],
     ],
 

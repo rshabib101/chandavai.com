@@ -438,17 +438,43 @@
         <!-- STATS CARD -->
         <div class="stats-card">
             <div class="stat-col">
-                <div class="stat-number">{{ count($reports) > 0 ? count($reports) : 1 }}</div>
+                <div class="stat-number">{{ $user->reports ? $user->reports->count() : count($reports) }}</div>
                 <div class="stat-label">Posts</div>
             </div>
             <div class="stat-col">
-                <div class="stat-number">501</div>
+                <div class="stat-number">{{ $user->followers_count }}</div>
                 <div class="stat-label">Followers</div>
             </div>
             <div class="stat-col">
-                <div class="stat-number">1</div>
+                <div class="stat-number">{{ $user->following_count }}</div>
                 <div class="stat-label">Following</div>
             </div>
+            <div class="stat-col">
+                <div class="stat-number" style="color: #d97706;">🪙 {{ $user->points }}</div>
+                <div class="stat-label">Points</div>
+            </div>
+        </div>
+
+        @php
+            $minFollowersReq = (int) \App\Models\Setting::get('min_followers_for_income', 20);
+            $isMonetized = $user->followers_count >= $minFollowersReq;
+        @endphp
+
+        <!-- MONETIZATION INCOME STATUS BANNER -->
+        <div style="margin: 0 20px 20px 20px; padding: 12px 16px; border-radius: 14px; background: {{ $isMonetized ? '#f0fdf4' : '#fffbeb' }}; border: 1px solid {{ $isMonetized ? '#bbf7d0' : '#fef3c7' }};">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="font-weight: 700; font-size: 14px; color: {{ $isMonetized ? '#166534' : '#92400e' }};">
+                    💰 {{ $isMonetized ? '✅ Income Monetization Active' : '🔒 Income Locked' }}
+                </span>
+                <span style="font-size: 12px; font-weight: 700; color: #475569;">Req: {{ $minFollowersReq }} Followers</span>
+            </div>
+            <p style="font-size: 12px; color: {{ $isMonetized ? '#15803d' : '#b45309' }}; margin: 0; line-height: 1.4;">
+                @if($isMonetized)
+                    অভিনন্দন! আপনার {{ $user->followers_count }} জন ফলোয়ার রয়েছে। আপনার ইনকাম ফিচার চালু রয়েছে।
+                @else
+                    ইনকাম শুরু করতে অন্তত <strong>{{ $minFollowersReq }} জন ফলোয়ার</strong> প্রয়োজন। আপনার আছে <strong>{{ $user->followers_count }}</strong> জন (আরও <strong>{{ max(0, $minFollowersReq - $user->followers_count) }}</strong> জন ফলোয়ার প্রয়োজন)।
+                @endif
+            </p>
         </div>
 
         <!-- ACTION BUTTONS ROW -->

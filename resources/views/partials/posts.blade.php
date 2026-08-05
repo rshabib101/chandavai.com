@@ -79,6 +79,16 @@
         transform: scale(1.04);
     }
 
+    .follow-badge-btn.following {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .follow-badge-btn.following:hover {
+        background: #cbd5e1;
+        color: #0f172a;
+    }
+
     .author-sub {
         font-size: 12px;
         color: #64748b;
@@ -187,9 +197,9 @@
         font-weight: 600;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         cursor: pointer;
-        padding: 6px 12px;
+        padding: 6px 10px;
         border-radius: 8px;
         transition: all 0.2s ease;
     }
@@ -207,7 +217,16 @@
         color: #e11d48;
     }
 
-    /* COMMENTS SECTION */
+    .action-button.star-btn {
+        color: #d97706;
+    }
+
+    .action-button.star-btn:hover {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    /* COMMENTS SECTION & NESTED REPLIES */
     .comments-drawer {
         margin-top: 12px;
         padding-top: 12px;
@@ -217,7 +236,7 @@
     .comments-list {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
         margin-bottom: 12px;
     }
 
@@ -228,8 +247,8 @@
     }
 
     .comment-avatar {
-        width: 32px;
-        height: 32px;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
         background: #0284c7;
         color: #ffffff;
@@ -241,11 +260,16 @@
         flex-shrink: 0;
     }
 
+    .comment-body-wrap {
+        flex: 1;
+    }
+
     .comment-bubble {
         background: #f1f5f9;
         border-radius: 14px;
         padding: 8px 12px;
-        flex: 1;
+        display: inline-block;
+        max-width: 100%;
     }
 
     .comment-author-name {
@@ -258,7 +282,56 @@
         font-size: 13px;
         color: #334155;
         margin-top: 2px;
-        line-height: 1.3;
+        line-height: 1.35;
+    }
+
+    .comment-meta-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 3px;
+        margin-left: 6px;
+    }
+
+    .comment-time {
+        font-size: 11px;
+        color: #94a3b8;
+    }
+
+    .comment-reply-btn {
+        background: none;
+        border: none;
+        color: #2563eb;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .comment-reply-btn:hover {
+        text-decoration: underline;
+    }
+
+    /* NESTED REPLIES LIST */
+    .replies-list {
+        margin-top: 8px;
+        padding-left: 12px;
+        border-left: 2px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .reply-item .comment-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+        background: #3b82f6;
+    }
+
+    .reply-item .comment-bubble {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
     }
 
     .comment-input-row {
@@ -296,6 +369,132 @@
         font-size: 13px;
         flex-shrink: 0;
     }
+
+    /* STAR SENDER MODAL STYLES */
+    .star-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 10001;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .star-modal-overlay.active {
+        display: flex;
+    }
+
+    .star-modal-card {
+        background: #ffffff;
+        color: #0f172a;
+        width: 100%;
+        max-width: 420px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        overflow: hidden;
+        animation: starPop 0.2s ease-out;
+    }
+
+    @keyframes starPop {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .star-modal-header {
+        position: relative;
+        padding: 14px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .star-modal-header h4 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .star-close-btn {
+        background: #f1f5f9;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        color: #64748b;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    .star-modal-body {
+        padding: 16px;
+    }
+
+    .star-balance-text {
+        font-size: 13px;
+        color: #475569;
+        margin-bottom: 12px;
+        background: #fffbeb;
+        border: 1px solid #fef3c7;
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+
+    .star-preset-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .star-preset-btn {
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 10px 4px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #d97706;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .star-preset-btn:hover, .star-preset-btn.selected {
+        background: #fef3c7;
+        border-color: #d97706;
+        transform: scale(1.03);
+    }
+
+    .star-input-field {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 13px;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .confirm-stars-btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        transition: transform 0.2s;
+    }
+
+    .confirm-stars-btn:hover {
+        transform: translateY(-1px);
+    }
 </style>
 
 @foreach($reports as $report)
@@ -308,6 +507,12 @@
     $commentsCount = $report->comments ? $report->comments->count() : 0;
     $authorName = $report->user->name ?? 'MD Abdullah Rana';
     $authorHandle = '@' . Str::slug($authorName, '_');
+    $authorUserId = $report->user_id ?: 1;
+    $isFollowingAuthor = false;
+    if (auth()->check()) {
+        $isFollowingAuthor = auth()->user()->isFollowing($authorUserId);
+    }
+    $isSelf = auth()->check() && auth()->id() == $authorUserId;
 @endphp
 <div class="post-card" id="post-card-{{ $report->id }}">
 
@@ -318,11 +523,15 @@
                 {{ strtoupper(substr($authorName, 0, 1)) }}
             </div>
             <div class="author-meta">
-                <div class="author-name-wrap">
+                <div class="author-name-wrap" style="display: flex; align-items: center; gap: 8px;">
                     <span class="author-name">
                         {{ $authorName }}
                     </span>
-                    <button type="button" class="follow-badge-btn">Follow</button>
+                    @if(!$isSelf)
+                        <button type="button" class="follow-badge-btn {{ $isFollowingAuthor ? 'following' : '' }}" onclick="toggleFollowUser({{ $authorUserId }}, this); event.preventDefault(); event.stopPropagation();">
+                            {{ $isFollowingAuthor ? '✓ Following' : '+ Follow' }}
+                        </button>
+                    @endif
                 </div>
                 <div class="author-sub">
                     {{ $authorHandle }} · {{ $report->created_at ? $report->created_at->diffForHumans() : '25 min ago' }}
@@ -336,7 +545,7 @@
 
     <!-- TITLE -->
     @if($report->title)
-        <div class="post-content-title">
+        <div class="post-content-title" onclick="openFbPostViewer({{ $report->id }})" style="cursor:pointer;">
             {{ $report->title }}
         </div>
     @endif
@@ -357,7 +566,7 @@
             <img class="post-media-img"
                  src="{{ asset('storage/'.$report->image) }}"
                  alt="Report image"
-                 onclick="openImage(this.src)">
+                 onclick="openFbPostViewer({{ $report->id }})">
         </div>
     @endif
 
@@ -390,7 +599,7 @@
         @endif
     </div>
 
-    <!-- INTERACTION BUTTONS (FACEBOOK LOVE REACT, COMMENT, SHARE) -->
+    <!-- INTERACTION BUTTONS (FACEBOOK LOVE REACT, COMMENT, STARS, SHARE) -->
     <div class="post-actions-bar">
         <button class="action-button love-btn {{ $isLoved ? 'loved' : '' }}" id="react-btn-{{ $report->id }}" onclick="toggleLove({{ $report->id }})">
             <i class="{{ $isLoved ? 'fa-solid' : 'fa-regular' }} fa-heart" id="react-icon-{{ $report->id }}"></i>
@@ -400,23 +609,89 @@
         <button class="action-button" onclick="toggleComments({{ $report->id }})">
             <i class="fa-regular fa-comment"></i> Comment (<span id="comment-count-{{ $report->id }}">{{ $commentsCount }}</span>)
         </button>
+        <button class="action-button star-btn" onclick="openStarModal({{ $report->id }}, '{{ addslashes($authorName) }}', {{ $report->user_id ?? 0 }})">
+            ⭐ Send Stars
+        </button>
         <button class="action-button" onclick="sharePost({{ $report->id }})">
             <i class="fa-regular fa-paper-plane"></i> Share
         </button>
     </div>
 
-    <!-- DYNAMIC COMMENTS DRAWER -->
+    <!-- DYNAMIC COMMENTS DRAWER & NESTED REPLIES -->
     <div class="comments-drawer" id="comments-drawer-{{ $report->id }}" style="display: none;">
         <div class="comments-list" id="comments-list-{{ $report->id }}">
             @if($report->comments && $report->comments->count() > 0)
                 @foreach($report->comments as $c)
-                    <div class="comment-item">
+                    @php
+                        $commentUserId = $c->user_id ?: 1;
+                        $isCommentAuthorFollowing = false;
+                        if (auth()->check()) {
+                            $isCommentAuthorFollowing = auth()->user()->isFollowing($commentUserId);
+                        }
+                        $isCommentSelf = auth()->check() && auth()->id() == $commentUserId;
+                    @endphp
+                    <div class="comment-item" id="comment-item-{{ $c->id }}">
                         <div class="comment-avatar">
                             {{ strtoupper(substr($c->user->name ?? 'U', 0, 1)) }}
                         </div>
-                        <div class="comment-bubble">
-                            <div class="comment-author-name">{{ $c->user->name ?? 'User' }}</div>
-                            <div class="comment-text">{{ $c->comment }}</div>
+                        <div class="comment-body-wrap">
+                            <div class="comment-bubble">
+                                <div class="comment-author-name-wrap" style="display: flex; align-items: center; gap: 6px;">
+                                    <span class="comment-author-name">{{ $c->user->name ?? 'User' }}</span>
+                                    @if(!$isCommentSelf)
+                                        <button type="button" class="follow-badge-btn {{ $isCommentAuthorFollowing ? 'following' : '' }}" style="font-size:10px; padding:1px 6px;" onclick="toggleFollowUser({{ $commentUserId }}, this); event.preventDefault(); event.stopPropagation();">
+                                            {{ $isCommentAuthorFollowing ? '✓ Following' : '+ Follow' }}
+                                        </button>
+                                    @endif
+                                </div>
+                                <div class="comment-text">{{ $c->comment }}</div>
+                            </div>
+                            <div class="comment-meta-actions">
+                                <span class="comment-time">{{ $c->created_at ? $c->created_at->diffForHumans() : 'Just now' }}</span>
+                                <button type="button" class="comment-reply-btn" onclick="toggleReplyInput({{ $c->id }})">Reply</button>
+                            </div>
+
+                            <!-- NESTED REPLIES LIST -->
+                            <div class="replies-list" id="replies-list-{{ $c->id }}">
+                                @if($c->replies && $c->replies->count() > 0)
+                                    @foreach($c->replies as $reply)
+                                        @php
+                                            $replyUserId = $reply->user_id ?: 1;
+                                            $isReplyAuthorFollowing = false;
+                                            if (auth()->check()) {
+                                                $isReplyAuthorFollowing = auth()->user()->isFollowing($replyUserId);
+                                            }
+                                            $isReplySelf = auth()->check() && auth()->id() == $replyUserId;
+                                        @endphp
+                                        <div class="comment-item reply-item">
+                                            <div class="comment-avatar">
+                                                {{ strtoupper(substr($reply->user->name ?? 'U', 0, 1)) }}
+                                            </div>
+                                            <div class="comment-bubble">
+                                                <div class="comment-author-name-wrap" style="display: flex; align-items: center; gap: 6px;">
+                                                    <span class="comment-author-name">{{ $reply->user->name ?? 'User' }}</span>
+                                                    @if(!$isReplySelf)
+                                                        <button type="button" class="follow-badge-btn {{ $isReplyAuthorFollowing ? 'following' : '' }}" style="font-size:10px; padding:1px 6px;" onclick="toggleFollowUser({{ $replyUserId }}, this); event.preventDefault(); event.stopPropagation();">
+                                                            {{ $isReplyAuthorFollowing ? '✓ Following' : '+ Follow' }}
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                                <div class="comment-text">{{ $reply->comment }}</div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+
+                            <!-- REPLY INPUT ROW -->
+                            <div class="reply-input-row" id="reply-input-row-{{ $c->id }}" style="display: none; margin-top: 6px;">
+                                <div class="comment-input-row">
+                                    <input type="text" class="comment-field" id="reply-input-{{ $c->id }}" placeholder="Write a reply..." onkeydown="if(event.key==='Enter') submitComment({{ $report->id }}, {{ $c->id }})">
+                                    <button class="comment-submit-btn" onclick="submitComment({{ $report->id }}, {{ $c->id }})" title="Post reply">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -431,11 +706,126 @@
     </div>
 
 </div>
+
+@if($loop->iteration % 3 == 0 && \App\Models\Setting::get('ad_script_feed'))
+    <div class="in-feed-ad-wrapper" style="background:#ffffff; border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04); text-align:center;">
+        <span style="font-size:10px; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Sponsored Ad</span>
+        {!! \App\Models\Setting::get('ad_script_feed') !!}
+    </div>
+@endif
 @endforeach
 
+<!-- STAR SENDER MODAL -->
+<div id="starSenderModal" class="star-modal-overlay" onclick="if(event.target===this) closeStarModal()">
+    <div class="star-modal-card">
+        <div class="star-modal-header">
+            <h4>⭐ Send Stars to <span id="starAuthorName">Author</span></h4>
+            <button type="button" class="star-close-btn" onclick="closeStarModal()">&times;</button>
+        </div>
+        <div class="star-modal-body">
+            <div class="star-balance-text">Your Balance: 🪙 <strong id="starModalUserPoints">{{ auth()->user()->points ?? 0 }}</strong> Points</div>
+            <div class="star-preset-grid">
+                <button type="button" class="star-preset-btn" onclick="selectStarAmount(10)">⭐ 10</button>
+                <button type="button" class="star-preset-btn" onclick="selectStarAmount(50)">⭐ 50</button>
+                <button type="button" class="star-preset-btn" onclick="selectStarAmount(100)">⭐ 100</button>
+                <button type="button" class="star-preset-btn" onclick="selectStarAmount(500)">⭐ 500</button>
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="font-size:12px; font-weight:600; color:#475569;">Custom Star Count:</label>
+                <input type="number" id="customStarInput" class="star-input-field" value="10" min="1" placeholder="Enter stars count">
+            </div>
+            <div style="margin-bottom:14px;">
+                <input type="text" id="starMessageInput" class="star-input-field" placeholder="Add an appreciation message (optional)">
+            </div>
+            <button type="button" id="confirmSendStarsBtn" class="confirm-stars-btn" onclick="confirmSendStars()">
+                ⭐ Send Stars Now
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Facebook Love React Toggle with AJAX DB persistence
+    const IS_AUTH = @json(auth()->check());
+
+    function requireAuth() {
+        if (!IS_AUTH) {
+            window.location.href = '/register';
+            return false;
+        }
+        return true;
+    }
+
+    let activeStarReportId = null;
+
+    function openStarModal(reportId, authorName, authorId) {
+        if (!requireAuth()) return;
+        activeStarReportId = reportId;
+        document.getElementById('starAuthorName').innerText = authorName;
+        document.getElementById('starSenderModal').classList.add('active');
+    }
+
+    function closeStarModal() {
+        document.getElementById('starSenderModal').classList.remove('active');
+    }
+
+    function selectStarAmount(amt) {
+        document.getElementById('customStarInput').value = amt;
+        document.querySelectorAll('.star-preset-btn').forEach(b => b.classList.remove('selected'));
+        event.target.classList.add('selected');
+    }
+
+    function confirmSendStars() {
+        if (!requireAuth() || !activeStarReportId) return;
+
+        const stars = parseInt(document.getElementById('customStarInput').value) || 10;
+        const msg = document.getElementById('starMessageInput').value.trim();
+        const btn = document.getElementById('confirmSendStarsBtn');
+
+        btn.setAttribute('disabled', 'true');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending Stars...';
+
+        fetch('/report/' + activeStarReportId + '/stars', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ stars: stars, message: msg })
+        })
+        .then(res => {
+            if (res.status === 401) {
+                window.location.href = '/register';
+                return;
+            }
+            return res.json();
+        })
+        .then(data => {
+            btn.removeAttribute('disabled');
+            btn.innerHTML = '⭐ Send Stars Now';
+            if (data.status === 'success') {
+                alert(data.message);
+                closeStarModal();
+                if (document.getElementById('starModalUserPoints')) {
+                    document.getElementById('starModalUserPoints').innerText = data.sender_points;
+                }
+                if (typeof updateDailyChallengeWidget === 'function') {
+                    updateDailyChallengeWidget();
+                }
+            } else {
+                alert(data.message || 'Error sending stars');
+            }
+        })
+        .catch(err => {
+            btn.removeAttribute('disabled');
+            btn.innerHTML = '⭐ Send Stars Now';
+            alert('Error processing transaction');
+        });
+    }
+
+    // Facebook Love React Toggle
     function toggleLove(reportId) {
+        if (!requireAuth()) return;
+
         const btn = document.getElementById('react-btn-' + reportId);
         const icon = document.getElementById('react-icon-' + reportId);
         const countSpan = document.getElementById('react-count-' + reportId);
@@ -449,7 +839,7 @@
         })
         .then(res => {
             if (res.status === 401) {
-                window.location.href = '/login';
+                window.location.href = '/register';
                 return;
             }
             return res.json();
@@ -464,14 +854,17 @@
                 icon.className = 'fa-regular fa-heart';
             }
             countSpan.innerText = data.reactions_count;
+            if (typeof updateDailyChallengeWidget === 'function') {
+                updateDailyChallengeWidget();
+            }
         })
         .catch(err => {
             console.error('Reaction error:', err);
         });
     }
 
-    // Toggle Comments Drawer
     function toggleComments(reportId) {
+        if (!requireAuth()) return;
         const drawer = document.getElementById('comments-drawer-' + reportId);
         if (drawer.style.display === 'none' || !drawer.style.display) {
             drawer.style.display = 'block';
@@ -480,9 +873,28 @@
         }
     }
 
-    // Submit Dynamic Comment with AJAX DB persistence
-    function submitComment(reportId) {
-        const input = document.getElementById('comment-input-' + reportId);
+    function toggleReplyInput(commentId) {
+        if (!requireAuth()) return;
+        const row = document.getElementById('reply-input-row-' + commentId);
+        if (row.style.display === 'none' || !row.style.display) {
+            row.style.display = 'block';
+            document.getElementById('reply-input-' + commentId).focus();
+        } else {
+            row.style.display = 'none';
+        }
+    }
+
+    // Submit Comment or Reply
+    function submitComment(reportId, parentId = null) {
+        if (!requireAuth()) return;
+
+        let input;
+        if (parentId) {
+            input = document.getElementById('reply-input-' + parentId);
+        } else {
+            input = document.getElementById('comment-input-' + reportId);
+        }
+
         const text = input.value.trim();
         if (!text) return;
 
@@ -492,11 +904,11 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({ comment: text })
+            body: JSON.stringify({ comment: text, parent_id: parentId })
         })
         .then(res => {
             if (res.status === 401) {
-                window.location.href = '/login';
+                window.location.href = '/register';
                 return;
             }
             return res.json();
@@ -504,22 +916,56 @@
         .then(data => {
             if (!data || data.status !== 'success') return;
 
-            const commentsList = document.getElementById('comments-list-' + reportId);
             const countSpan = document.getElementById('comment-count-' + reportId);
+            if (countSpan) countSpan.innerText = data.comments_count;
 
-            countSpan.innerText = data.comments_count;
+            if (parentId) {
+                const repliesList = document.getElementById('replies-list-' + parentId);
+                const replyItem = document.createElement('div');
+                replyItem.className = 'comment-item reply-item';
+                replyItem.innerHTML = `
+                    <div class="comment-avatar">${escapeHtml(data.comment.user_initial)}</div>
+                    <div class="comment-bubble">
+                        <div class="comment-author-name">${escapeHtml(data.comment.user_name)}</div>
+                        <div class="comment-text">${escapeHtml(data.comment.text)}</div>
+                    </div>
+                `;
+                repliesList.appendChild(replyItem);
+                document.getElementById('reply-input-row-' + parentId).style.display = 'none';
+            } else {
+                const commentsList = document.getElementById('comments-list-' + reportId);
+                const newComment = document.createElement('div');
+                newComment.className = 'comment-item';
+                newComment.id = 'comment-item-' + data.comment.id;
+                newComment.innerHTML = `
+                    <div class="comment-avatar">${escapeHtml(data.comment.user_initial)}</div>
+                    <div class="comment-body-wrap">
+                        <div class="comment-bubble">
+                            <div class="comment-author-name">${escapeHtml(data.comment.user_name)}</div>
+                            <div class="comment-text">${escapeHtml(data.comment.text)}</div>
+                        </div>
+                        <div class="comment-meta-actions">
+                            <span class="comment-time">${data.comment.time_ago}</span>
+                            <button type="button" class="comment-reply-btn" onclick="toggleReplyInput(${data.comment.id})">Reply</button>
+                        </div>
+                        <div class="replies-list" id="replies-list-${data.comment.id}"></div>
+                        <div class="reply-input-row" id="reply-input-row-${data.comment.id}" style="display: none; margin-top: 6px;">
+                            <div class="comment-input-row">
+                                <input type="text" class="comment-field" id="reply-input-${data.comment.id}" placeholder="Write a reply..." onkeydown="if(event.key==='Enter') submitComment(${reportId}, ${data.comment.id})">
+                                <button class="comment-submit-btn" onclick="submitComment(${reportId}, ${data.comment.id})" title="Post reply">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                commentsList.appendChild(newComment);
+            }
 
-            const newComment = document.createElement('div');
-            newComment.className = 'comment-item';
-            newComment.innerHTML = `
-                <div class="comment-avatar">${escapeHtml(data.comment.user_name.charAt(0).toUpperCase())}</div>
-                <div class="comment-bubble">
-                    <div class="comment-author-name">${escapeHtml(data.comment.user_name)}</div>
-                    <div class="comment-text">${escapeHtml(data.comment.text)}</div>
-                </div>
-            `;
-            commentsList.appendChild(newComment);
             input.value = '';
+            if (typeof updateDailyChallengeWidget === 'function') {
+                updateDailyChallengeWidget();
+            }
         })
         .catch(err => {
             console.error('Comment error:', err);
@@ -530,8 +976,46 @@
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
+    // Toggle Follow User AJAX
+    function toggleFollowUser(targetUserId, btn) {
+        if (!requireAuth()) return;
+
+        fetch('/user/' + targetUserId + '/follow', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(res => {
+            if (res.status === 401) {
+                window.location.href = '/register';
+                return;
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!data || data.status !== 'success') return;
+            document.querySelectorAll(`button[onclick*="toggleFollowUser(${targetUserId},"]`).forEach(b => {
+                if (data.is_following) {
+                    b.classList.add('following');
+                    b.innerText = '✓ Following';
+                } else {
+                    b.classList.remove('following');
+                    b.innerText = '+ Follow';
+                }
+            });
+            if (typeof updateDailyChallengeWidget === 'function') {
+                updateDailyChallengeWidget();
+            }
+        })
+        .catch(err => console.error('Follow error:', err));
+    }
+
     // Facebook Share Dialog / Link Copy
     function sharePost(reportId) {
+        if (!requireAuth()) return;
+
         const shareUrl = window.location.origin + '/#post-' + reportId;
         if (navigator.share) {
             navigator.share({

@@ -185,6 +185,7 @@
 
         <form method="POST" action="{{ route('register') }}">
             @csrf
+            <input type="hidden" name="ref_code" value="{{ request('ref', session('ref_code')) }}">
 
             <!-- FULL NAME -->
             <div class="form-group">

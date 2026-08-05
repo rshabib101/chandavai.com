@@ -6,6 +6,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chandavai Feed</title>
+    <!-- Dynamic Admin Header Ad Script -->
+    @if(\App\Models\Setting::get('ad_script_head'))
+        {!! \App\Models\Setting::get('ad_script_head') !!}
+    @endif
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +17,118 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <link rel="stylesheet" href="{{ asset('css/habib-custom.css') }}">
+    <style>
+        .notif-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+            border: 2px solid #ffffff;
+        }
+
+        .notif-dropdown-card {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            width: 320px;
+            max-height: 420px;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 1px solid #e2e8f0;
+            z-index: 1000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notif-dropdown-header {
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .mark-read-btn {
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .notif-list-container {
+            overflow-y: auto;
+            max-height: 360px;
+        }
+
+        .notif-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.15s;
+        }
+
+        .notif-item.unread {
+            background: #eff6ff;
+        }
+
+        .notif-item:hover {
+            background: #f8fafc;
+        }
+
+        .notif-icon-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            color: #4338ca;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .notif-body {
+            flex: 1;
+        }
+
+        .notif-item-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .notif-item-text {
+            font-size: 12px;
+            color: #475569;
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+
+        .notif-item-time {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
     <style>
         * {
             box-sizing: border-box;
@@ -302,28 +418,609 @@
             background: #e2e8f0;
         }
 
-        /* MODAL */
-        .modal {
+        /* FACEBOOK CREATE POST MODAL STYLES */
+        .fb-modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.92);
-            justify-content: center;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
             align-items: center;
-            z-index: 9999;
+            justify-content: center;
+            padding: 16px;
         }
 
-        .modal img {
-            max-width: 90%;
-            max-height: 90%;
+        .fb-modal-overlay.active {
+            display: flex;
+        }
+
+        .fb-modal-card {
+            background: #242526;
+            color: #e4e6eb;
+            width: 100%;
+            max-width: 500px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3e4042;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: fbModalPop 0.2s ease-out;
         }
 
-        /* BOTTOM APP NAVIGATION */
+        @keyframes fbModalPop {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .fb-modal-header {
+            position: relative;
+            padding: 14px 16px;
+            border-bottom: 1px solid #3e4042;
+            text-align: center;
+        }
+
+        .fb-modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e4e6eb;
+            margin: 0;
+        }
+
+        .fb-modal-close-btn {
+            position: absolute;
+            right: 14px;
+            top: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #3a3b3c;
+            color: #b0b3b8;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .fb-modal-close-btn:hover {
+            background: #4e4f50;
+            color: #ffffff;
+        }
+
+        .fb-modal-body {
+            padding: 16px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* User Info Row */
+        .fb-user-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .fb-user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .fb-user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .fb-user-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e4e6eb;
+            line-height: 1.2;
+        }
+
+        .fb-badges-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fb-badge-btn {
+            background: #3a3b3c;
+            color: #e4e6eb;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .fb-badge-btn:hover {
+            background: #4e4f50;
+        }
+
+        /* Post Input Textarea */
+        .fb-input-area {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .fb-textarea {
+            width: 100%;
+            min-height: 110px;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e4e6eb;
+            font-family: inherit;
+            font-size: 18px;
+            line-height: 1.4;
+            resize: none;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .fb-textarea::placeholder {
+            color: #8a8d91;
+        }
+
+        /* Background Color Post Card Options */
+        .fb-textarea.bg-post {
+            min-height: 180px;
+            border-radius: 12px;
+            padding: 24px 16px;
+            font-weight: 700;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .fb-textarea.bg-gradient-1 { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: #ffffff; }
+        .fb-textarea.bg-gradient-2 { background: linear-gradient(135deg, #8a2387, #e94057, #f27121); color: #ffffff; }
+        .fb-textarea.bg-gradient-3 { background: linear-gradient(135deg, #11998e, #38ef7d); color: #ffffff; }
+        .fb-textarea.bg-gradient-4 { background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; }
+        .fb-textarea.bg-gradient-5 { background: linear-gradient(135deg, #f857a6, #ff5858); color: #ffffff; }
+
+        /* Text Controls Row (Aa & Emoji) */
+        .fb-input-tools {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .fb-aa-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #ff4757, #2563eb, #10b981);
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .fb-emoji-trigger {
+            background: none;
+            border: none;
+            color: #8a8d91;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: color 0.2s;
+        }
+
+        .fb-emoji-trigger:hover {
+            color: #f7b928;
+        }
+
+        /* Background Color Picker Palette */
+        .fb-bg-picker {
+            display: none;
+            gap: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .fb-bg-picker.active {
+            display: flex;
+        }
+
+        .fb-bg-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .fb-bg-circle.selected {
+            border-color: #ffffff;
+        }
+
+        /* Emoji Picker Drawer */
+        .fb-emoji-drawer {
+            display: none;
+            background: #3a3b3c;
+            border-radius: 8px;
+            padding: 8px;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .fb-emoji-drawer.active {
+            display: flex;
+        }
+
+        .fb-emoji-item {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+
+        .fb-emoji-item:hover {
+            background: #4e4f50;
+        }
+
+        /* Add To Your Post Toolbar Box */
+        .fb-add-box {
+            border: 1px solid #3e4042;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            background: #242526;
+        }
+
+        .fb-add-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e4e6eb;
+        }
+
+        .fb-add-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .fb-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .fb-icon-btn:hover {
+            background: #3a3b3c;
+        }
+
+        .icon-photo { color: #45bd62; }
+        .icon-tag { color: #1877f2; }
+        .icon-feeling { color: #f7b928; }
+        .icon-location { color: #f5533d; }
+        .icon-video { color: #26a69a; }
+        .icon-more { color: #b0b3b8; }
+
+        /* Image Preview Container */
+        .fb-media-preview-box {
+            display: none;
+            position: relative;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #3e4042;
+        }
+
+        .fb-media-preview-box img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .fb-remove-preview-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Extra Collapsible Inputs (Location, Video, Category) */
+        .fb-extra-field {
+            display: none;
+            margin-bottom: 12px;
+        }
+
+        .fb-extra-field.active {
+            display: block;
+        }
+
+        .fb-select-input, .fb-text-input {
+            width: 100%;
+            background: #3a3b3c;
+            border: 1px solid #4e4f50;
+            color: #e4e6eb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .fb-select-input option {
+            background: #242526;
+            color: #e4e6eb;
+        }
+
+        /* Submit Post Button */
+        .fb-submit-btn {
+            width: 100%;
+            height: 38px;
+            border-radius: 6px;
+            background: #2374e1;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fb-submit-btn:disabled {
+            background: #505151;
+            color: #8a8d91;
+            cursor: not-allowed;
+        }
+
+        .fb-submit-btn:not(:disabled):hover {
+            background: #1a6ed8;
+        }
+        /* DAILY CHALLENGE & INCOME CARD STYLES */
+        .daily-challenge-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .challenge-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .challenge-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .challenge-icon {
+            font-size: 24px;
+        }
+
+        .challenge-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .challenge-subtitle {
+            font-size: 12px;
+            color: #64748b;
+            margin: 2px 0 0 0;
+        }
+
+        .user-points-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
+        }
+
+        .challenge-tasks-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        @media (max-width: 500px) {
+            .challenge-tasks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .challenge-task-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .challenge-task-item.completed {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .task-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .task-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .task-count {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .challenge-task-item.completed .task-count {
+            color: #16a34a;
+        }
+
+        .task-progress-bar {
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .task-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+
+        .challenge-task-item.completed .task-progress-fill {
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+        }
+
+        .claim-reward-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+            transition: transform 0.2s, opacity 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .claim-reward-btn:disabled {
+            background: #cbd5e1;
+            color: #64748b;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .claim-reward-btn:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+        }
+
+        /* Income Status Box */
+        .income-eligibility-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 14px;
+        }
+
+        .income-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .income-icon {
+            font-size: 16px;
+        }
+
+        .income-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .income-status-desc {
+            font-size: 12px;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        .income-badge-active {
+            display: inline-block;
+            background: #dcfce7;
+            color: #15803d;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-right: 4px;
+        }
+
+        .income-badge-locked {
+            display: inline-block;
+            background: #fef3c7;
+            color: #b45309;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-right: 4px;
+        }
+
+        /* FIXED BOTTOM APP NAVIGATION STYLES */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -375,6 +1072,101 @@
             justify-content: center;
             box-shadow: 0 2px 6px rgba(255, 71, 87, 0.4);
         }
+
+        /* FACEBOOK-STYLE POST VIEWER MODAL STYLES */
+        .fb-viewer-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(8px);
+            z-index: 10005;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .fb-viewer-overlay.active {
+            display: flex;
+        }
+
+        .fb-viewer-card {
+            position: relative;
+            background: #ffffff;
+            width: 95%;
+            max-width: 1050px;
+            height: 90vh;
+            max-height: 720px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .fb-viewer-close-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.75);
+            color: #ffffff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 30;
+            transition: background 0.2s;
+        }
+
+        .fb-viewer-close-btn:hover {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .fb-viewer-layout {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .fb-viewer-layout {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .fb-viewer-card {
+                height: 95vh;
+                max-height: 95vh;
+            }
+        }
+
+        .fb-viewer-media-pane {
+            flex: 1.4;
+            background: #09090b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            min-height: 250px;
+        }
+
+        .fb-viewer-media-pane img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .fb-viewer-content-pane {
+            flex: 1;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 
@@ -387,15 +1179,39 @@
             <span class="brand-title">Treend</span>
         </a>
         <div class="topbar-actions">
-            <a href="/report/create" class="top-btn-icon" title="Create Post">
+            <button class="top-btn-icon" onclick="openCreatePostModal()" title="Create Post">
                 <i class="fa-solid fa-plus"></i>
+            </button>
+            <a href="/referral-leaderboard" class="top-btn-icon" title="Referral Leaderboard">
+                <i class="fa-solid fa-trophy" style="color: #f59e0b;"></i>
             </a>
-            <button class="top-btn-icon" title="Search">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-            <button class="top-btn-icon" title="Messages">
-                <i class="fa-regular fa-paper-plane"></i>
-            </button>
+            @if(auth()->check() && auth()->user()->isAdmin())
+                <a href="{{ route('admin.settings') }}" style="background: linear-gradient(135deg, #1877f2, #0052cc); color: #ffffff; font-weight: 700; border-radius: 20px; padding: 5px 12px; text-decoration: none; font-size: 11px; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 6px rgba(24, 119, 242, 0.4);" title="Admin Panel">
+                    <i class="fa-solid fa-user-shield"></i> Admin
+                </a>
+            @endif
+            @auth
+            <div style="position: relative;">
+                <button class="top-btn-icon" id="notifBellBtn" onclick="toggleNotificationDrawer()" title="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                    <span id="notifBadge" class="notif-badge" style="display: none;">0</span>
+                </button>
+
+                <!-- Notification Dropdown Drawer -->
+                <div id="notifDropdown" class="notif-dropdown-card" style="display: none;">
+                    <div class="notif-dropdown-header">
+                        <span>🔔 Notifications</span>
+                        <button type="button" onclick="markAllNotificationsRead()" class="mark-read-btn">Mark all read</button>
+                    </div>
+                    <div id="notifListContainer" class="notif-list-container">
+                        <div style="padding: 16px; text-align: center; color: #64748b; font-size: 13px;">Loading notifications...</div>
+                    </div>
+                </div>
+            </div>
+            @endauth
+            <a href="/user/profile" class="top-btn-icon" title="Profile">
+                <i class="fa-regular fa-user"></i>
+            </a>
         </div>
     </div>
 
@@ -407,10 +1223,10 @@
             <a href="/user/profile" class="user-avatar-initial" style="text-decoration:none;">
                 {{ strtoupper(substr(auth()->user()->name ?? 'R', 0, 1)) }}
             </a>
-            <a href="/report/create" class="mind-input-btn">
-                <span>What's on your mind?</span>
+            <div class="mind-input-btn" onclick="openCreatePostModal()" style="cursor: pointer;">
+                <span>What's on your mind, {{ strtok(auth()->user()->name ?? 'Rs', ' ') }}?</span>
                 <i class="fa-regular fa-image img-icon"></i>
-            </a>
+            </div>
         </div>
 
         <!-- STORIES HORIZONTAL CAROUSEL -->
@@ -462,11 +1278,99 @@
                 <a href="#" class="category-pill">
                     <i class="fa-solid fa-trophy"></i> Contest
                 </a>
-                <a href="#" class="category-pill">
-                    <i class="fa-solid fa-gift"></i> Refer
+                <a href="/referral-leaderboard" class="category-pill">
+                    <i class="fa-solid fa-gift"></i> Refer & Win ৳1000
                 </a>
             </div>
         </div>
+
+        @auth
+        <!-- DAILY CHALLENGE & INCOME ELIGIBILITY CARD -->
+        <div class="daily-challenge-card" id="dailyChallengeWidget">
+            <div class="challenge-card-header">
+                <div class="challenge-title-wrap">
+                    <span class="challenge-icon">🎯</span>
+                    <div>
+                        <h4 class="challenge-title">আজকের চ্যালেঞ্জ (Daily Challenge)</h4>
+                        <p class="challenge-subtitle">টাস্কগুলো পূরণ করে জিতে নিন ১০০ পয়েন্ট রিওয়ার্ড!</p>
+                    </div>
+                </div>
+                <div class="user-points-badge" id="widgetPointsBadge">
+                    🪙 <span id="widgetPointsValue">0</span> Pts
+                </div>
+            </div>
+
+            <!-- TASK PROGRESS ITEMS -->
+            <div class="challenge-tasks-grid">
+                <!-- Task 1: 3 Posts Today -->
+                <div class="challenge-task-item" id="taskItemPosts">
+                    <div class="task-info">
+                        <span class="task-name">📝 ৩ টি পোষ্ট করুন</span>
+                        <span class="task-count" id="taskCountPosts">0 / 3</span>
+                    </div>
+                    <div class="task-progress-bar">
+                        <div class="task-progress-fill" id="taskFillPosts" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Task 2: 10 Followers -->
+                <div class="challenge-task-item" id="taskItemFollowers">
+                    <div class="task-info">
+                        <span class="task-name">👥 ১০ জন ফলোয়ার</span>
+                        <span class="task-count" id="taskCountFollowers">0 / 10</span>
+                    </div>
+                    <div class="task-progress-bar">
+                        <div class="task-progress-fill" id="taskFillFollowers" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Task 3: 20 Following -->
+                <div class="challenge-task-item" id="taskItemFollowing">
+                    <div class="task-info">
+                        <span class="task-name">➕ ২০ জনকে ফলো করুন</span>
+                        <span class="task-count" id="taskCountFollowing">0 / 20</span>
+                    </div>
+                    <div class="task-progress-bar">
+                        <div class="task-progress-fill" id="taskFillFollowing" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Task 4: 100 Likes Today -->
+                <div class="challenge-task-item" id="taskItemLikes">
+                    <div class="task-info">
+                        <span class="task-name">❤️ ১০০ টি পোষ্টে লাইক</span>
+                        <span class="task-count" id="taskCountLikes">0 / 100</span>
+                    </div>
+                    <div class="task-progress-bar">
+                        <div class="task-progress-fill" id="taskFillLikes" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLAIM REWARD BUTTON -->
+            <button type="button" id="claimRewardBtn" class="claim-reward-btn" onclick="claimDailyReward()" disabled>
+                🔒 ৪টি চ্যালেঞ্জ টাস্কই পূরণ করুন (১০০ পয়েন্ট রিওয়ার্ড)
+            </button>
+
+            <!-- INCOME MONETIZATION ELIGIBILITY STATUS -->
+            <div class="income-eligibility-box" id="incomeStatusBox">
+                <div class="income-header">
+                    <span class="income-icon">💰</span>
+                    <span class="income-title">ইনকাম যোগ্যতা (Monetization Status)</span>
+                </div>
+                <div id="incomeStatusContent" class="income-status-desc">
+                    ইনকাম স্ট্যাটাস লোড হচ্ছে...
+                </div>
+            </div>
+        </div>
+        @endauth
+
+        @if(\App\Models\Setting::get('ad_script_sidebar'))
+            <div class="sidebar-ad-card" style="background:#ffffff; border-radius:16px; padding:14px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.04); text-align:center;">
+                <span style="font-size:10px; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Sponsored Ad</span>
+                {!! \App\Models\Setting::get('ad_script_sidebar') !!}
+            </div>
+        @endif
 
         <!-- POSTS FEED CONTAINER -->
         <div id="feed">
@@ -475,9 +1379,163 @@
 
     </div>
 
+    <!-- FACEBOOK CREATE POST MODAL -->
+    <div id="fbCreatePostModal" class="fb-modal-overlay" onclick="if(event.target===this) closeCreatePostModal()">
+        <div class="fb-modal-card">
+            <!-- Header -->
+            <div class="fb-modal-header">
+                <h3 class="fb-modal-title">Create post</h3>
+                <button type="button" class="fb-modal-close-btn" onclick="closeCreatePostModal()" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="fbCreatePostForm" method="POST" action="/report/store" enctype="multipart/form-data" onsubmit="handleFbPostSubmit(event)">
+                @csrf
+                <div class="fb-modal-body">
+                    <!-- User Header -->
+                    <div class="fb-user-row">
+                        <div class="fb-user-avatar">
+                            {{ strtoupper(substr(auth()->user()->name ?? 'R', 0, 1)) }}
+                        </div>
+                        <div class="fb-user-details">
+                            <div class="fb-user-name">{{ auth()->user()->name ?? 'Rs Hasan Talukder' }}</div>
+                            <div class="fb-badges-row">
+                                <button type="button" class="fb-badge-btn">
+                                    <i class="fa-solid fa-earth-americas"></i> Public <i class="fa-solid fa-caret-down"></i>
+                                </button>
+                                <button type="button" class="fb-badge-btn" onclick="toggleExtraField('category')">
+                                    <i class="fa-solid fa-plus"></i> AI label off <i class="fa-solid fa-caret-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post Text Area -->
+                    <div class="fb-input-area">
+                        <textarea id="fbPostDescription" name="description" class="fb-textarea" placeholder="What's on your mind, {{ strtok(auth()->user()->name ?? 'Rs', ' ') }}?" oninput="checkFbPostValidity()"></textarea>
+                    </div>
+
+                    <!-- Color Background Palette -->
+                    <div id="fbBgPicker" class="fb-bg-picker">
+                        <div class="fb-bg-circle selected" style="background:#242526;" onclick="selectPostBg('')"></div>
+                        <div class="fb-bg-circle" style="background:linear-gradient(135deg, #ff416c, #ff4b2b);" onclick="selectPostBg('bg-gradient-1')"></div>
+                        <div class="fb-bg-circle" style="background:linear-gradient(135deg, #8a2387, #e94057, #f27121);" onclick="selectPostBg('bg-gradient-2')"></div>
+                        <div class="fb-bg-circle" style="background:linear-gradient(135deg, #11998e, #38ef7d);" onclick="selectPostBg('bg-gradient-3')"></div>
+                        <div class="fb-bg-circle" style="background:linear-gradient(135deg, #00c6ff, #0072ff);" onclick="selectPostBg('bg-gradient-4')"></div>
+                        <div class="fb-bg-circle" style="background:linear-gradient(135deg, #f857a6, #ff5858);" onclick="selectPostBg('bg-gradient-5')"></div>
+                    </div>
+
+                    <!-- Emoji Drawer -->
+                    <div id="fbEmojiDrawer" class="fb-emoji-drawer">
+                        <span class="fb-emoji-item" onclick="insertEmoji('❤️')">❤️</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('😂')">😂</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('😍')">😍</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('🔥')">🔥</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('👍')">👍</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('🎉')">🎉</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('💯')">💯</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('📌')">📌</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('🚀')">🚀</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('😮')">😮</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('😢')">😢</span>
+                        <span class="fb-emoji-item" onclick="insertEmoji('👏')">👏</span>
+                    </div>
+
+                    <!-- Text Tools Row (Aa & Emoji) -->
+                    <div class="fb-input-tools">
+                        <button type="button" class="fb-aa-btn" onclick="toggleFbBgPicker()" title="Formatting & Themes">Aa</button>
+                        <button type="button" class="fb-emoji-trigger" onclick="toggleFbEmojiDrawer()" title="Add Emojis">
+                            <i class="fa-regular fa-face-smile"></i>
+                        </button>
+                    </div>
+
+                    <!-- Image Preview -->
+                    <div id="fbMediaPreviewBox" class="fb-media-preview-box">
+                        <img id="fbMediaPreviewImg" src="" alt="Preview">
+                        <button type="button" class="fb-remove-preview-btn" onclick="removeFbImagePreview()">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Hidden Image File Input -->
+                    <input type="file" id="fbImageInput" name="image" accept="image/*" style="display:none;" onchange="handleFbImageSelect(this)">
+
+                    <!-- Optional Extra Fields (Location, Video, Category) -->
+                    <div id="fbFieldCategory" class="fb-extra-field">
+                        <input type="text" name="category" class="fb-text-input" placeholder="Tag / Category (e.g. News, Discussion, General)">
+                    </div>
+
+                    <div id="fbFieldVideo" class="fb-extra-field">
+                        <input type="text" name="video_url" class="fb-text-input" placeholder="YouTube Video URL (optional)">
+                    </div>
+
+                    <div id="fbFieldLocation" class="fb-extra-field">
+                        <input type="text" name="location" class="fb-text-input" placeholder="Location / Thana (e.g. Mirpur, Dhaka)">
+                    </div>
+
+                    <!-- Add to your post Toolbar -->
+                    <div class="fb-add-box">
+                        <span class="fb-add-label">Add to your post</span>
+                        <div class="fb-add-actions">
+                            <button type="button" class="fb-icon-btn icon-photo" onclick="triggerFbImageUpload()" title="Photo/video">
+                                <i class="fa-solid fa-images"></i>
+                            </button>
+                            <button type="button" class="fb-icon-btn icon-tag" onclick="toggleExtraField('category')" title="Tag people">
+                                <i class="fa-solid fa-user-tag"></i>
+                            </button>
+                            <button type="button" class="fb-icon-btn icon-feeling" onclick="toggleFbEmojiDrawer()" title="Feeling/activity">
+                                <i class="fa-regular fa-face-smile"></i>
+                            </button>
+                            <button type="button" class="fb-icon-btn icon-location" onclick="toggleExtraField('location')" title="Check in / Location">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </button>
+                            <button type="button" class="fb-icon-btn icon-video" onclick="toggleExtraField('video')" title="Video Link">
+                                <i class="fa-solid fa-video"></i>
+                            </button>
+                            <button type="button" class="fb-icon-btn icon-more" onclick="toggleExtraField('category')" title="More">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Submit / Next Button -->
+                    <button type="submit" id="fbSubmitBtn" class="fb-submit-btn" disabled>Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL FOR IMAGE -->
     <div id="imgModal" class="modal" onclick="closeImage()">
         <img id="modalImg" alt="Enlarged Post Image">
+    </div>
+
+    <!-- FACEBOOK-STYLE FULL POST VIEWER MODAL -->
+    <div id="fbPostViewerModal" class="fb-viewer-overlay" onclick="if(event.target===this) closeFbPostViewer()">
+        <div class="fb-viewer-card">
+            <button type="button" class="fb-viewer-close-btn" onclick="closeFbPostViewer()" title="Close viewer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="fb-viewer-layout">
+                <!-- Left Media Pane -->
+                <div class="fb-viewer-media-pane" id="fbViewerMediaPane">
+                    <img id="fbViewerImg" src="" alt="Post Image" style="display:none;">
+                    <div id="fbViewerVideoContainer" style="display:none; width:100%; height:100%;"></div>
+                </div>
+
+                <!-- Right Content Pane -->
+                <div class="fb-viewer-content-pane">
+                    <div class="fb-viewer-author-row" id="fbViewerAuthorSlot"></div>
+                    <div class="fb-viewer-text-body">
+                        <h3 id="fbViewerTitle" style="font-size:16px; font-weight:700; color:#0f172a; margin-bottom:8px; display:none;"></h3>
+                        <p id="fbViewerDesc" style="font-size:14px; color:#334155; line-height:1.5; white-space:pre-wrap;"></p>
+                    </div>
+                    <div id="fbViewerActionsSlot" style="border-top:1px solid #f1f5f9; padding-top:10px; margin-top:10px;"></div>
+                    <div class="fb-viewer-comments-section" id="fbViewerCommentsSlot" style="flex:1; overflow-y:auto; margin-top:10px;"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- FIXED BOTTOM APP NAVIGATION -->
@@ -490,10 +1548,10 @@
             <i class="fa-solid fa-clapperboard"></i>
             <span>Reels</span>
         </a>
-        <a href="/report/create" class="nav-item nav-item-create">
+        <button type="button" class="nav-item nav-item-create" onclick="openCreatePostModal()" style="border:none; background:none; cursor:pointer;">
             <i class="fa-solid fa-plus"></i>
             <span>Create</span>
-        </a>
+        </button>
         <a href="/user/profile" class="nav-item">
             <i class="fa-solid fa-wallet"></i>
             <span>Wallet</span>
@@ -506,6 +1564,213 @@
 
 
     <script>
+        // Facebook Create Post Modal Functions
+        function openCreatePostModal() {
+            if (typeof IS_AUTH !== 'undefined' && !IS_AUTH) {
+                window.location.href = '/register';
+                return;
+            }
+            document.getElementById('fbCreatePostModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                document.getElementById('fbPostDescription').focus();
+            }, 100);
+        }
+
+        function closeCreatePostModal() {
+            document.getElementById('fbCreatePostModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Notification Drawer Logic
+        function toggleNotificationDrawer() {
+            const dropdown = document.getElementById('notifDropdown');
+            if (!dropdown) return;
+            if (dropdown.style.display === 'none' || !dropdown.style.display) {
+                dropdown.style.display = 'flex';
+                fetchNotifications();
+            } else {
+                dropdown.style.display = 'none';
+            }
+        }
+
+        function fetchNotifications() {
+            fetch('/user/notifications')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const badge = document.getElementById('notifBadge');
+                        if (badge) {
+                            if (data.unread_count > 0) {
+                                badge.innerText = data.unread_count;
+                                badge.style.display = 'inline-block';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+
+                        const container = document.getElementById('notifListContainer');
+                        if (container && data.notifications) {
+                            if (data.notifications.length === 0) {
+                                container.innerHTML = '<div style="padding:20px; text-align:center; color:#94a3b8; font-size:13px;">কোনো নোটিফিকেশন নেই</div>';
+                                return;
+                            }
+
+                            container.innerHTML = data.notifications.map(n => `
+                                <a href="${n.link || '#'}" class="notif-item ${!n.is_read ? 'unread' : ''}">
+                                    <div class="notif-icon-badge">
+                                        <i class="fa-solid ${getNotifIcon(n.type)}"></i>
+                                    </div>
+                                    <div class="notif-body">
+                                        <div class="notif-item-title">${escapeHtml(n.title)}</div>
+                                        <div class="notif-item-text">${escapeHtml(n.message)}</div>
+                                    </div>
+                                </a>
+                            `).join('');
+                        }
+                    }
+                })
+                .catch(err => console.error('Notifications fetch error:', err));
+        }
+
+        function getNotifIcon(type) {
+            switch(type) {
+                case 'like': return 'fa-heart';
+                case 'comment':
+                case 'comment_reply': return 'fa-comment';
+                case 'star': return 'fa-star';
+                case 'follow': return 'fa-user-plus';
+                case 'referral': return 'fa-gift';
+                default: return 'fa-bell';
+            }
+        }
+
+        function markAllNotificationsRead() {
+            fetch('/user/notifications/read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById('notifBadge');
+                if (badge) badge.style.display = 'none';
+                document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
+            })
+            .catch(err => console.error('Mark read error:', err));
+        }
+
+        function checkFbPostValidity() {
+            const text = document.getElementById('fbPostDescription').value.trim();
+            const hasImg = document.getElementById('fbImageInput').files.length > 0;
+            const submitBtn = document.getElementById('fbSubmitBtn');
+            if (text.length > 0 || hasImg) {
+                submitBtn.removeAttribute('disabled');
+            } else {
+                submitBtn.setAttribute('disabled', 'true');
+            }
+        }
+
+        function toggleFbBgPicker() {
+            const picker = document.getElementById('fbBgPicker');
+            picker.classList.toggle('active');
+        }
+
+        function selectPostBg(bgClass) {
+            const textarea = document.getElementById('fbPostDescription');
+            textarea.className = 'fb-textarea';
+            if (bgClass) {
+                textarea.classList.add('bg-post', bgClass);
+            }
+            document.querySelectorAll('.fb-bg-circle').forEach(c => c.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        function toggleFbEmojiDrawer() {
+            const drawer = document.getElementById('fbEmojiDrawer');
+            drawer.classList.toggle('active');
+        }
+
+        function insertEmoji(emoji) {
+            const textarea = document.getElementById('fbPostDescription');
+            textarea.value += emoji;
+            checkFbPostValidity();
+            textarea.focus();
+        }
+
+        function triggerFbImageUpload() {
+            document.getElementById('fbImageInput').click();
+        }
+
+        function handleFbImageSelect(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('fbMediaPreviewImg').src = e.target.result;
+                    document.getElementById('fbMediaPreviewBox').style.display = 'block';
+                    checkFbPostValidity();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeFbImagePreview() {
+            document.getElementById('fbImageInput').value = '';
+            document.getElementById('fbMediaPreviewBox').style.display = 'none';
+            document.getElementById('fbMediaPreviewImg').src = '';
+            checkFbPostValidity();
+        }
+
+        function toggleExtraField(type) {
+            if (type === 'location') {
+                const el = document.getElementById('fbFieldLocation');
+                el.classList.toggle('active');
+            } else if (type === 'video') {
+                const el = document.getElementById('fbFieldVideo');
+                el.classList.toggle('active');
+            } else if (type === 'category') {
+                const el = document.getElementById('fbFieldCategory');
+                el.classList.toggle('active');
+            }
+        }
+
+        function handleFbPostSubmit(e) {
+            e.preventDefault();
+            const form = document.getElementById('fbCreatePostForm');
+            const submitBtn = document.getElementById('fbSubmitBtn');
+            
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Posting...';
+            submitBtn.setAttribute('disabled', 'true');
+
+            const formData = new FormData(form);
+
+            fetch('/report/store', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(res => {
+                if (res.redirected) {
+                    window.location.href = res.url;
+                    return;
+                }
+                return res.json();
+            })
+            .then(data => {
+                closeCreatePostModal();
+                // Reload feed cleanly to show new post at top
+                window.location.reload();
+            })
+            .catch(err => {
+                // Fallback standard submit
+                form.submit();
+            });
+        }
+
         // See More / See Less Toggle
         function toggleDesc(id, btn) {
             let desc = document.getElementById('desc-' + id);
@@ -568,6 +1833,204 @@
                     loading = false;
                 });
         }
+
+        // Daily Challenge & Monetization Widget Functions
+        function updateDailyChallengeWidget() {
+            const widget = document.getElementById('dailyChallengeWidget');
+            if (!widget) return;
+
+            fetch('/user/challenge-status')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data || data.status !== 'success') return;
+
+                    // Update Points Badge
+                    const ptsVal = document.getElementById('widgetPointsValue');
+                    if (ptsVal) ptsVal.innerText = data.user.points;
+
+                    const tasks = data.challenge.tasks;
+
+                    // Task 1: Posts
+                    updateTaskUI('Posts', tasks.posts.current, tasks.posts.target, tasks.posts.done);
+
+                    // Task 2: Followers
+                    updateTaskUI('Followers', tasks.followers.current, tasks.followers.target, tasks.followers.done);
+
+                    // Task 3: Following
+                    updateTaskUI('Following', tasks.following.current, tasks.following.target, tasks.following.done);
+
+                    // Task 4: Likes
+                    updateTaskUI('Likes', tasks.likes.current, tasks.likes.target, tasks.likes.done);
+
+                    // Claim Reward Button
+                    const claimBtn = document.getElementById('claimRewardBtn');
+                    if (claimBtn) {
+                        if (data.challenge.is_claimed) {
+                            claimBtn.innerText = '✅ আজকের ১০০ পয়েন্ট রিওয়ার্ড ক্লেইমড!';
+                            claimBtn.setAttribute('disabled', 'true');
+                            claimBtn.style.background = '#e2e8f0';
+                            claimBtn.style.color = '#334155';
+                        } else if (data.challenge.is_completed) {
+                            claimBtn.innerText = '🎁 Claim ' + data.challenge.reward_points + ' Points Reward!';
+                            claimBtn.removeAttribute('disabled');
+                            claimBtn.style.background = 'linear-gradient(135deg, #16a34a, #22c55e)';
+                            claimBtn.style.color = '#ffffff';
+                        } else {
+                            claimBtn.innerText = '🔒 ৪টি চ্যালেঞ্জ টাস্কই পূরণ করুন (১০০ পয়েন্ট রিওয়ার্ড)';
+                            claimBtn.setAttribute('disabled', 'true');
+                            claimBtn.style.background = '#cbd5e1';
+                            claimBtn.style.color = '#64748b';
+                        }
+                    }
+
+                    // Monetization / Income Eligibility
+                    const m = data.monetization;
+                    const incBox = document.getElementById('incomeStatusContent');
+                    if (incBox && m) {
+                        if (m.eligible) {
+                            incBox.innerHTML = `<span class="income-badge-active">✅ ইনকাম সক্রিয়</span> আপনার <strong>${m.current}</strong> জন ফলোয়ার রয়েছে। আপনার অ্যাকাউন্ট ইনকাম করার জন্য সম্পূর্ণ যোগ্য!`;
+                        } else {
+                            const needed = Math.max(0, m.required - m.current);
+                            incBox.innerHTML = `<span class="income-badge-locked">🔒 ইনকাম লকড</span> ইনকাম শুরু করতে <strong>${m.required} জন ফলোয়ার</strong> প্রয়োজন। আপনার আছে <strong>${m.current}</strong> জন (আরও <strong>${needed}</strong> জন ফলোয়ার লাগবে)।`;
+                        }
+                    }
+                })
+                .catch(err => console.error('Challenge widget fetch error:', err));
+        }
+
+        function updateTaskUI(name, current, target, isDone) {
+            const item = document.getElementById('taskItem' + name);
+            const count = document.getElementById('taskCount' + name);
+            const fill = document.getElementById('taskFill' + name);
+
+            if (count) count.innerText = current + ' / ' + target;
+            if (fill) {
+                const pct = Math.min(100, Math.round((current / target) * 100));
+                fill.style.width = pct + '%';
+            }
+
+            if (item) {
+                if (isDone) {
+                    item.classList.add('completed');
+                } else {
+                    item.classList.remove('completed');
+                }
+            }
+        }
+
+        function claimDailyReward() {
+            const claimBtn = document.getElementById('claimRewardBtn');
+            if (claimBtn) {
+                claimBtn.setAttribute('disabled', 'true');
+                claimBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Claiming...';
+            }
+
+            fetch('/user/claim-challenge', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    updateDailyChallengeWidget();
+                } else {
+                    alert(data.message || 'Error claiming reward');
+                    updateDailyChallengeWidget();
+                }
+            })
+            .catch(err => {
+                console.error('Claim error:', err);
+                updateDailyChallengeWidget();
+            });
+        }
+
+        function openFbPostViewer(reportId) {
+            const postCard = document.getElementById('post-card-' + reportId);
+            if (!postCard) return;
+
+            const modal = document.getElementById('fbPostViewerModal');
+            const mediaPane = document.getElementById('fbViewerMediaPane');
+            const img = document.getElementById('fbViewerImg');
+            const videoBox = document.getElementById('fbViewerVideoContainer');
+            const titleEl = document.getElementById('fbViewerTitle');
+            const descEl = document.getElementById('fbViewerDesc');
+            const authorSlot = document.getElementById('fbViewerAuthorSlot');
+            const actionsSlot = document.getElementById('fbViewerActionsSlot');
+            const commentsSlot = document.getElementById('fbViewerCommentsSlot');
+
+            img.style.display = 'none';
+            videoBox.style.display = 'none';
+            videoBox.innerHTML = '';
+            mediaPane.style.display = 'flex';
+
+            const postImg = postCard.querySelector('.post-media-img');
+            if (postImg) {
+                img.src = postImg.src;
+                img.style.display = 'block';
+            } else {
+                const iframe = postCard.querySelector('iframe');
+                if (iframe) {
+                    videoBox.innerHTML = iframe.outerHTML;
+                    videoBox.style.display = 'block';
+                } else {
+                    mediaPane.style.display = 'none';
+                }
+            }
+
+            const authorRow = postCard.querySelector('.post-author-row');
+            if (authorRow) {
+                authorSlot.innerHTML = authorRow.outerHTML;
+            }
+
+            const title = postCard.querySelector('.post-content-title');
+            if (title && title.innerText.trim()) {
+                titleEl.innerText = title.innerText;
+                titleEl.style.display = 'block';
+            } else {
+                titleEl.style.display = 'none';
+            }
+
+            const desc = postCard.querySelector('.post-content-desc');
+            if (desc) {
+                descEl.innerText = desc.innerText;
+            } else {
+                descEl.innerText = '';
+            }
+
+            const actionsBar = postCard.querySelector('.post-actions-bar');
+            if (actionsBar) {
+                actionsSlot.innerHTML = actionsBar.outerHTML;
+            }
+
+            const commentsDrawer = postCard.querySelector('.comments-drawer');
+            if (commentsDrawer) {
+                commentsSlot.innerHTML = commentsDrawer.outerHTML;
+                const innerDrawer = commentsSlot.querySelector('.comments-drawer');
+                if (innerDrawer) innerDrawer.style.display = 'block';
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFbPostViewer() {
+            const modal = document.getElementById('fbPostViewerModal');
+            if (modal) modal.classList.remove('active');
+            document.body.style.overflow = '';
+            const videoBox = document.getElementById('fbViewerVideoContainer');
+            if (videoBox) videoBox.innerHTML = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDailyChallengeWidget();
+            if (typeof IS_AUTH !== 'undefined' && IS_AUTH) {
+                fetchNotifications();
+            }
+        });
     </script>
 </body>
 

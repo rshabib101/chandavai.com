@@ -12,8 +12,10 @@ class DashboardController extends Controller
 {
 
     public function index()
-
     {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            return redirect('/')->with('error', 'Access denied. Admin privileges required.');
+        }
 
         $pending = Report::where('status', 'pending')->count();
 

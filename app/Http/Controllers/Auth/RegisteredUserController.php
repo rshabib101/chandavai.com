@@ -18,8 +18,11 @@ class RegisteredUserController extends Controller
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
+        if ($request->has('ref')) {
+            session(['ref_code' => $request->query('ref')]);
+        }
         return view('auth.register');
     }
 
@@ -34,18 +37,42 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'ref_code' => ['nullable', 'string'],
         ]);
+
+        $refCode = $request->ref_code ?: session('ref_code');
+        $referredBy = null;
+
+        if ($refCode) {
+            $referrer = User::where('referral_code', $refCode)->first();
+            if ($referrer) {
+                $referredBy = $referrer->id;
+            }
+        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'referred_by_id' => $referredBy,
         ]);
+
+        if ($referredBy) {
+            \App\Models\UserNotification::createNotification(
+                $referredBy,
+                $user->id,
+                'referral',
+                'New Referral Signup 🎉',
+                $user->name . ' joined using your referral link!',
+                '/referral-leaderboard'
+            );
+            session()->forget('ref_code');
+        }
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect('/');
     }
 }

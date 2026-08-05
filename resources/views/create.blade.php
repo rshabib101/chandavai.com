@@ -4,282 +4,602 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create Report</title>
+<title>Create Post</title>
 
-<!-- Google Font -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Fonts & Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <link rel="stylesheet" href="{{ asset('css/habib-custom.css') }}">
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-    background:#f0f2f5;
-    font-family:'Poppins', sans-serif;
-    padding:30px 15px;
+body {
+    background: #18191a;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 12px;
 }
 
-/* FORM CONTAINER */
-.form-box{
-    max-width:650px;
-    margin:auto;
-    background:white;
-    padding:25px;
-    border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
-    animation:fadeUp 0.5s ease;
+.fb-page-card {
+    background: #242526;
+    color: #e4e6eb;
+    width: 100%;
+    max-width: 520px;
+    border-radius: 12px;
+    border: 1px solid #3e4042;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
 }
 
-/* TITLE */
-.form-title{
-    font-size:28px;
-    font-weight:800;
-    margin-bottom:20px;
-    color:#111827;
-    text-align:center;
+.fb-page-header {
+    position: relative;
+    padding: 14px 16px;
+    border-bottom: 1px solid #3e4042;
+    text-align: center;
 }
 
-/* LABEL */
-label{
-    font-size:14px;
-    font-weight:600;
-    color:#374151;
-    margin-bottom:8px;
-    display:block;
+.fb-page-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e4e6eb;
+    margin: 0;
 }
 
-/* INPUT */
-.input-box{
-    width:100%;
-    padding:13px 15px;
-    border:1px solid #d1d5db;
-    border-radius:12px;
-    outline:none;
-    margin-bottom:15px;
-    font-size:14px;
-    transition:0.3s;
-    background:#f9fafb;
+.fb-page-close-btn {
+    position: absolute;
+    right: 14px;
+    top: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #3a3b3c;
+    color: #b0b3b8;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
 }
 
-/* FOCUS EFFECT */
-.input-box:focus{
-    border-color:#1877f2;
-    background:white;
-    box-shadow:0 0 0 4px rgba(24,119,242,0.15);
-    transform:translateY(-1px);
+.fb-page-close-btn:hover {
+    background: #4e4f50;
+    color: #ffffff;
 }
 
-/* TEXTAREA */
-textarea.input-box{
-    min-height:140px;
-    resize:none;
+.fb-page-body {
+    padding: 18px;
 }
 
-/* FILE INPUT */
-.file-box{
-    background:#f9fafb;
-    padding:10px;
-    border-radius:12px;
-    border:1px dashed #cbd5e1;
-    margin-bottom:15px;
+/* User Info Row */
+.fb-user-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
-/* SUBMIT BUTTON */
-.submit-btn{
-    width:100%;
-    border:none;
-    background:linear-gradient(135deg,#1877f2,#0d6efd);
-    color:white;
-    padding:15px;
-    border-radius:14px;
-    font-size:16px;
-    font-weight:700;
-    cursor:pointer;
-    transition:0.3s;
-    position:relative;
-    overflow:hidden;
+.fb-user-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-/* HOVER */
-.submit-btn:hover{
-    transform:translateY(-2px) scale(1.01);
-    box-shadow:0 10px 20px rgba(24,119,242,0.25);
+.fb-user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-/* CLICK */
-.submit-btn:active{
-    transform:scale(0.97);
+.fb-user-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #e4e6eb;
+    line-height: 1.2;
 }
 
-/* SHINE EFFECT */
-.submit-btn::before{
-    content:'';
-    position:absolute;
-    top:0;
-    left:-100%;
-    width:100%;
-    height:100%;
-    background:rgba(255,255,255,0.2);
-    transition:0.5s;
+.fb-badges-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.submit-btn:hover::before{
-    left:100%;
+.fb-badge-btn {
+    background: #3a3b3c;
+    color: #e4e6eb;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
 }
 
-/* CARD ANIMATION */
-@keyframes fadeUp{
-    from{
-        opacity:0;
-        transform:translateY(20px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
+.fb-badge-btn:hover {
+    background: #4e4f50;
 }
 
-/* MOBILE */
-@media(max-width:768px){
-    .form-box{
-        padding:18px;
-    }
-    .form-title{
-        font-size:24px;
-    }
+/* Post Input Textarea */
+.fb-input-area {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.fb-textarea {
+    width: 100%;
+    min-height: 130px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #e4e6eb;
+    font-family: inherit;
+    font-size: 18px;
+    line-height: 1.4;
+    resize: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.fb-textarea::placeholder {
+    color: #8a8d91;
+}
+
+.fb-textarea.bg-post {
+    min-height: 190px;
+    border-radius: 12px;
+    padding: 24px 16px;
+    font-weight: 700;
+    font-size: 22px;
+    text-align: center;
+}
+
+.fb-textarea.bg-gradient-1 { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: #ffffff; }
+.fb-textarea.bg-gradient-2 { background: linear-gradient(135deg, #8a2387, #e94057, #f27121); color: #ffffff; }
+.fb-textarea.bg-gradient-3 { background: linear-gradient(135deg, #11998e, #38ef7d); color: #ffffff; }
+.fb-textarea.bg-gradient-4 { background: linear-gradient(135deg, #00c6ff, #0072ff); color: #ffffff; }
+.fb-textarea.bg-gradient-5 { background: linear-gradient(135deg, #f857a6, #ff5858); color: #ffffff; }
+
+/* Text Tools Row (Aa & Emoji) */
+.fb-input-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.fb-aa-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ff4757, #2563eb, #10b981);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 15px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.fb-emoji-trigger {
+    background: none;
+    border: none;
+    color: #8a8d91;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: color 0.2s;
+}
+
+.fb-emoji-trigger:hover {
+    color: #f7b928;
+}
+
+/* Background Color Picker Palette */
+.fb-bg-picker {
+    display: none;
+    gap: 8px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.fb-bg-picker.active {
+    display: flex;
+}
+
+.fb-bg-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.fb-bg-circle.selected {
+    border-color: #ffffff;
+}
+
+/* Emoji Drawer */
+.fb-emoji-drawer {
+    display: none;
+    background: #3a3b3c;
+    border-radius: 8px;
+    padding: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.fb-emoji-drawer.active {
+    display: flex;
+}
+
+.fb-emoji-item {
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.fb-emoji-item:hover {
+    background: #4e4f50;
+}
+
+/* Add To Your Post Toolbar Box */
+.fb-add-box {
+    border: 1px solid #3e4042;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    background: #242526;
+}
+
+.fb-add-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e4e6eb;
+}
+
+.fb-add-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.fb-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.fb-icon-btn:hover {
+    background: #3a3b3c;
+}
+
+.icon-photo { color: #45bd62; }
+.icon-tag { color: #1877f2; }
+.icon-feeling { color: #f7b928; }
+.icon-location { color: #f5533d; }
+.icon-video { color: #26a69a; }
+.icon-more { color: #b0b3b8; }
+
+/* Image Preview Container */
+.fb-media-preview-box {
+    display: none;
+    position: relative;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #3e4042;
+}
+
+.fb-media-preview-box img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    display: block;
+}
+
+.fb-remove-preview-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Extra Collapsible Inputs */
+.fb-extra-field {
+    display: none;
+    margin-bottom: 12px;
+}
+
+.fb-extra-field.active {
+    display: block;
+}
+
+.fb-text-input, .fb-select-input {
+    width: 100%;
+    background: #3a3b3c;
+    border: 1px solid #4e4f50;
+    color: #e4e6eb;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* Submit Post Button */
+.fb-submit-btn {
+    width: 100%;
+    height: 40px;
+    border-radius: 6px;
+    background: #2374e1;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fb-submit-btn:disabled {
+    background: #505151;
+    color: #8a8d91;
+    cursor: not-allowed;
+}
+
+.fb-submit-btn:not(:disabled):hover {
+    background: #1a6ed8;
 }
 </style>
 </head>
 <body>
 
-<div class="form-box">
-
-    <h1 class="form-title">
-        ➕ Create Report
-    </h1>
+<div class="fb-page-card">
+    <div class="fb-page-header">
+        <h3 class="fb-page-title">Create post</h3>
+        <a href="/" class="fb-page-close-btn" title="Back to Feed">
+            <i class="fa-solid fa-xmark"></i>
+        </a>
+    </div>
 
     <form method="POST" action="/report/store" enctype="multipart/form-data">
         @csrf
+        <div class="fb-page-body">
+            <!-- User Header -->
+            <div class="fb-user-row">
+                <div class="fb-user-avatar">
+                    {{ strtoupper(substr(auth()->user()->name ?? 'R', 0, 1)) }}
+                </div>
+                <div class="fb-user-details">
+                    <div class="fb-user-name">{{ auth()->user()->name ?? 'Rs Hasan Talukder' }}</div>
+                    <div class="fb-badges-row">
+                        <button type="button" class="fb-badge-btn">
+                            <i class="fa-solid fa-earth-americas"></i> Public <i class="fa-solid fa-caret-down"></i>
+                        </button>
+                        <button type="button" class="fb-badge-btn" onclick="toggleExtraField('category')">
+                            <i class="fa-solid fa-plus"></i> AI label off <i class="fa-solid fa-caret-down"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-        <!-- TITLE -->
-        <label>Report Title</label>
-        <input type="text" name="title" class="input-box" placeholder="Enter report title" required>
+            <!-- Post Text Area -->
+            <div class="fb-input-area">
+                <textarea id="fbPostDescription" name="description" class="fb-textarea" placeholder="What's on your mind, {{ strtok(auth()->user()->name ?? 'Rs', ' ') }}?" oninput="checkFbPostValidity()" required></textarea>
+            </div>
 
-        <!-- DESCRIPTION -->
-        <label>Description</label>
-        <textarea name="description" class="input-box" placeholder="Write full details..." required></textarea>
+            <!-- Color Background Palette -->
+            <div id="fbBgPicker" class="fb-bg-picker">
+                <div class="fb-bg-circle selected" style="background:#242526;" onclick="selectPostBg('')"></div>
+                <div class="fb-bg-circle" style="background:linear-gradient(135deg, #ff416c, #ff4b2b);" onclick="selectPostBg('bg-gradient-1')"></div>
+                <div class="fb-bg-circle" style="background:linear-gradient(135deg, #8a2387, #e94057, #f27121);" onclick="selectPostBg('bg-gradient-2')"></div>
+                <div class="fb-bg-circle" style="background:linear-gradient(135deg, #11998e, #38ef7d);" onclick="selectPostBg('bg-gradient-3')"></div>
+                <div class="fb-bg-circle" style="background:linear-gradient(135deg, #00c6ff, #0072ff);" onclick="selectPostBg('bg-gradient-4')"></div>
+                <div class="fb-bg-circle" style="background:linear-gradient(135deg, #f857a6, #ff5858);" onclick="selectPostBg('bg-gradient-5')"></div>
+            </div>
 
-        <!-- DIVISION -->
-        <label>Division</label>
-        <select id="division" name="division_id" class="input-box"> <!-- name="division_id" যুক্ত করা হয়েছে -->
-            <option value="">Select Division</option>
-        </select>
+            <!-- Emoji Drawer -->
+            <div id="fbEmojiDrawer" class="fb-emoji-drawer">
+                <span class="fb-emoji-item" onclick="insertEmoji('❤️')">❤️</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('😂')">😂</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('😍')">😍</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('🔥')">🔥</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('👍')">👍</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('🎉')">🎉</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('💯')">💯</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('📌')">📌</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('🚀')">🚀</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('😮')">😮</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('😢')">😢</span>
+                <span class="fb-emoji-item" onclick="insertEmoji('👏')">👏</span>
+            </div>
 
-        <!-- DISTRICT -->
-        <label>District</label>
-        <select id="district" name="district_id" class="input-box"> <!-- name="district_id" যুক্ত করা হয়েছে -->
-            <option value="">Select District</option>
-        </select>
+            <!-- Text Tools Row (Aa & Emoji) -->
+            <div class="fb-input-tools">
+                <button type="button" class="fb-aa-btn" onclick="toggleFbBgPicker()" title="Formatting & Themes">Aa</button>
+                <button type="button" class="fb-emoji-trigger" onclick="toggleFbEmojiDrawer()" title="Add Emojis">
+                    <i class="fa-regular fa-face-smile"></i>
+                </button>
+            </div>
 
-        <!-- THANA -->
-        <label>Thana / Upazila</label>
-        <select id="upazila" name="location" class="input-box"> <!-- name="location" যুক্ত করা হয়েছে কন্ট্রোলারের সাথে মিলিয়ে -->
-            <option value="">Select Thana</option>
-        </select>
+            <!-- Image Preview Container -->
+            <div id="fbMediaPreviewBox" class="fb-media-preview-box">
+                <img id="fbMediaPreviewImg" src="" alt="Preview">
+                <button type="button" class="fb-remove-preview-btn" onclick="removeFbImagePreview()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
-        <!-- CATEGORY -->
-        <label>Category</label>
-        <input type="text" name="category" class="input-box" placeholder="Example: Corruption / Crime">
+            <!-- Hidden Image File Input -->
+            <input type="file" id="fbImageInput" name="image" accept="image/*" style="display:none;" onchange="handleFbImageSelect(this)">
 
-        <!-- IMAGE -->
-        <label>Upload Image</label>
-        <div class="file-box">
-            <input type="file" name="image">
+            <!-- Optional Extra Fields -->
+            <div id="fbFieldCategory" class="fb-extra-field">
+                <input type="text" name="category" class="fb-text-input" placeholder="Tag / Category (e.g. News, Discussion, General)">
+            </div>
+
+            <div id="fbFieldVideo" class="fb-extra-field">
+                <input type="text" name="video_url" class="fb-text-input" placeholder="YouTube Video URL (optional)">
+            </div>
+
+            <div id="fbFieldLocation" class="fb-extra-field">
+                <input type="text" name="location" class="fb-text-input" placeholder="Location / Thana (e.g. Mirpur, Dhaka)">
+            </div>
+
+            <!-- Add to your post Toolbar -->
+            <div class="fb-add-box">
+                <span class="fb-add-label">Add to your post</span>
+                <div class="fb-add-actions">
+                    <button type="button" class="fb-icon-btn icon-photo" onclick="triggerFbImageUpload()" title="Photo/video">
+                        <i class="fa-solid fa-images"></i>
+                    </button>
+                    <button type="button" class="fb-icon-btn icon-tag" onclick="toggleExtraField('category')" title="Tag people">
+                        <i class="fa-solid fa-user-tag"></i>
+                    </button>
+                    <button type="button" class="fb-icon-btn icon-feeling" onclick="toggleFbEmojiDrawer()" title="Feeling/activity">
+                        <i class="fa-regular fa-face-smile"></i>
+                    </button>
+                    <button type="button" class="fb-icon-btn icon-location" onclick="toggleExtraField('location')" title="Check in / Location">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </button>
+                    <button type="button" class="fb-icon-btn icon-video" onclick="toggleExtraField('video')" title="Video Link">
+                        <i class="fa-solid fa-video"></i>
+                    </button>
+                    <button type="button" class="fb-icon-btn icon-more" onclick="toggleExtraField('category')" title="More">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit / Next Button -->
+            <button type="submit" id="fbSubmitBtn" class="fb-submit-btn" disabled>Next</button>
         </div>
-
-        <!-- VIDEO -->
-        <label>YouTube Video URL</label>
-        <input type="text" name="video_url" class="input-box" placeholder="Paste YouTube video link">
-
-        <!-- SUBMIT -->
-        <button type="submit" class="submit-btn">
-            🚀 Submit Report
-        </button>
     </form>
 </div>
 
-<!-- LOCATION SCRIPT -->
 <script>
-let divisions = [];
-let districts = [];
-let upazilas = [];
+function checkFbPostValidity() {
+    const text = document.getElementById('fbPostDescription').value.trim();
+    const hasImg = document.getElementById('fbImageInput').files.length > 0;
+    const submitBtn = document.getElementById('fbSubmitBtn');
+    if (text.length > 0 || hasImg) {
+        submitBtn.removeAttribute('disabled');
+    } else {
+        submitBtn.setAttribute('disabled', 'true');
+    }
+}
 
-// LOAD DIVISIONS
-fetch('/location/divisions.json')
-.then(res => res.json())
-.then(data => {
-    divisions = data[2].data;
-    let divisionSelect = document.getElementById('division');
+function toggleFbBgPicker() {
+    document.getElementById('fbBgPicker').classList.toggle('active');
+}
 
-    divisions.forEach(div => {
-        divisionSelect.innerHTML += `
-        <option value="${div.id}">
-            ${div.bn_name}
-        </option>`;
-    });
-});
+function selectPostBg(bgClass) {
+    const textarea = document.getElementById('fbPostDescription');
+    textarea.className = 'fb-textarea';
+    if (bgClass) {
+        textarea.classList.add('bg-post', bgClass);
+    }
+    document.querySelectorAll('.fb-bg-circle').forEach(c => c.classList.remove('selected'));
+    event.target.classList.add('selected');
+}
 
-// LOAD DISTRICTS
-fetch('/location/districts.json')
-.then(res => res.json())
-.then(data => {
-    districts = data[2].data;
-});
+function toggleFbEmojiDrawer() {
+    document.getElementById('fbEmojiDrawer').classList.toggle('active');
+}
 
-// LOAD UPAZILAS
-fetch('/location/upazilas.json')
-.then(res => res.json())
-.then(data => {
-    upazilas = data[2].data;
-});
+function insertEmoji(emoji) {
+    const textarea = document.getElementById('fbPostDescription');
+    textarea.value += emoji;
+    checkFbPostValidity();
+    textarea.focus();
+}
 
-// DIVISION CHANGE
-document.getElementById('division').addEventListener('change', function(){
-    let district = document.getElementById('district');
-    let upazila = document.getElementById('upazila');
+function triggerFbImageUpload() {
+    document.getElementById('fbImageInput').click();
+}
 
-    // নতুন বিভাগ সিলেক্ট করলে জেলা এবং থানা দুটোই রিসেট হবে
-    district.innerHTML = '<option value="">Select District</option>';
-    upazila.innerHTML = '<option value="">Select Thana</option>';
+function handleFbImageSelect(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('fbMediaPreviewImg').src = e.target.result;
+            document.getElementById('fbMediaPreviewBox').style.display = 'block';
+            checkFbPostValidity();
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 
-    let filtered = districts.filter(d => d.division_id == this.value);
+function removeFbImagePreview() {
+    document.getElementById('fbImageInput').value = '';
+    document.getElementById('fbMediaPreviewBox').style.display = 'none';
+    document.getElementById('fbMediaPreviewImg').src = '';
+    checkFbPostValidity();
+}
 
-    filtered.forEach(d => {
-        district.innerHTML += `
-        <option value="${d.id}">
-            ${d.bn_name}
-        </option>`;
-    });
-});
-
-// DISTRICT CHANGE
-document.getElementById('district').addEventListener('change', function(){
-    let upazila = document.getElementById('upazila');
-
-    upazila.innerHTML = '<option value="">Select Thana</option>';
-
-    let filtered = upazilas.filter(u => u.district_id == this.value);
-
-    filtered.forEach(u => {
-        upazila.innerHTML += `
-        <option value="${u.id}">
-            ${u.bn_name}
-        </option>`;
-    });
-});
+function toggleExtraField(type) {
+    if (type === 'location') {
+        document.getElementById('fbFieldLocation').classList.toggle('active');
+    } else if (type === 'video') {
+        document.getElementById('fbFieldVideo').classList.toggle('active');
+    } else if (type === 'category') {
+        document.getElementById('fbFieldCategory').classList.toggle('active');
+    }
+}
 </script>
 
 </body>

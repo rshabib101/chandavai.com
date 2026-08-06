@@ -17,6 +17,15 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>⚠️ Error!</strong> {{ session('error') }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+@endif
+
 <div class="card">
     <div class="card-body p-0 table-responsive">
         <table class="table table-striped table-hover">
@@ -39,7 +48,9 @@
                         <td><strong>{{ $user->name }}</strong></td>
                         <td>{{ $user->email }}</td>
                         <td>
-                            @if($user->isAdmin())
+                            @if($user->isCreatorAdmin())
+                                <span class="badge badge-warning px-2 py-1"><i class="fa fa-crown"></i> Creator Admin</span>
+                            @elseif($user->isAdmin())
                                 <span class="badge badge-primary px-2 py-1"><i class="fa fa-user-shield"></i> Admin</span>
                             @else
                                 <span class="badge badge-secondary px-2 py-1"><i class="fa fa-user"></i> User</span>
@@ -55,20 +66,66 @@
                         </td>
                         <td>{{ $user->created_at ? $user->created_at->format('d M Y') : 'N/A' }}</td>
                         <td>
-                            <form method="POST" action="{{ route('admin.user.toggle-role', $user->id) }}" style="display:inline-block; margin-right: 4px;" onsubmit="return confirm('Are you sure you want to change role for {{ $user->name }}?')">
-                                @csrf
-                                <button type="submit" class="btn btn-sm {{ $user->isAdmin() ? 'btn-warning' : 'btn-info' }}" {{ auth()->id() == $user->id ? 'disabled' : '' }}>
-                                    <i class="fa {{ $user->isAdmin() ? 'fa-user' : 'fa-user-shield' }}"></i>
-                                    {{ $user->isAdmin() ? 'Make User' : 'Make Admin' }}
+                            @if(auth()->user()->isCreatorAdmin())
+                                {{-- Creator Admin Full Privileges --}}
+                                <div class="btn-group mr-1" style="display:inline-block;">
+                                    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {{ auth()->id() == $user->id ? 'disabled' : '' }}>
+                                        <i class="fa fa-user-cog"></i> Role
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <form method="POST" action="{{ route('admin.user.toggle-role', $user->id) }}">
+                                            @csrf
+                                            <input type="hidden" name="role" value="user">
+                                            <button type="submit" class="dropdown-item {{ $user->role === 'user' || empty($user->role) ? 'active' : '' }}">
+                                                <i class="fa fa-user text-secondary mr-2"></i> Make User
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.user.toggle-role', $user->id) }}">
+                                            @csrf
+                                            <input type="hidden" name="role" value="admin">
+                                            <button type="submit" class="dropdown-item {{ $user->role === 'admin' ? 'active' : '' }}">
+                                                <i class="fa fa-user-shield text-primary mr-2"></i> Make Admin
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.user.toggle-role', $user->id) }}">
+                                            @csrf
+                                            <input type="hidden" name="role" value="creator_admin">
+                                            <button type="submit" class="dropdown-item {{ $user->isCreatorAdmin() ? 'active' : '' }}">
+                                                <i class="fa fa-crown text-warning mr-2"></i> Make Creator Admin
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <form method="POST" action="{{ route('admin.user.toggle-block', $user->id) }}" style="display:inline-block; margin-right: 4px;" onsubmit="return confirm('Are you sure you want to {{ $user->is_blocked ? 'unblock' : 'block' }} this user?')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm {{ $user->is_blocked ? 'btn-success' : 'btn-danger' }}" {{ auth()->id() == $user->id ? 'disabled' : '' }}>
+                                        <i class="fa {{ $user->is_blocked ? 'fa-unlock' : 'fa-ban' }}"></i>
+                                        {{ $user->is_blocked ? 'Unblock' : 'Block' }}
+                                    </button>
+                                </form>
+
+                                {{-- Device Control Modal Button (Only Creator Admin) --}}
+                                <button type="button" class="btn btn-sm btn-dark btn-control-modal"
+                                    data-name="{{ $user->name }}"
+                                    data-ip="{{ $user->last_ip_address ?? 'N/A' }}"
+                                    data-country="{{ $user->country ?? 'N/A' }}"
+                                    data-city="{{ $user->city ?? 'N/A' }}"
+                                    data-browser="{{ $user->browser ?? 'N/A' }}"
+                                    data-os="{{ $user->operating_system ?? 'N/A' }}"
+                                    data-resolution="{{ $user->screen_resolution ?? 'N/A' }}"
+                                    data-language="{{ $user->language ?? 'N/A' }}"
+                                    data-timezone="{{ $user->timezone ?? 'N/A' }}"
+                                    data-referrer="{{ $user->referrer ?? 'N/A' }}"
+                                    data-device="{{ $user->device_type ?? 'N/A' }}">
+                                    <i class="fa fa-sliders-h"></i> Control
                                 </button>
-                            </form>
-                            <form method="POST" action="{{ route('admin.user.toggle-block', $user->id) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to {{ $user->is_blocked ? 'unblock' : 'block' }} this user?')">
-                                @csrf
-                                <button type="submit" class="btn btn-sm {{ $user->is_blocked ? 'btn-success' : 'btn-danger' }}">
-                                    <i class="fa {{ $user->is_blocked ? 'fa-unlock' : 'fa-ban' }}"></i>
-                                    {{ $user->is_blocked ? 'Unblock User' : 'Block User' }}
-                                </button>
-                            </form>
+                            @else
+                                {{-- Standard Admin Restricted Note --}}
+                                <span class="badge badge-light border text-muted" title="Only Creator Admin has permission for user actions">
+                                    <i class="fa fa-lock"></i> Restricted (Creator Admin Only)
+                                </span>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -77,4 +134,94 @@
     </div>
 </div>
 
+<!-- User Control Modal -->
+<div class="modal fade" id="userControlModal" tabindex="-1" role="dialog" aria-labelledby="userControlModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="userControlModalLabel">
+                    <i class="fa fa-sliders-h mr-2"></i> User Control & Device Info - <span id="ctrl-user-name" class="text-warning"></span>
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped m-0">
+                        <tbody>
+                            <tr>
+                                <th style="width: 35%;"><i class="fa fa-network-wired text-info mr-2"></i> IP Address</th>
+                                <td><span id="ctrl-ip" class="badge badge-secondary p-2 font-mono"></span></td>
+                            </tr>
+                            <tr>
+                                <th><i class="fa fa-globe text-success mr-2"></i> Country</th>
+                                <td id="ctrl-country" class="font-weight-bold"></td>
+                            </tr>
+                            <tr>
+                                <th><i class="fa fa-city text-primary mr-2"></i> City (আনুমানিক)</th>
+                                <td id="ctrl-city"></td>
+                            </tr>
+                            <tr>
+                                <th><i class="fa fa-compass text-warning mr-2"></i> Browser</th>
+                                <td id="ctrl-browser"></td>
+                            </tr>
+                            <tr>
+                                <th><i class="fa fa-desktop text-secondary mr-2"></i> Operating System</th>
+                                <td id="ctrl-os"></td>
+                            </tr>
+                            <tr>
+                                <th><i class="fa fa-tv text-purple mr-2"></i> Screen Resolution</th>
+                                <td id="ctrl-resolution"></td>
+                            </tr>
+                            <tr>
+                                <th><i class="fa fa-language text-info mr-2"></i> Language</th>
+                                <td id="ctrl-language"></td>
+                            </tr>
+                            <tr>
+                                <th><i class="fa fa-clock text-danger mr-2"></i> Timezone</th>
+                                <td id="ctrl-timezone"></td>
+                            </tr>
+                            <tr>
+                                <th><i class="fa fa-link text-muted mr-2"></i> Referrer</th>
+                                <td><span id="ctrl-referrer" class="text-break"></span></td>
+                            </tr>
+                            <tr>
+                                <th><i class="fa fa-mobile-alt text-success mr-2"></i> Device Type</th>
+                                <td><span id="ctrl-device" class="badge badge-info p-1"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@stop
+
+@section('js')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        $('.btn-control-modal').on('click', function () {
+            var btn = $(this);
+            $('#ctrl-user-name').text(btn.data('name'));
+            $('#ctrl-ip').text(btn.data('ip'));
+            $('#ctrl-country').text(btn.data('country'));
+            $('#ctrl-city').text(btn.data('city'));
+            $('#ctrl-browser').text(btn.data('browser'));
+            $('#ctrl-os').text(btn.data('os'));
+            $('#ctrl-resolution').text(btn.data('resolution'));
+            $('#ctrl-language').text(btn.data('language'));
+            $('#ctrl-timezone').text(btn.data('timezone'));
+            $('#ctrl-referrer').text(btn.data('referrer'));
+            $('#ctrl-device').text(btn.data('device'));
+
+            $('#userControlModal').modal('show');
+        });
+    });
+</script>
 @stop

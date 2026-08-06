@@ -30,6 +30,16 @@ class User extends Authenticatable
         'is_blocked',
         'referral_code',
         'referred_by_id',
+        'last_ip_address',
+        'country',
+        'city',
+        'browser',
+        'operating_system',
+        'screen_resolution',
+        'language',
+        'timezone',
+        'referrer',
+        'device_type',
     ];
 
     /**
@@ -57,14 +67,19 @@ class User extends Authenticatable
         ];
     }
 
+    public function isCreatorAdmin(): bool
+    {
+        return $this->role === 'creator_admin' || $this->role === 'super_admin';
+    }
+
     public function isAdmin(): bool
     {
-        return $this->role === 'admin' || $this->role === 'super_admin';
+        return $this->role === 'admin' || $this->isCreatorAdmin();
     }
 
     public function isUser(): bool
     {
-        return !$this->isAdmin();
+        return $this->role === 'user' || empty($this->role);
     }
 
     public function reports()

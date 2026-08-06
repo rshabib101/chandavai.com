@@ -53,6 +53,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/{id}/follow', [ChallengeController::class, 'toggleFollow'])->name('user.follow');
     Route::get('/user/challenge-status', [ChallengeController::class, 'getStatus'])->name('user.challenge.status');
     Route::post('/user/claim-challenge', [ChallengeController::class, 'claimReward'])->name('user.challenge.claim');
+
+    // User Client Meta Route
+    Route::post('/user/update-client-meta', [ProfileController::class, 'updateClientMeta'])->name('user.client-meta');
 });
 
 // Admin Only Routes (Protected by auth and admin middleware)

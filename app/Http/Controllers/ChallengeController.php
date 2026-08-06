@@ -212,7 +212,17 @@ class ChallengeController extends Controller
      */
     public function toggleBlockUser(Request $request, $id)
     {
+        /** @var User $currentUser */
+        $currentUser = auth()->user();
+        if (!$currentUser || !$currentUser->isCreatorAdmin()) {
+            return redirect()->back()->with('error', 'Only Creator Admin can block or unblock users.');
+        }
+
         $user = User::findOrFail($id);
+        if ($user->id == $currentUser->id) {
+            return redirect()->back()->with('error', 'You cannot block yourself.');
+        }
+
         $user->is_blocked = !$user->is_blocked;
         $user->save();
 
@@ -260,15 +270,33 @@ class ChallengeController extends Controller
     }
 
     /**
-     * Admin Panel: Toggle User Role (Admin / User).
+     * Admin Panel: Toggle User Role (User / Admin / Creator Admin).
      */
     public function toggleRoleUser(Request $request, $id)
     {
+        /** @var User $currentUser */
+        $currentUser = auth()->user();
+        if (!$currentUser || !$currentUser->isCreatorAdmin()) {
+            return redirect()->back()->with('error', 'Only Creator Admin can change user roles.');
+        }
+
         $user = User::findOrFail($id);
-        if ($user->id == auth()->id()) {
+        if ($user->id == $currentUser->id) {
             return redirect()->back()->with('error', 'You cannot change your own role.');
         }
-        $user->role = $user->isAdmin() ? 'user' : 'admin';
+
+        if ($request->has('role') && in_array($request->input('role'), ['user', 'admin', 'creator_admin'])) {
+            $user->role = $request->input('role');
+        } else {
+            // Cycle role: user -> admin -> creator_admin -> user
+            if ($user->role === 'user' || empty($user->role)) {
+                $user->role = 'admin';
+            } elseif ($user->role === 'admin') {
+                $user->role = 'creator_admin';
+            } else {
+                $user->role = 'user';
+            }
+        }
         $user->save();
 
         return redirect()->back()->with('success', "User {$user->name} role updated to {$user->role}!");

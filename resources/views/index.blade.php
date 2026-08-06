@@ -2074,6 +2074,21 @@
             updateDailyChallengeWidget();
             if (typeof IS_AUTH !== 'undefined' && IS_AUTH) {
                 fetchNotifications();
+                try {
+                    var screenRes = window.screen.width + 'x' + window.screen.height;
+                    var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+                    fetch("{{ route('user.client-meta') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            screen_resolution: screenRes,
+                            timezone: timeZone
+                        })
+                    });
+                } catch(e) {}
             }
         });
     </script>

@@ -155,5 +155,26 @@ class ProfileController extends Controller
 
         return back()->with('success', 'Photo updated successfully!');
     }
+
+    /**
+     * Update client-side screen resolution & timezone metadata.
+     */
+    public function updateClientMeta(Request $request)
+    {
+        $user = $request->user();
+        if ($user) {
+            $data = [];
+            if ($request->filled('screen_resolution')) {
+                $data['screen_resolution'] = substr($request->input('screen_resolution'), 0, 50);
+            }
+            if ($request->filled('timezone')) {
+                $data['timezone'] = substr($request->input('timezone'), 0, 100);
+            }
+            if (!empty($data)) {
+                $user->update($data);
+            }
+        }
+        return response()->json(['status' => 'success']);
+    }
 }
 

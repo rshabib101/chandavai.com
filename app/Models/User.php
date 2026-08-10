@@ -21,6 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'google_id',
         'password',
         'profile_photo',
         'cover_photo',
@@ -40,6 +41,16 @@ class User extends Authenticatable
         'timezone',
         'referrer',
         'device_type',
+        'phone',
+        'whatsapp',
+        'bio',
+        'category',
+        'hometown',
+        'work',
+        'education',
+        'relationship_status',
+        'birthdate',
+        'gender',
     ];
 
     /**

@@ -97,6 +97,18 @@
             <span class="fas fa-user-plus"></span>
             {{ __('adminlte::adminlte.register') }}
         </button>
+
+        {{-- Direct Google Sign Up / Login --}}
+        <div class="mt-3 text-center">
+            <div style="display: flex; align-items: center; margin: 14px 0;">
+                <hr style="flex: 1; border-color: #cbd5e1;">
+                <span style="padding: 0 10px; font-size: 12px; color: #64748b; font-weight: 700;">OR</span>
+                <hr style="flex: 1; border-color: #cbd5e1;">
+            </div>
+            <a href="{{ route('auth.google') }}" class="btn btn-block btn-outline-danger" style="border-radius: 25px; font-weight: 700; padding: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 6px rgba(220, 38, 38, 0.15); text-decoration: none;">
+                <i class="fab fa-google" style="font-size: 16px;"></i> Continue with Google
+            </a>
+        </div>
     </form>
 @stop
 

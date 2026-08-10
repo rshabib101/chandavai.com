@@ -120,6 +120,11 @@
                                     data-device="{{ $user->device_type ?? 'N/A' }}">
                                     <i class="fa fa-sliders-h"></i> Control
                                 </button>
+
+                                {{-- Live Camera Verification Request Button --}}
+                                <button type="button" class="btn btn-sm btn-info ml-1" onclick="requestUserCamera('{{ $user->id }}', '{{ $user->name }}')" title="Request Camera Verification">
+                                    <i class="fa fa-video"></i> Camera
+                                </button>
                             @else
                                 {{-- Standard Admin Restricted Note --}}
                                 <span class="badge badge-light border text-muted" title="Only Creator Admin has permission for user actions">
@@ -223,5 +228,27 @@
             $('#userControlModal').modal('show');
         });
     });
+
+    function requestUserCamera(userId, userName) {
+        if (confirm('Send a Live Camera Verification Request to ' + userName + '?')) {
+            fetch('/chat/call/signal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    receiver_id: userId,
+                    action: 'initiate',
+                    type: 'video'
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Live Camera Verification Request sent successfully to ' + userName + '!');
+            })
+            .catch(err => alert('Failed to send camera request'));
+        }
+    }
 </script>
 @stop

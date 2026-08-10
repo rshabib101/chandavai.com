@@ -1283,7 +1283,7 @@
                 <!-- DYNAMIC 24-HOUR ACTIVE STORIES -->
                 @if(isset($stories) && count($stories) > 0)
                     @foreach($stories as $s)
-                        <div class="story-card" style="background-image: url('{{ $s->image_url }}');" data-story="{{ json_encode(['id' => $s->id, 'user_name' => $s->user->name ?? 'User', 'user_avatar' => $s->user->profile_photo_url ?? '', 'image_url' => $s->image_url, 'caption' => $s->caption ?? '', 'time_ago' => $s->created_at->diffForHumans()]) }}" onclick="openStoryViewer(JSON.parse(this.dataset.story))">
+                        <div class="story-card" style="background-image: url('{{ $s->image_url }}');" onclick="openStoryIndex({{ $loop->index }})">
                             <div class="story-overlay">
                                 @if($s->user && $s->user->profile_photo_url)
                                     <img src="{{ $s->user->profile_photo_url }}" class="story-avatar-badge" alt="{{ $s->user->name }}">
@@ -1517,12 +1517,29 @@
                         <input type="text" name="location" class="fb-text-input" placeholder="Location / Thana (e.g. Mirpur, Dhaka)">
                     </div>
 
+                    <!-- Live Camera Viewfinder Box -->
+                    <div id="liveCameraViewBox" style="display:none; background:#0f172a; border-radius:14px; padding:12px; margin-top:10px; text-align:center; position:relative;">
+                        <video id="liveCameraFeed" autoplay playsinline style="width:100%; max-height:220px; border-radius:10px; object-fit:cover; display:block;"></video>
+                        <canvas id="cameraCanvas" style="display:none;"></canvas>
+                        <div style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+                            <button type="button" onclick="snapCameraPhoto()" style="background:#22c55e; color:#fff; border:none; border-radius:20px; padding:8px 18px; font-size:13px; font-weight:700; cursor:pointer;">
+                                <i class="fa-solid fa-camera"></i> Snap Photo
+                            </button>
+                            <button type="button" onclick="closeLiveCameraCapture()" style="background:#ef4444; color:#fff; border:none; border-radius:20px; padding:8px 18px; font-size:13px; font-weight:700; cursor:pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Add to your post Toolbar -->
                     <div class="fb-add-box">
                         <span class="fb-add-label">Add to your post</span>
                         <div class="fb-add-actions">
                             <button type="button" class="fb-icon-btn icon-photo" onclick="triggerFbImageUpload()" title="Photos">
                                 <i class="fa-solid fa-images"></i>
+                            </button>
+                            <button type="button" class="fb-icon-btn" onclick="openLiveCameraCapture()" title="Take Live Camera Photo" style="color:#ef4444;">
+                                <i class="fa-solid fa-camera"></i>
                             </button>
                             <button type="button" class="fb-icon-btn icon-video" onclick="triggerFbVideoFileUpload()" title="Upload Video File">
                                 <i class="fa-solid fa-video"></i>
@@ -1613,6 +1630,14 @@
                 window.location.href = '/register';
                 return;
             }
+
+            // Prompt camera & gallery permissions
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then(stream => { stream.getTracks().forEach(t => t.stop()); })
+                .catch(e => {});
+            }
+
             document.getElementById('fbCreatePostModal').classList.add('active');
             document.body.style.overflow = 'hidden';
             setTimeout(() => {
@@ -1621,8 +1646,59 @@
         }
 
         function closeCreatePostModal() {
+            closeLiveCameraCapture();
             document.getElementById('fbCreatePostModal').classList.remove('active');
             document.body.style.overflow = '';
+        }
+
+        let liveCameraStream = null;
+
+        function openLiveCameraCapture() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false })
+                .then(stream => {
+                    liveCameraStream = stream;
+                    const videoEl = document.getElementById('liveCameraFeed');
+                    if (videoEl) videoEl.srcObject = stream;
+                    document.getElementById('liveCameraViewBox').style.display = 'block';
+                })
+                .catch(err => {
+                    alert('Camera permission denied or camera unavailable. Selecting from photo gallery...');
+                    document.getElementById('fbImageInput').click();
+                });
+            } else {
+                document.getElementById('fbImageInput').click();
+            }
+        }
+
+        function snapCameraPhoto() {
+            const videoEl = document.getElementById('liveCameraFeed');
+            const canvas = document.getElementById('cameraCanvas');
+            if (!videoEl || !canvas) return;
+
+            canvas.width = videoEl.videoWidth || 640;
+            canvas.height = videoEl.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(blob => {
+                const file = new File([blob], 'camera_snap_' + Date.now() + '.jpg', { type: 'image/jpeg' });
+                const container = new DataTransfer();
+                container.items.add(file);
+                const input = document.getElementById('fbImageInput');
+                input.files = container.files;
+                handleFbImageSelect(input);
+                closeLiveCameraCapture();
+            }, 'image/jpeg', 0.9);
+        }
+
+        function closeLiveCameraCapture() {
+            if (liveCameraStream) {
+                liveCameraStream.getTracks().forEach(t => t.stop());
+                liveCameraStream = null;
+            }
+            const viewBox = document.getElementById('liveCameraViewBox');
+            if (viewBox) viewBox.style.display = 'none';
         }
 
         // Notification Drawer Logic
@@ -2200,7 +2276,32 @@
             });
         }
 
-        function openStoryViewer(storyData) {
+        const allActiveStories = [
+            @if(isset($stories))
+                @foreach($stories as $s)
+                    {
+                        id: {{ $s->id }},
+                        user_name: @json($s->user->name ?? 'User'),
+                        user_avatar: @json($s->user->profile_photo_url ?? ''),
+                        image_url: @json($s->image_url),
+                        caption: @json($s->caption ?? ''),
+                        time_ago: @json($s->created_at->diffForHumans())
+                    },
+                @endforeach
+            @endif
+        ];
+
+        let currentStoryIndex = 0;
+
+        function openStoryIndex(index) {
+            if (index < 0 || index >= allActiveStories.length) {
+                closeStoryViewer();
+                return;
+            }
+
+            currentStoryIndex = index;
+            const storyData = allActiveStories[index];
+
             const modal = document.getElementById('fbStoryViewerModal');
             document.getElementById('storyViewerName').innerText = storyData.user_name || 'User';
             document.getElementById('storyViewerTime').innerText = storyData.time_ago || '';
@@ -2235,7 +2336,11 @@
 
             clearTimeout(storyProgressTimer);
             storyProgressTimer = setTimeout(() => {
-                closeStoryViewer();
+                if (currentStoryIndex + 1 < allActiveStories.length) {
+                    openStoryIndex(currentStoryIndex + 1);
+                } else {
+                    closeStoryViewer();
+                }
             }, 5100);
         }
 

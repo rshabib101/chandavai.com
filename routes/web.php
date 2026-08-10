@@ -10,11 +10,15 @@ use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\StoryController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Models\User;
 use App\Models\Setting;
 
 // Public Routes
 Route::get('/', [ReportController::class, 'index']);
+Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
+Route::post('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 Route::get('/referral-leaderboard', [ReferralController::class, 'index'])->name('referral.leaderboard');
 Route::get('/portfolio', [PortfolioController::class, 'show'])->name('portfolio.show');
 Route::get('/report/create', [ReportController::class, 'create']);
@@ -37,6 +41,7 @@ Route::get('/all', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/user/profile/{id?}', [ProfileController::class, 'show'])->name('user.profile');
     Route::post('/user/profile/photos', [ProfileController::class, 'updatePhotos'])->name('user.profile.photos');
+    Route::post('/user/profile/update-info', [ProfileController::class, 'updateInfo'])->name('user.profile.update-info');
     Route::get('/user/analytics', [ProfileController::class, 'analytics'])->name('user.analytics');
     Route::get('/user/wallet', [ProfileController::class, 'analytics'])->name('user.wallet');
     Route::post('/user/cashout', [ProfileController::class, 'cashout'])->name('user.cashout');
@@ -62,6 +67,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/chat/messages/{userId}', [ChatController::class, 'getMessages'])->name('chat.messages');
     Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
     Route::post('/chat/mark-read/{userId}', [ChatController::class, 'markRead'])->name('chat.mark-read');
+    Route::post('/chat/call/signal', [ChatController::class, 'sendCallSignal'])->name('chat.call.signal');
+    Route::get('/chat/call/check', [ChatController::class, 'checkCallSignals'])->name('chat.call.check');
 
     // 24-Hour Stories Routes
     Route::get('/stories', [StoryController::class, 'index'])->name('stories.index');

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Messenger - chanda vai</title>
 
@@ -22,16 +22,21 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+        html, body {
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             background-color: #f0f2f5;
             color: #0f172a;
-            height: 100vh;
-            overflow: hidden;
         }
 
         .messenger-layout {
             display: flex;
             height: 100vh;
+            height: 100dvh;
             width: 100vw;
             max-width: 1200px;
             margin: 0 auto;
@@ -50,7 +55,7 @@
         }
 
         .sidebar-header {
-            padding: 16px;
+            padding: 14px 16px;
             border-bottom: 1px solid #f1f5f9;
             display: flex;
             align-items: center;
@@ -208,23 +213,25 @@
             flex-direction: column;
             background: #ffffff;
             position: relative;
+            height: 100%;
         }
 
         /* CHAT WINDOW HEADER */
         .chat-area-header {
-            padding: 12px 20px;
+            padding: 12px 16px;
             border-bottom: 1px solid #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: #ffffff;
             z-index: 10;
+            flex-shrink: 0;
         }
 
         .chat-target-meta {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .chat-target-name {
@@ -244,17 +251,17 @@
         .call-action-btns {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn-call-icon {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: #f1f5f9;
             color: #0084ff;
             border: none;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -270,7 +277,8 @@
         /* MESSAGES THREAD CONTAINER */
         .messages-thread {
             flex: 1;
-            padding: 20px;
+            min-height: 0;
+            padding: 16px;
             overflow-y: auto;
             background: #fafbfc;
             display: flex;
@@ -291,7 +299,7 @@
         .msg-bubble-wrap {
             display: flex;
             flex-direction: column;
-            max-width: 65%;
+            max-width: 75%;
         }
 
         .msg-bubble-wrap.self {
@@ -341,20 +349,21 @@
         }
 
         .msg-time-stamp {
-            font-size: 10px;
+            font-size: 11px;
             color: #94a3b8;
-            margin-top: 2px;
+            margin-top: 3px;
             padding: 0 4px;
         }
 
         /* CHAT INPUT BAR */
         .chat-input-bar {
-            padding: 12px 16px;
+            padding: 10px 14px;
             border-top: 1px solid #f1f5f9;
             background: #ffffff;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         .attachment-btn {
@@ -394,15 +403,16 @@
             background: #0084ff;
             color: #ffffff;
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: transform 0.15s;
+            flex-shrink: 0;
         }
 
         .btn-send-msg:active {
@@ -414,8 +424,8 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
             z-index: 10000;
             flex-direction: column;
             align-items: center;
@@ -490,7 +500,7 @@
         .call-control-toolbar {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
         }
 
         .btn-call-control {
@@ -512,30 +522,76 @@
             background: rgba(255, 255, 255, 0.35);
         }
 
+        .btn-call-accept {
+            background: #22c55e !important;
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
+        }
+
         .btn-call-end {
             background: #ef4444 !important;
             box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
         }
 
-        /* RESPONSIVE TOGGLES FOR MOBILE */
+        /* RESPONSIVE CSS FIX FOR MOBILE SMARTPHONES */
         @media (max-width: 768px) {
             .messenger-layout {
                 flex-direction: column;
+                width: 100vw;
+                height: 100vh;
+                height: 100dvh;
+                position: fixed;
+                inset: 0;
             }
+
             .chat-sidebar {
                 width: 100%;
                 height: 100vh;
+                height: 100dvh;
+                display: flex;
+                flex-direction: column;
             }
+
             .chat-main-area {
                 display: none;
                 width: 100%;
                 height: 100vh;
+                height: 100dvh;
+                position: fixed;
+                inset: 0;
+                z-index: 50;
+                background: #ffffff;
+                flex-direction: column;
             }
+
             .messenger-layout.chat-active .chat-sidebar {
                 display: none;
             }
+
             .messenger-layout.chat-active .chat-main-area {
                 display: flex;
+            }
+
+            #mobileBackBtn {
+                display: flex !important;
+            }
+
+            .messages-thread {
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                padding: 12px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .chat-input-bar {
+                flex-shrink: 0;
+                position: sticky;
+                bottom: 0;
+                background: #ffffff;
+                z-index: 100;
+                padding: 10px 12px;
+                border-top: 1px solid #e2e8f0;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
             }
         }
     </style>
@@ -582,7 +638,7 @@
                 <!-- CHAT HEADER -->
                 <div class="chat-area-header">
                     <div class="chat-target-meta">
-                        <button type="button" class="btn-back-home" onclick="closeChatMobile()" style="display:none;" id="mobileBackBtn">
+                        <button type="button" class="btn-back-home" onclick="closeChatMobile()" id="mobileBackBtn">
                             <i class="fa-solid fa-arrow-left"></i>
                         </button>
                         <div class="user-avatar-wrap">
@@ -623,7 +679,7 @@
                     <button type="button" onclick="cancelAttachment()" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer;">&times;</button>
                 </div>
 
-                <!-- CHAT INPUT BAR -->
+                <!-- CHAT INPUT BAR (ALWAYS VISIBLE AT BOTTOM) -->
                 <div class="chat-input-bar">
                     <input type="file" id="chatFileInput" accept="image/*,video/*" style="display:none;" onchange="handleFileSelected(this)">
                     <button type="button" class="attachment-btn" onclick="triggerFilePicker('image')" title="Send Photo">
@@ -665,6 +721,9 @@
         </div>
 
         <div class="call-control-toolbar">
+            <button type="button" class="btn-call-control btn-call-accept" id="btnAcceptCall" onclick="acceptIncomingCall()" style="display:none;" title="Accept Call">
+                <i class="fa-solid fa-phone"></i>
+            </button>
             <button type="button" class="btn-call-control" id="btnMuteMic" onclick="toggleMic()" title="Mute Microphone">
                 <i class="fa-solid fa-microphone"></i>
             </button>
@@ -681,10 +740,39 @@
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const activeTargetUserId = "{{ $targetUser->id ?? '' }}";
         let activeAttachmentFile = null;
-        let pollInterval = null;
         let localStream = null;
         let isMicMuted = false;
         let isCamOff = false;
+        let activeCallSignalId = null;
+        let audioCtx = null;
+        let ringtoneInterval = null;
+
+        // SYNTHESIZED RINGTONE SOUND GENERATOR
+        function playRingtoneSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.8);
+            } catch(e) {}
+        }
+
+        function startRingtone() {
+            stopRingtone();
+            playRingtoneSound();
+            ringtoneInterval = setInterval(playRingtoneSound, 2000);
+        }
+
+        function stopRingtone() {
+            if (ringtoneInterval) clearInterval(ringtoneInterval);
+            ringtoneInterval = null;
+        }
 
         // LOAD CONVERSATIONS LIST
         function loadConversations() {
@@ -692,12 +780,13 @@
             fetch('/chat/conversations?search=' + encodeURIComponent(query))
             .then(res => res.json())
             .then(data => {
-                if (data.status === 'success') {
-                    const container = document.getElementById('conversationsList');
-                    container.innerHTML = '';
+                const container = document.getElementById('conversationsList');
+                if (!container) return;
 
+                if (data.status === 'success' && Array.isArray(data.conversations)) {
+                    container.innerHTML = '';
                     if (data.conversations.length === 0) {
-                        container.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:13px;">No users found</div>';
+                        container.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8; font-size:13px;">No conversations yet</div>';
                         return;
                     }
 
@@ -707,7 +796,7 @@
                         item.onclick = () => window.location.href = '/chat?user_id=' + c.id;
 
                         const avatarHtml = c.avatar_url ?
-                            `<img src="${c.avatar_url}" class="user-avatar-img" alt="${c.name}">` :
+                            `<img src="${c.avatar_url}" class="user-avatar-img" alt="${escapeHtml(c.name)}">` :
                             `<div class="user-avatar-initial">${c.initial}</div>`;
 
                         item.innerHTML = `
@@ -724,6 +813,12 @@
                         container.appendChild(item);
                     });
                 }
+            })
+            .catch(err => {
+                const container = document.getElementById('conversationsList');
+                if (container && container.innerText.includes('Loading')) {
+                    container.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8; font-size:13px;">No conversations yet</div>';
+                }
             });
         }
 
@@ -736,6 +831,7 @@
             .then(data => {
                 if (data.status === 'success') {
                     const thread = document.getElementById('messagesThread');
+                    if (!thread) return;
                     const isAtBottom = thread.scrollHeight - thread.scrollTop <= thread.clientHeight + 100;
 
                     thread.innerHTML = '';
@@ -777,13 +873,26 @@
             });
         }
 
-        // SEND CHAT MESSAGE
+        // SEND CHAT MESSAGE (REAL-TIME OPTIMISTIC RENDER)
         function sendChatMessage() {
             if (!activeTargetUserId) return;
             const textInput = document.getElementById('chatMessageInput');
             const messageText = textInput.value.trim();
 
             if (!messageText && !activeAttachmentFile) return;
+
+            // Optimistic bubble render
+            const thread = document.getElementById('messagesThread');
+            if (thread && messageText) {
+                const bubbleWrap = document.createElement('div');
+                bubbleWrap.className = 'msg-bubble-wrap self';
+                bubbleWrap.innerHTML = `
+                    <div class="msg-bubble">${escapeHtml(messageText)}</div>
+                    <span class="msg-time-stamp">Sending...</span>
+                `;
+                thread.appendChild(bubbleWrap);
+                thread.scrollTop = thread.scrollHeight;
+            }
 
             const formData = new FormData();
             formData.append('receiver_id', activeTargetUserId);
@@ -848,7 +957,7 @@
         }
 
         // ==========================================
-        // AUDIO & VIDEO CALLING SYSTEM (WEBRTC READY)
+        // AUDIO & VIDEO CALLING SYSTEM WITH SIGNALING
         // ==========================================
         function startCall(type) {
             if (!activeTargetUserId) return;
@@ -862,7 +971,8 @@
                 document.getElementById('callAvatarImg').src = targetAvatar;
             }
 
-            document.getElementById('callStatusLbl').innerText = type === 'video' ? 'Connecting video call...' : 'Ringing audio call...';
+            document.getElementById('btnAcceptCall').style.display = 'none';
+            document.getElementById('callStatusLbl').innerText = type === 'video' ? 'Calling video...' : 'Calling audio...';
             const videoBox = document.getElementById('videoStreamsBox');
 
             if (type === 'video') {
@@ -872,18 +982,105 @@
             }
 
             modal.classList.add('active');
+            startRingtone();
 
-            // Request Camera/Mic Access
+            // Request Camera/Mic
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ audio: true, video: (type === 'video') })
                 .then(stream => {
                     localStream = stream;
                     const localVid = document.getElementById('localVideo');
-                    localVid.srcObject = stream;
-                    document.getElementById('callStatusLbl').innerText = 'Connected 🟢';
+                    if (localVid) localVid.srcObject = stream;
                 })
-                .catch(err => {
-                    document.getElementById('callStatusLbl').innerText = 'Call connected (Microphone active)';
+                .catch(err => console.log('Mic/Cam error', err));
+            }
+
+            // Send call signal to server
+            fetch('/chat/call/signal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    receiver_id: activeTargetUserId,
+                    action: 'initiate',
+                    type: type
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    activeCallSignalId = data.signal_id;
+                }
+            });
+        }
+
+        function checkIncomingCallSignals() {
+            fetch('/chat/call/check')
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Check incoming call for auth user
+                    if (data.incoming_call && !document.getElementById('callingModal').classList.contains('active')) {
+                        const call = data.incoming_call;
+                        activeCallSignalId = call.id;
+
+                        document.getElementById('callUserName').innerText = call.caller_name;
+                        if (call.caller_avatar) document.getElementById('callAvatarImg').src = call.caller_avatar;
+                        document.getElementById('callStatusLbl').innerText = 'Incoming ' + (call.type === 'video' ? 'Video' : 'Audio') + ' Call...';
+
+                        document.getElementById('btnAcceptCall').style.display = 'flex';
+                        const videoBox = document.getElementById('videoStreamsBox');
+                        videoBox.style.display = call.type === 'video' ? 'block' : 'none';
+
+                        document.getElementById('callingModal').classList.add('active');
+                        startRingtone();
+                    }
+
+                    // Check outgoing call status
+                    if (data.outgoing_status && document.getElementById('callingModal').classList.contains('active')) {
+                        const status = data.outgoing_status.status;
+                        if (status === 'accepted') {
+                            stopRingtone();
+                            document.getElementById('callStatusLbl').innerText = 'Connected 🟢';
+                        } else if (status === 'declined' || status === 'ended') {
+                            stopRingtone();
+                            document.getElementById('callStatusLbl').innerText = 'Call Ended';
+                            setTimeout(() => endCall(), 1200);
+                        }
+                    }
+                }
+            })
+            .catch(e => {});
+        }
+
+        function acceptIncomingCall() {
+            stopRingtone();
+            document.getElementById('btnAcceptCall').style.display = 'none';
+            document.getElementById('callStatusLbl').innerText = 'Connected 🟢';
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+                .then(stream => {
+                    localStream = stream;
+                    const localVid = document.getElementById('localVideo');
+                    if (localVid) localVid.srcObject = stream;
+                })
+                .catch(e => {});
+            }
+
+            if (activeCallSignalId) {
+                fetch('/chat/call/signal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        receiver_id: activeTargetUserId,
+                        action: 'accept'
+                    })
                 });
             }
         }
@@ -907,20 +1104,39 @@
         }
 
         function endCall() {
+            stopRingtone();
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
                 localStream = null;
             }
             document.getElementById('callingModal').classList.remove('active');
+
+            if (activeTargetUserId) {
+                fetch('/chat/call/signal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        receiver_id: activeTargetUserId,
+                        action: 'end'
+                    })
+                });
+            }
         }
 
-        // INITIAL LOAD & AUTO-POLL
+        // INITIAL LOAD & REAL-TIME AUTO POLLING
         document.addEventListener('DOMContentLoaded', () => {
             loadConversations();
             if (activeTargetUserId) {
                 loadMessages();
-                pollInterval = setInterval(loadMessages, 3000);
             }
+
+            // Real-Time Polling Intervals (No Page Reload Needed)
+            setInterval(loadMessages, 2000);
+            setInterval(loadConversations, 3000);
+            setInterval(checkIncomingCallSignals, 3000);
         });
     </script>
 </body>

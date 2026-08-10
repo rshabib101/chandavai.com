@@ -33,6 +33,16 @@ class ProfileController extends Controller
         $isOwner = auth()->check() && (auth()->id() == $user->id);
         $isFollowing = auth()->check() ? auth()->user()->isFollowing($user->id) : false;
 
+        $followersCount = \App\Models\Follow::where('following_id', $user->id)->count();
+        $followingCount = \App\Models\Follow::where('follower_id', $user->id)->count();
+        $followersList = \App\Models\Follow::with('follower')
+            ->where('following_id', $user->id)
+            ->latest()
+            ->take(8)
+            ->get()
+            ->pluck('follower')
+            ->filter();
+
         $reports = \App\Models\Report::with(['user', 'reactions', 'comments'])
             ->withCount(['views', 'starTransactions'])
             ->where('user_id', $user->id)
@@ -40,7 +50,39 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
-        return view('profile.show', compact('user', 'reports', 'isOwner', 'isFollowing'));
+        return view('profile.show', compact('user', 'reports', 'isOwner', 'isFollowing', 'followersCount', 'followingCount', 'followersList'));
+    }
+
+    /**
+     * Update user personal information.
+     */
+    public function updateInfo(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $validated = $request->validate([
+            'bio' => 'nullable|string|max:500',
+            'category' => 'nullable|string|max:100',
+            'phone' => 'nullable|string|max:30',
+            'whatsapp' => 'nullable|string|max:30',
+            'hometown' => 'nullable|string|max:100',
+            'work' => 'nullable|string|max:200',
+            'education' => 'nullable|string|max:200',
+            'relationship_status' => 'nullable|string|max:50',
+            'birthdate' => 'nullable|date',
+            'gender' => 'nullable|string|max:30',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile information updated successfully!',
+            'user' => $user
+        ]);
     }
 
     /**

@@ -547,12 +547,18 @@
 
         <!-- ACTION BUTTONS ROW -->
         <div class="profile-actions-row">
-            <a href="/profile" class="btn-edit-profile">
-                <i class="fa-solid fa-pencil"></i> Edit profile
-            </a>
-            <a href="/user/analytics" class="btn-earnings">
-                <i class="fa-solid fa-sack-dollar"></i> Earnings
-            </a>
+            @if(isset($isOwner) && !$isOwner)
+                <button type="button" class="btn-edit-profile {{ isset($isFollowing) && $isFollowing ? 'following' : '' }}" style="{{ isset($isFollowing) && $isFollowing ? 'background:#e2e8f0; color:#334155;' : 'background:#ff4757; color:#fff;' }}" onclick="toggleFollowUser({{ $user->id }}, this)">
+                    {{ isset($isFollowing) && $isFollowing ? '✓ Following' : '+ Follow User' }}
+                </button>
+            @else
+                <a href="/profile" class="btn-edit-profile">
+                    <i class="fa-solid fa-pencil"></i> Edit profile
+                </a>
+                <a href="/user/analytics" class="btn-earnings">
+                    <i class="fa-solid fa-sack-dollar"></i> Earnings
+                </a>
+            @endif
         </div>
 
 

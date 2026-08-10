@@ -5,20 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PostView extends Model
+class Withdrawal extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'report_id',
         'user_id',
-        'ip_address',
-        'country',
+        'coins',
+        'amount_bdt',
+        'payment_method',
+        'account_number',
+        'status',
+        'admin_note',
     ];
 
-    public function report()
+    protected function casts(): array
     {
-        return $this->belongsTo(Report::class);
+        return [
+            'coins' => 'float',
+            'amount_bdt' => 'float',
+        ];
     }
 
     public function user()

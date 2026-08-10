@@ -547,8 +547,106 @@
         transition: transform 0.2s;
     }
 
-    .confirm-stars-btn:hover {
-        transform: translateY(-1px);
+    /* DROPDOWN & MODAL EXTRA STYLES */
+    .dropdown-item-btn {
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+        padding: 10px 16px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #334155;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: background 0.15s;
+    }
+    .dropdown-item-btn:hover {
+        background: #f8fafc;
+        color: #0f172a;
+    }
+    .dropdown-item-btn.delete-item:hover {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    /* INSIGHTS & EDIT MODAL STYLES */
+    .insights-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(4px);
+        z-index: 10002;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+    .insights-modal-overlay.active {
+        display: flex;
+    }
+    .insights-modal-card {
+        background: #ffffff;
+        color: #0f172a;
+        width: 100%;
+        max-width: 440px;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    .insights-metric-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 16px 0;
+    }
+    .insights-metric-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .insights-metric-val {
+        font-size: 22px;
+        font-weight: 800;
+        color: #0f172a;
+    }
+    .insights-metric-lbl {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+    }
+    .country-bar-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 10px;
+    }
+    .country-bar-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .country-bar-track {
+        flex: 1;
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .country-bar-fill {
+        height: 100%;
+        background: #2563eb;
+        border-radius: 4px;
     }
 </style>
 
@@ -573,7 +671,7 @@
 
     <!-- AUTHOR HEADER -->
     <div class="post-author-row">
-        <a href="/user/profile" class="author-left" style="text-decoration:none;">
+        <a href="/user/profile/{{ $authorUserId }}" class="author-left" style="text-decoration:none;">
             @if($report->user && $report->user->profile_photo_url)
                 <img src="{{ $report->user->profile_photo_url }}" alt="{{ $authorName }}" class="author-avatar-img">
             @else
@@ -587,7 +685,7 @@
                         {{ $authorName }}
                     </span>
                     @if(!$isSelf)
-                        <button type="button" class="follow-badge-btn {{ $isFollowingAuthor ? 'following' : '' }}" onclick="toggleFollowUser({{ $authorUserId }}, this); event.preventDefault(); event.stopPropagation();">
+                        <button type="button" class="follow-badge-btn {{ $isFollowingAuthor ? 'following' : '' }}" onclick="toggleFollowUser({{ $authorUserId }}, this, {{ $report->id }}); event.preventDefault(); event.stopPropagation();">
                             {{ $isFollowingAuthor ? '✓ Following' : '+ Follow' }}
                         </button>
                     @endif
@@ -597,9 +695,31 @@
                 </div>
             </div>
         </a>
-        <a href="/settings" class="more-options-btn" title="Settings & Options">
-            <i class="fa-solid fa-ellipsis-vertical"></i>
-        </a>
+        <div class="post-dropdown-wrap" style="position: relative;">
+            <button type="button" class="more-options-btn" onclick="togglePostDropdown({{ $report->id }}, event)" title="Post Options">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+            <div id="postDropdown-{{ $report->id }}" class="post-dropdown-menu" style="display:none; position:absolute; right:0; top:30px; background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; box-shadow:0 10px 25px rgba(0,0,0,0.12); width:180px; z-index:100; padding:6px 0; overflow:hidden;">
+                @if($isSelf || (auth()->check() && auth()->user()->isAdmin()))
+                    <button type="button" class="dropdown-item-btn" onclick="openEditPostModal({{ $report->id }}, '{{ addslashes($report->description) }}', '{{ addslashes($report->location) }}')">
+                        <i class="fa-solid fa-pen-to-square" style="color:#2563eb;"></i> Edit Post
+                    </button>
+                    <button type="button" class="dropdown-item-btn" onclick="openPostInsightsModal({{ $report->id }})">
+                        <i class="fa-solid fa-chart-line" style="color:#16a34a;"></i> View Insights 📊
+                    </button>
+                    <button type="button" class="dropdown-item-btn delete-item" onclick="confirmDeletePost({{ $report->id }})">
+                        <i class="fa-solid fa-trash-can" style="color:#dc2626;"></i> Delete Post
+                    </button>
+                @else
+                    <button type="button" class="dropdown-item-btn" onclick="sharePost({{ $report->id }})">
+                        <i class="fa-solid fa-share-nodes" style="color:#2563eb;"></i> Share Post
+                    </button>
+                    <button type="button" class="dropdown-item-btn" onclick="showToast('Post link copied!')">
+                        <i class="fa-solid fa-link" style="color:#64748b;"></i> Copy Link
+                    </button>
+                @endif
+            </div>
+        </div>
     </div>
 
     <!-- TITLE (Render ONLY if distinct from description) -->
@@ -1074,16 +1194,19 @@
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // Toggle Follow User AJAX
-    function toggleFollowUser(targetUserId, btn) {
+    // Toggle Follow User AJAX with optional report_id
+    function toggleFollowUser(targetUserId, btn, reportId = null) {
         if (!requireAuth()) return;
 
-        fetch('/user/' + targetUserId + '/follow', {
+        let url = '/user/' + targetUserId + '/follow';
+
+        fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
+            },
+            body: JSON.stringify({ report_id: reportId })
         })
         .then(res => {
             if (res.status === 401) {
@@ -1125,4 +1248,225 @@
             window.open(fbShareUrl, '_blank', 'width=600,height=400');
         }
     }
+
+    // TOGGLE POST OPTIONS DROPDOWN
+    function togglePostDropdown(reportId, e) {
+        if (e) e.stopPropagation();
+        const menu = document.getElementById('postDropdown-' + reportId);
+        document.querySelectorAll('.post-dropdown-menu').forEach(m => {
+            if (m !== menu) m.style.display = 'none';
+        });
+        if (menu) {
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+    }
+
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.post-dropdown-menu').forEach(m => m.style.display = 'none');
+    });
+
+    // EDIT POST MODAL
+    function openEditPostModal(reportId, description, location) {
+        document.getElementById('editReportId').value = reportId;
+        document.getElementById('editDescriptionInput').value = description || '';
+        document.getElementById('editLocationInput').value = location || '';
+        document.getElementById('editPostModal').classList.add('active');
+    }
+
+    function closeEditPostModal() {
+        document.getElementById('editPostModal').classList.remove('active');
+    }
+
+    function submitEditPost() {
+        const reportId = document.getElementById('editReportId').value;
+        const desc = document.getElementById('editDescriptionInput').value;
+        const loc = document.getElementById('editLocationInput').value;
+
+        fetch('/report/' + reportId + '/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ description: desc, location: loc })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const descEl = document.getElementById('desc-' + reportId);
+                if (descEl) descEl.innerText = desc;
+                closeEditPostModal();
+                alert('Post updated successfully!');
+            } else {
+                alert(data.message || 'Failed to update post');
+            }
+        })
+        .catch(err => alert('Error updating post'));
+    }
+
+    // DELETE POST
+    function confirmDeletePost(reportId) {
+        if (!confirm('Are you sure you want to delete this post?')) return;
+
+        fetch('/report/' + reportId + '/delete', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const card = document.getElementById('post-card-' + reportId);
+                if (card) card.remove();
+                alert('Post deleted successfully!');
+            } else {
+                alert(data.message || 'Failed to delete post');
+            }
+        })
+        .catch(err => alert('Error deleting post'));
+    }
+
+    // FACEBOOK POST INSIGHTS MODAL
+    function openPostInsightsModal(reportId) {
+        const modal = document.getElementById('postInsightsModal');
+        modal.classList.add('active');
+        document.getElementById('insightsLoading').style.display = 'block';
+        document.getElementById('insightsContent').style.display = 'none';
+
+        fetch('/report/' + reportId + '/insights')
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const ins = data.insights;
+                document.getElementById('insPostTitle').innerText = ins.title || ('Post #' + ins.post_id);
+                document.getElementById('insPostDate').innerText = ins.created_at;
+                document.getElementById('insViewsVal').innerText = ins.views;
+                document.getElementById('insReactionsVal').innerText = ins.reactions;
+                document.getElementById('insCommentsVal').innerText = ins.comments;
+                document.getElementById('insFollowersVal').innerText = '+' + ins.followers_gained;
+
+                const countryContainer = document.getElementById('insCountriesContainer');
+                countryContainer.innerHTML = '';
+                ins.countries.forEach(c => {
+                    const row = document.createElement('div');
+                    row.className = 'country-bar-item';
+                    row.innerHTML = `
+                        <span>${c.flag} ${c.name}</span>
+                        <div class="country-bar-track">
+                            <div class="country-bar-fill" style="width: ${c.percentage}%;"></div>
+                        </div>
+                        <span style="font-size:12px; color:#64748b; width:45px; text-align:right;">${c.percentage}%</span>
+                    `;
+                    countryContainer.appendChild(row);
+                });
+
+                document.getElementById('insightsLoading').style.display = 'none';
+                document.getElementById('insightsContent').style.display = 'block';
+            }
+        })
+        .catch(err => alert('Error loading post insights'));
+    }
+
+    function closePostInsightsModal() {
+        document.getElementById('postInsightsModal').classList.remove('active');
+    }
+
+    // ==========================================
+    // SINGLE ACTIVE VIDEO PLAYBACK CONTROLLER
+    // ==========================================
+    document.addEventListener('play', function(e) {
+        if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'video') {
+            const allVideos = document.querySelectorAll('video');
+            allVideos.forEach(v => {
+                if (v !== e.target && !v.paused) {
+                    v.pause();
+                }
+            });
+        }
+    }, true);
+
+    // Auto-pause video when scrolled out of view
+    if ('IntersectionObserver' in window) {
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting && !entry.target.paused) {
+                    entry.target.pause();
+                }
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('video').forEach(v => videoObserver.observe(v));
+    }
 </script>
+
+<!-- EDIT POST MODAL -->
+<div id="editPostModal" class="insights-modal-overlay">
+    <div class="insights-modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="font-size:18px; font-weight:700;">Edit Post ✏️</h3>
+            <button type="button" style="background:none; border:none; font-size:20px; color:#64748b; cursor:pointer;" onclick="closeEditPostModal()">&times;</button>
+        </div>
+        <input type="hidden" id="editReportId">
+        <div style="margin-bottom:14px;">
+            <label style="font-size:13px; font-weight:600; color:#334155; margin-bottom:6px; display:block;">Description</label>
+            <textarea id="editDescriptionInput" rows="4" style="width:100%; border:1px solid #cbd5e1; border-radius:12px; padding:10px; font-size:14px; outline:none; font-family:inherit;"></textarea>
+        </div>
+        <div style="margin-bottom:20px;">
+            <label style="font-size:13px; font-weight:600; color:#334155; margin-bottom:6px; display:block;">Location</label>
+            <input type="text" id="editLocationInput" style="width:100%; border:1px solid #cbd5e1; border-radius:12px; padding:10px; font-size:14px; outline:none;">
+        </div>
+        <button type="button" style="width:100%; background:#2563eb; color:#fff; border:none; border-radius:12px; padding:12px; font-size:15px; font-weight:700; cursor:pointer;" onclick="submitEditPost()">Save Changes</button>
+    </div>
+</div>
+
+<!-- FACEBOOK POST INSIGHTS MODAL -->
+<div id="postInsightsModal" class="insights-modal-overlay">
+    <div class="insights-modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="font-size:18px; font-weight:800; color:#0f172a;">Post Insights 📊</h3>
+            <button type="button" style="background:none; border:none; font-size:20px; color:#64748b; cursor:pointer;" onclick="closePostInsightsModal()">&times;</button>
+        </div>
+
+        <div id="insightsLoading" style="text-align:center; padding:30px; color:#64748b;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:24px;"></i>
+            <p style="margin-top:8px; font-size:13px;">Loading insights...</p>
+        </div>
+
+        <div id="insightsContent" style="display:none;">
+            <div style="background:#f1f5f9; border-radius:12px; padding:12px; margin-bottom:14px;">
+                <div id="insPostTitle" style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:2px;">Post Title</div>
+                <div id="insPostDate" style="font-size:11px; color:#64748b;">Date</div>
+            </div>
+
+            <!-- METRICS GRID -->
+            <div class="insights-metric-grid">
+                <div class="insights-metric-box">
+                    <span class="insights-metric-val" id="insViewsVal">0</span>
+                    <span class="insights-metric-lbl">👁️ Total Views</span>
+                </div>
+                <div class="insights-metric-box">
+                    <span class="insights-metric-val" id="insReactionsVal">0</span>
+                    <span class="insights-metric-lbl">❤️ Likes / Reactions</span>
+                </div>
+                <div class="insights-metric-box">
+                    <span class="insights-metric-val" id="insCommentsVal">0</span>
+                    <span class="insights-metric-lbl">💬 Comments</span>
+                </div>
+                <div class="insights-metric-box">
+                    <span class="insights-metric-val" id="insFollowersVal">+0</span>
+                    <span class="insights-metric-lbl">👥 Followers Gained</span>
+                </div>
+            </div>
+
+            <!-- TOP COUNTRIES BREAKDOWN -->
+            <div style="font-size:14px; font-weight:700; color:#0f172a; margin-top:16px; margin-bottom:8px;">
+                Top View Countries 🌐
+            </div>
+            <div class="country-bar-row" id="insCountriesContainer">
+                <!-- Dynamic country bars -->
+            </div>
+        </div>
+    </div>
+</div>

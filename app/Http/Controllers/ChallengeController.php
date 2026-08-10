@@ -181,6 +181,7 @@ class ChallengeController extends Controller
             Follow::create([
                 'follower_id' => $authUser->id,
                 'following_id' => $targetUser->id,
+                'report_id' => $request->report_id ?: null,
             ]);
             $isFollowing = true;
 

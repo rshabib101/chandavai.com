@@ -5,24 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PostView extends Model
+class Story extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'report_id',
         'user_id',
-        'ip_address',
-        'country',
+        'image',
+        'caption',
+        'expires_at',
     ];
 
-    public function report()
+    protected function casts(): array
     {
-        return $this->belongsTo(Report::class);
+        return [
+            'expires_at' => 'datetime',
+        ];
     }
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getImageUrlAttribute(): string
+    {
+        return asset('storage/' . $this->image);
     }
 }

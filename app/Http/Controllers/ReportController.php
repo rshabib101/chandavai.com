@@ -9,6 +9,7 @@ use App\Models\PostView;
 use App\Models\StarTransaction;
 use App\Models\UserNotification;
 use App\Models\User;
+use App\Models\Story;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
@@ -34,16 +35,18 @@ class ReportController extends Controller
         ->latest()
         ->paginate(6);
 
+        $userCountry = auth()->check() ? (auth()->user()->country ?: 'Bangladesh') : 'Bangladesh';
         foreach ($reports as $report) {
             try {
                 if (auth()->check()) {
                     PostView::firstOrCreate(
                         ['report_id' => $report->id, 'user_id' => auth()->id()],
-                        ['ip_address' => $request->ip()]
+                        ['ip_address' => $request->ip(), 'country' => $userCountry]
                     );
                 } else {
                     PostView::firstOrCreate(
-                        ['report_id' => $report->id, 'ip_address' => $request->ip()]
+                        ['report_id' => $report->id, 'ip_address' => $request->ip()],
+                        ['country' => $userCountry]
                     );
                 }
             } catch (\Exception $e) {
@@ -55,7 +58,9 @@ class ReportController extends Controller
             return view('partials.posts', compact('reports'))->render();
         }
 
-        return view('index', compact('reports'));
+        $stories = Story::with('user')->where('expires_at', '>', now())->latest()->get();
+
+        return view('index', compact('reports', 'stories'));
     }
 
     public function toggleReaction(Request $request, $id)
@@ -438,11 +443,188 @@ class ReportController extends Controller
         $report = Report::findOrFail($id);
 
         if ($report->image && file_exists(public_path('storage/' . $report->image))) {
-            unlink(public_path('storage/' . $report->image));
+            @unlink(public_path('storage/' . $report->image));
         }
 
         $report->delete();
 
         return redirect()->back()->with('success', 'Report deleted successfully!');
+    }
+
+    /**
+     * Update an existing post.
+     */
+    public function update(Request $request, $id)
+    {
+        if (!auth()->check()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $this->checkBlockedUser();
+        $report = Report::findOrFail($id);
+
+        if ($report->user_id != auth()->id() && !auth()->user()->isAdmin()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized action.'], 403);
+        }
+
+        $request->validate([
+            'description' => 'nullable|string|max:5000',
+            'location' => 'nullable|string|max:255',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'video' => 'nullable|file|mimes:mp4,mov,avi,mkv,webm|max:51200',
+        ]);
+
+        if ($request->has('description')) {
+            $report->description = $request->description;
+        }
+
+        if ($request->has('location')) {
+            $report->location = $request->location;
+        }
+
+        // Handle image updates
+        if ($request->hasFile('images')) {
+            $imagePaths = [];
+            foreach ($request->file('images') as $file) {
+                if ($file && $file->isValid()) {
+                    $imagePaths[] = $file->store('reports', 'public');
+                }
+            }
+            if (!empty($imagePaths)) {
+                $report->images = $imagePaths;
+                $report->image = $imagePaths[0];
+            }
+        }
+
+        // Handle video update
+        if ($request->hasFile('video') && $request->file('video')->isValid()) {
+            $report->video = $request->file('video')->store('videos', 'public');
+        }
+
+        $report->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Post updated successfully!',
+            'report' => $report,
+        ]);
+    }
+
+    /**
+     * Delete a post (API or Form).
+     */
+    public function destroy(Request $request, $id)
+    {
+        if (!auth()->check()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $this->checkBlockedUser();
+        $report = Report::findOrFail($id);
+
+        if ($report->user_id != auth()->id() && !auth()->user()->isAdmin()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized action.'], 403);
+        }
+
+        // Delete images & videos
+        if ($report->image && file_exists(public_path('storage/' . $report->image))) {
+            @unlink(public_path('storage/' . $report->image));
+        }
+        if (is_array($report->images)) {
+            foreach ($report->images as $img) {
+                if (file_exists(public_path('storage/' . $img))) {
+                    @unlink(public_path('storage/' . $img));
+                }
+            }
+        }
+        if ($report->video && file_exists(public_path('storage/' . $report->video))) {
+            @unlink(public_path('storage/' . $report->video));
+        }
+
+        $report->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Post deleted successfully!'
+            ]);
+        }
+
+        return back()->with('success', 'Post deleted successfully!');
+    }
+
+    /**
+     * Get Facebook-style Insights for a specific post.
+     */
+    public function getPostInsights(Request $request, $id)
+    {
+        if (!auth()->check()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $report = Report::with(['user'])->withCount(['views', 'reactions', 'comments', 'starTransactions'])->findOrFail($id);
+
+        if ($report->user_id != auth()->id() && !auth()->user()->isAdmin()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized action.'], 403);
+        }
+
+        // Followers gained from this post
+        $followersGained = \App\Models\Follow::where('report_id', $id)->count();
+
+        // Country breakdown from post_views
+        $viewsByCountry = PostView::select('country', \DB::raw('count(*) as count'))
+            ->where('report_id', $id)
+            ->groupBy('country')
+            ->orderBy('count', 'desc')
+            ->get();
+
+        $totalViews = max(1, $report->views_count);
+        $countriesList = [];
+
+        $flagMap = [
+            'Bangladesh' => '🇧🇩',
+            'Malaysia' => '🇲🇾',
+            'United States' => '🇺🇸',
+            'India' => '🇮🇳',
+            'United Arab Emirates' => '🇦🇪',
+            'Saudi Arabia' => '🇸🇦',
+            'Qatar' => '🇶🇦',
+            'United Kingdom' => '🇬🇧',
+        ];
+
+        if ($viewsByCountry->count() > 0) {
+            foreach ($viewsByCountry as $v) {
+                $cName = $v->country ?: 'Bangladesh';
+                $pct = round(($v->count / $totalViews) * 100);
+                $countriesList[] = [
+                    'name' => $cName,
+                    'flag' => $flagMap[$cName] ?? '🌐',
+                    'count' => $v->count,
+                    'percentage' => $pct,
+                ];
+            }
+        } else {
+            $countriesList[] = [
+                'name' => 'Bangladesh',
+                'flag' => '🇧🇩',
+                'count' => $report->views_count,
+                'percentage' => 100,
+            ];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'insights' => [
+                'post_id' => $report->id,
+                'title' => $report->title ?: \Illuminate\Support\Str::limit($report->description, 40),
+                'created_at' => $report->created_at->format('M j, Y - g:i A'),
+                'views' => $report->views_count,
+                'reactions' => $report->reactions_count,
+                'comments' => $report->comments_count,
+                'stars' => $report->star_transactions_count,
+                'followers_gained' => $followersGained,
+                'countries' => $countriesList,
+            ]
+        ]);
     }
 }

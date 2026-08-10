@@ -8,25 +8,39 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\Withdrawal;
+use App\Models\StarTransaction;
+use App\Models\DailyChallengeClaim;
+use Carbon\Carbon;
 
 class ProfileController extends Controller
 {
     /**
      * Display the Facebook/Boipai style user profile view.
      */
-    public function show(Request $request)
+    public function show(Request $request, $id = null)
     {
-        $user = $request->user();
+        if ($id) {
+            $user = \App\Models\User::findOrFail($id);
+        } else {
+            $user = $request->user();
+        }
+
         if (!$user) {
             return redirect()->route('login');
         }
 
-        $reports = \App\Models\Report::where('user_id', $user->id)
+        $isOwner = auth()->check() && (auth()->id() == $user->id);
+        $isFollowing = auth()->check() ? auth()->user()->isFollowing($user->id) : false;
+
+        $reports = \App\Models\Report::with(['user', 'reactions', 'comments'])
+            ->withCount(['views', 'starTransactions'])
+            ->where('user_id', $user->id)
             ->where('status', 'approved')
             ->latest()
             ->get();
 
-        return view('profile.show', compact('user', 'reports'));
+        return view('profile.show', compact('user', 'reports', 'isOwner', 'isFollowing'));
     }
 
     /**
@@ -43,7 +57,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Display the dark-themed post engagement analytics dashboard.
+     * Display the Wallet & Cash Out Earning Dashboard.
      */
     public function analytics(Request $request)
     {
@@ -52,7 +66,109 @@ class ProfileController extends Controller
             return redirect()->route('login');
         }
 
-        return view('profile.analytics', compact('user'));
+        $userPoints = (float) ($user->points ?? 0);
+        $rate = 0.025; // 1 Coin = 0.025 BDT (600 coins = 15.00 BDT)
+        $totalBdt = $userPoints * $rate;
+
+        // Calculate Today's Earnings
+        $todayStars = (float) StarTransaction::where('receiver_id', $user->id)->whereDate('created_at', Carbon::today())->sum('stars');
+        $todayClaimsCount = DailyChallengeClaim::where('user_id', $user->id)->whereDate('claim_date', Carbon::today())->count();
+        $todayClaimsPoints = $todayClaimsCount * 100; // default daily reward points
+        $todayPoints = $todayStars + $todayClaimsPoints;
+        $todayBdt = $todayPoints * $rate;
+
+        // Calculate Yesterday's Earnings
+        $yesterdayStars = (float) StarTransaction::where('receiver_id', $user->id)->whereDate('created_at', Carbon::yesterday())->sum('stars');
+        $yesterdayClaimsCount = DailyChallengeClaim::where('user_id', $user->id)->whereDate('claim_date', Carbon::yesterday())->count();
+        $yesterdayClaimsPoints = $yesterdayClaimsCount * 100;
+        $yesterdayPoints = $yesterdayStars + $yesterdayClaimsPoints;
+        $yesterdayBdt = $yesterdayPoints * $rate;
+
+        // Calculate This Month's Earnings
+        $monthStars = (float) StarTransaction::where('receiver_id', $user->id)->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year)->sum('stars');
+        $monthClaimsCount = DailyChallengeClaim::where('user_id', $user->id)->whereMonth('claim_date', Carbon::now()->month)->whereYear('claim_date', Carbon::now()->year)->count();
+        $monthClaimsPoints = $monthClaimsCount * 100;
+        $monthPoints = $monthStars + $monthClaimsPoints;
+        if ($monthPoints < $userPoints) {
+            $monthPoints = $userPoints;
+        }
+        $monthBdt = $monthPoints * $rate;
+
+        // Min Cashout Info
+        $minCashoutCoins = 600;
+        $needsMoreCoins = max(0, $minCashoutCoins - $userPoints);
+
+        // Fetch User's Past Withdrawals
+        $withdrawals = Withdrawal::where('user_id', $user->id)->latest()->take(20)->get();
+
+        return view('profile.analytics', compact(
+            'user',
+            'userPoints',
+            'rate',
+            'totalBdt',
+            'todayPoints',
+            'todayBdt',
+            'yesterdayPoints',
+            'yesterdayBdt',
+            'monthPoints',
+            'monthBdt',
+            'minCashoutCoins',
+            'needsMoreCoins',
+            'withdrawals'
+        ));
+    }
+
+    /**
+     * Handle Cash Out Withdrawal Submission.
+     */
+    public function cashout(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated.'], 401);
+        }
+
+        $request->validate([
+            'coins' => 'required|numeric|min:1',
+            'payment_method' => 'required|string',
+            'account_number' => 'required|string|min:4|max:50',
+        ]);
+
+        $coins = (float) $request->coins;
+        $userPoints = (float) $user->points;
+
+        if ($userPoints < $coins) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Your balance is insufficient for this amount',
+                'user_points' => $userPoints,
+            ], 400);
+        }
+
+        $rate = 0.025;
+        $amountBdt = $coins * $rate;
+
+        // Deduct points
+        $user->points = max(0, $userPoints - $coins);
+        $user->save();
+
+        // Create Withdrawal record
+        $withdrawal = Withdrawal::create([
+            'user_id' => $user->id,
+            'coins' => $coins,
+            'amount_bdt' => $amountBdt,
+            'payment_method' => $request->payment_method,
+            'account_number' => $request->account_number,
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cash out request for ৳' . number_format($amountBdt, 2) . ' submitted successfully!',
+            'new_points' => $user->points,
+            'new_bdt' => number_format($user->points * $rate, 3),
+            'withdrawal' => $withdrawal,
+        ]);
     }
 
 

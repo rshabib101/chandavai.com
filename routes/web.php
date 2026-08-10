@@ -8,6 +8,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ResellerSurveyController;
 use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\ChallengeController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\StoryController;
 use App\Models\User;
 use App\Models\Setting;
 
@@ -33,9 +35,11 @@ Route::get('/all', function () {
 
 // Authenticated User Routes (Regular Users & Admins)
 Route::middleware('auth')->group(function () {
-    Route::get('/user/profile', [ProfileController::class, 'show'])->name('user.profile');
+    Route::get('/user/profile/{id?}', [ProfileController::class, 'show'])->name('user.profile');
     Route::post('/user/profile/photos', [ProfileController::class, 'updatePhotos'])->name('user.profile.photos');
     Route::get('/user/analytics', [ProfileController::class, 'analytics'])->name('user.analytics');
+    Route::get('/user/wallet', [ProfileController::class, 'analytics'])->name('user.wallet');
+    Route::post('/user/cashout', [ProfileController::class, 'cashout'])->name('user.cashout');
     Route::get('/settings', [ProfileController::class, 'settings'])->name('user.settings');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -44,10 +48,24 @@ Route::middleware('auth')->group(function () {
     Route::post('/report/{id}/react', [ReportController::class, 'toggleReaction'])->name('report.react');
     Route::post('/report/{id}/comment', [ReportController::class, 'storeComment'])->name('report.comment');
     Route::post('/report/{id}/stars', [ReportController::class, 'sendStars'])->name('report.stars');
+    Route::post('/report/{id}/update', [ReportController::class, 'update'])->name('report.update');
+    Route::delete('/report/{id}/delete', [ReportController::class, 'destroy'])->name('report.destroy');
+    Route::get('/report/{id}/insights', [ReportController::class, 'getPostInsights'])->name('report.insights');
 
     // Notifications Routes
     Route::get('/user/notifications', [ReportController::class, 'getNotifications'])->name('user.notifications');
     Route::post('/user/notifications/read', [ReportController::class, 'markNotificationsRead'])->name('user.notifications.read');
+
+    // Messenger & Chat Routes
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/conversations', [ChatController::class, 'getConversations'])->name('chat.conversations');
+    Route::get('/chat/messages/{userId}', [ChatController::class, 'getMessages'])->name('chat.messages');
+    Route::post('/chat/send', [ChatController::class, 'sendMessage'])->name('chat.send');
+    Route::post('/chat/mark-read/{userId}', [ChatController::class, 'markRead'])->name('chat.mark-read');
+
+    // 24-Hour Stories Routes
+    Route::get('/stories', [StoryController::class, 'index'])->name('stories.index');
+    Route::post('/story/create', [StoryController::class, 'store'])->name('story.store');
 
     // Follow System & Daily Challenge Routes
     Route::post('/user/{id}/follow', [ChallengeController::class, 'toggleFollow'])->name('user.follow');

@@ -132,6 +132,11 @@ class User extends Authenticatable
         return $this->hasMany(StarTransaction::class, 'receiver_id');
     }
 
+    public function withdrawals()
+    {
+        return $this->hasMany(Withdrawal::class)->latest();
+    }
+
     public function isFollowing($targetUserId)
     {
         return $this->following()->where('following_id', $targetUserId)->exists();

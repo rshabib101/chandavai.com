@@ -352,26 +352,60 @@
         .create-story-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
         }
 
-        .create-story-card .story-overlay {
-            background: rgba(255, 255, 255, 0.9);
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            gap: 8px;
+        .create-story-bg {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
         }
 
-        .create-story-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #ff4757;
+        .create-story-bg-initial {
+            width: 100%;
+            height: 110px;
+            background: linear-gradient(135deg, #0284c7, #2563eb);
             color: #ffffff;
+            font-size: 32px;
+            font-weight: 800;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+        }
+
+        .create-story-footer {
+            height: 55px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 8px;
+            position: relative;
+        }
+
+        .plus-badge-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #0084ff;
+            color: #ffffff;
+            border: 3px solid #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            position: absolute;
+            top: -15px;
+        }
+
+        .create-story-lbl {
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
         }
 
         /* CATEGORY TABS */
@@ -1209,8 +1243,9 @@
                 </div>
             </div>
             @endauth
-            <a href="/user/profile" class="top-btn-icon" title="Profile">
-                <i class="fa-regular fa-user"></i>
+            <a href="/chat" class="top-btn-icon" title="Messenger" style="position: relative;">
+                <i class="fa-brands fa-facebook-messenger" style="color: #0084ff; font-size: 20px;"></i>
+                <span id="navChatUnreadBadge" class="notif-badge" style="display: none;">0</span>
             </a>
         </div>
     </div>
@@ -1231,38 +1266,35 @@
 
         <!-- STORIES HORIZONTAL CAROUSEL -->
         <div class="stories-section">
-            <div class="stories-wrapper">
-                <!-- Story Item 1: Israt Jahan -->
-                <div class="story-card" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80');" onclick="location.href='/user/profile'">
-                    <div class="story-overlay">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" class="story-avatar-badge" alt="Israt">
-                        <span class="story-user-name">Israt Jahan</span>
+            <div class="stories-wrapper" id="storiesWrapperContainer">
+                <!-- STORY ITEM 0: CREATE STORY (+) -->
+                <div class="story-card create-story-card" onclick="openCreateStoryModal()">
+                    @if(auth()->check() && auth()->user()->profile_photo_url)
+                        <img src="{{ auth()->user()->profile_photo_url }}" class="create-story-bg" alt="Your Profile">
+                    @else
+                        <div class="create-story-bg-initial">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</div>
+                    @endif
+                    <div class="create-story-footer">
+                        <div class="plus-badge-circle"><i class="fa-solid fa-plus"></i></div>
+                        <span class="create-story-lbl">Create story</span>
                     </div>
                 </div>
 
-                <!-- Story Item 2: Olie Munshi -->
-                <div class="story-card" style="background-image: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=300&q=80');" onclick="location.href='/user/profile'">
-                    <div class="story-overlay">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" class="story-avatar-badge" alt="Olie">
-                        <span class="story-user-name">Olie Munshi</span>
-                    </div>
-                </div>
-
-                <!-- Story Item 3: Hello Rana -->
-                <div class="story-card" style="background-image: url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80');" onclick="location.href='/user/profile'">
-                    <div class="story-overlay">
-                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" class="story-avatar-badge" alt="Rana">
-                        <span class="story-user-name">Hello Rana</span>
-                    </div>
-                </div>
-
-                <!-- Story Item 4: Rubel Hossain -->
-                <div class="story-card" style="background-image: url('https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80');" onclick="location.href='/user/profile'">
-                    <div class="story-overlay">
-                        <div class="story-avatar-placeholder">R</div>
-                        <span class="story-user-name">Rubel Hossain</span>
-                    </div>
-                </div>
+                <!-- DYNAMIC 24-HOUR ACTIVE STORIES -->
+                @if(isset($stories) && count($stories) > 0)
+                    @foreach($stories as $s)
+                        <div class="story-card" style="background-image: url('{{ $s->image_url }}');" data-story="{{ json_encode(['id' => $s->id, 'user_name' => $s->user->name ?? 'User', 'user_avatar' => $s->user->profile_photo_url ?? '', 'image_url' => $s->image_url, 'caption' => $s->caption ?? '', 'time_ago' => $s->created_at->diffForHumans()]) }}" onclick="openStoryViewer(JSON.parse(this.dataset.story))">
+                            <div class="story-overlay">
+                                @if($s->user && $s->user->profile_photo_url)
+                                    <img src="{{ $s->user->profile_photo_url }}" class="story-avatar-badge" alt="{{ $s->user->name }}">
+                                @else
+                                    <div class="story-avatar-placeholder">{{ strtoupper(substr($s->user->name ?? 'U', 0, 1)) }}</div>
+                                @endif
+                                <span class="story-user-name">{{ $s->user->name ?? 'User' }}</span>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
             </div>
         </div>
 
@@ -2091,7 +2123,192 @@
                 } catch(e) {}
             }
         });
+
+        // ==========================================
+        // DYNAMIC 24-HOUR FACEBOOK STORY SYSTEM
+        // ==========================================
+        let selectedStoryFile = null;
+        let storyProgressTimer = null;
+
+        function openCreateStoryModal() {
+            if (!requireAuth()) return;
+            document.getElementById('createStoryModal').classList.add('active');
+        }
+
+        function closeCreateStoryModal() {
+            document.getElementById('createStoryModal').classList.remove('active');
+            selectedStoryFile = null;
+            document.getElementById('storyImageInput').value = '';
+            document.getElementById('storyImagePreview').style.display = 'none';
+            document.getElementById('storyPlaceholderContent').style.display = 'block';
+            document.getElementById('storyCaptionInput').value = '';
+        }
+
+        function previewStoryImage(input) {
+            if (input.files && input.files[0]) {
+                selectedStoryFile = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('storyImagePreview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('storyPlaceholderContent').style.display = 'none';
+                };
+                reader.readAsDataURL(selectedStoryFile);
+            }
+        }
+
+        function submitStory() {
+            if (!selectedStoryFile) {
+                alert('Please select an image for your story.');
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitStory');
+            btn.disabled = true;
+            btn.innerText = 'Sharing to Story...';
+
+            const formData = new FormData();
+            formData.append('image', selectedStoryFile);
+            formData.append('caption', document.getElementById('storyCaptionInput').value.trim());
+
+            fetch('/story/create', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerText = 'Share to Story 🚀';
+
+                if (data.status === 'success') {
+                    alert('Story shared successfully!');
+                    closeCreateStoryModal();
+                    window.location.reload();
+                } else {
+                    alert(data.message || 'Failed to share story');
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerText = 'Share to Story 🚀';
+                alert('Error uploading story');
+            });
+        }
+
+        function openStoryViewer(storyData) {
+            const modal = document.getElementById('fbStoryViewerModal');
+            document.getElementById('storyViewerName').innerText = storyData.user_name || 'User';
+            document.getElementById('storyViewerTime').innerText = storyData.time_ago || '';
+            document.getElementById('storyViewerImg').src = storyData.image_url;
+
+            const avatarImg = document.getElementById('storyViewerAvatar');
+            if (storyData.user_avatar) {
+                avatarImg.src = storyData.user_avatar;
+                avatarImg.style.display = 'block';
+            } else {
+                avatarImg.style.display = 'none';
+            }
+
+            const captionBox = document.getElementById('storyViewerCaptionBox');
+            if (storyData.caption) {
+                document.getElementById('storyViewerCaption').innerText = storyData.caption;
+                captionBox.style.display = 'block';
+            } else {
+                captionBox.style.display = 'none';
+            }
+
+            modal.classList.add('active');
+
+            // Reset & Start Progress Bar
+            const bar = document.getElementById('storyProgressBar');
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.transition = 'width 5s linear';
+                bar.style.width = '100%';
+            }, 50);
+
+            clearTimeout(storyProgressTimer);
+            storyProgressTimer = setTimeout(() => {
+                closeStoryViewer();
+            }, 5100);
+        }
+
+        function closeStoryViewer() {
+            clearTimeout(storyProgressTimer);
+            const modal = document.getElementById('fbStoryViewerModal');
+            if (modal) modal.classList.remove('active');
+            const bar = document.getElementById('storyProgressBar');
+            if (bar) {
+                bar.style.transition = 'none';
+                bar.style.width = '0%';
+            }
+        }
     </script>
+
+    <!-- CREATE STORY MODAL -->
+    <div id="createStoryModal" class="insights-modal-overlay">
+        <div class="insights-modal-card" style="max-width: 420px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:18px; font-weight:800; color:#0f172a;">Create Story 📖</h3>
+                <button type="button" onclick="closeCreateStoryModal()" style="background:none; border:none; font-size:24px; color:#64748b; cursor:pointer;">&times;</button>
+            </div>
+            
+            <input type="file" id="storyImageInput" accept="image/*" style="display:none;" onchange="previewStoryImage(this)">
+            
+            <div id="storyImageDropArea" onclick="document.getElementById('storyImageInput').click()" style="background:#f8fafc; border:2px dashed #cbd5e1; border-radius:16px; height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; position:relative; margin-bottom:14px;">
+                <img id="storyImagePreview" style="display:none; width:100%; height:100%; object-fit:cover;">
+                <div id="storyPlaceholderContent" style="text-align:center; color:#64748b;">
+                    <i class="fa-regular fa-image" style="font-size:36px; color:#0084ff; margin-bottom:8px;"></i>
+                    <p style="font-size:14px; font-weight:600; color:#0f172a;">Click to select photo</p>
+                    <span style="font-size:12px; color:#94a3b8;">Add a photo to your 24h story</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label style="font-size:13px; font-weight:600; color:#334155; margin-bottom:6px; display:block;">Story Caption (Optional)</label>
+                <input type="text" id="storyCaptionInput" placeholder="Add a caption..." style="width:100%; border:1px solid #cbd5e1; border-radius:12px; padding:10px 14px; font-size:14px; outline:none;">
+            </div>
+
+            <button type="button" id="btnSubmitStory" onclick="submitStory()" style="width:100%; background:#0084ff; color:#fff; border:none; border-radius:25px; padding:12px; font-size:16px; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(0,132,255,0.3);">Share to Story 🚀</button>
+        </div>
+    </div>
+
+    <!-- FACEBOOK FULL-SCREEN STORY VIEWER MODAL -->
+    <div id="fbStoryViewerModal" class="insights-modal-overlay" style="background:rgba(0,0,0,0.92);">
+        <div style="position:relative; width:100%; max-width:400px; height:90vh; background:#0f172a; border-radius:20px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
+            <!-- TOP PROGRESS BAR -->
+            <div style="position:absolute; top:12px; left:12px; right:12px; z-index:20;">
+                <div style="height:3px; background:rgba(255,255,255,0.3); border-radius:3px; overflow:hidden;">
+                    <div id="storyProgressBar" style="height:100%; width:0%; background:#ffffff; transition:width 5s linear;"></div>
+                </div>
+                
+                <!-- AUTHOR HEADER -->
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img id="storyViewerAvatar" src="" style="width:36px; height:36px; border-radius:50%; border:2px solid #0084ff; object-fit:cover;">
+                        <div>
+                            <div id="storyViewerName" style="font-size:14px; font-weight:700; color:#fff;">Name</div>
+                            <div id="storyViewerTime" style="font-size:11px; color:#cbd5e1;">Time</div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeStoryViewer()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">&times;</button>
+                </div>
+            </div>
+
+            <!-- STORY IMAGE & CAPTION -->
+            <img id="storyViewerImg" src="" style="width:100%; height:100%; object-fit:cover;">
+            
+            <div id="storyViewerCaptionBox" style="position:absolute; bottom:20px; left:16px; right:16px; background:rgba(0,0,0,0.65); backdrop-filter:blur(6px); border-radius:14px; padding:12px 16px; color:#fff; font-size:14px; font-weight:600; text-align:center;">
+                <span id="storyViewerCaption">Caption</span>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

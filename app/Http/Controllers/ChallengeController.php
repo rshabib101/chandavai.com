@@ -286,11 +286,13 @@ class ChallengeController extends Controller
             return redirect()->back()->with('error', 'You cannot change your own role.');
         }
 
-        if ($request->has('role') && in_array($request->input('role'), ['user', 'admin', 'creator_admin'])) {
+        if ($request->has('role') && in_array($request->input('role'), ['user', 'advertiser', 'admin', 'creator_admin'])) {
             $user->role = $request->input('role');
         } else {
-            // Cycle role: user -> admin -> creator_admin -> user
+            // Cycle role: user -> advertiser -> admin -> creator_admin -> user
             if ($user->role === 'user' || empty($user->role)) {
+                $user->role = 'advertiser';
+            } elseif ($user->role === 'advertiser') {
                 $user->role = 'admin';
             } elseif ($user->role === 'admin') {
                 $user->role = 'creator_admin';

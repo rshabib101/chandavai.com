@@ -204,6 +204,29 @@
             background: #e2e8f0;
         }
 
+        .btn-ad-pill {
+            background: linear-gradient(135deg, #1877f2, #166fe5);
+            color: #ffffff;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(24, 119, 242, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .btn-ad-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24, 119, 242, 0.45);
+            color: #ffffff;
+        }
+
         /* SECTION TITLES */
         .section-header-title {
             font-size: 17px;
@@ -844,7 +867,15 @@
 
             <!-- TOTAL BALANCE HERO CARD -->
             <div class="white-card">
-                <div class="total-balance-label">Total balance</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <div class="total-balance-label" style="margin-bottom:0;">Total balance</div>
+                    @if(auth()->user()->isAdvertiser())
+                        <a href="/user/ad-manager" class="btn-ad-pill" title="Go to Ad Manager">
+                            <i class="fa-solid fa-rectangle-ad"></i>
+                            <span>Ad</span>
+                        </a>
+                    @endif
+                </div>
                 <div class="total-balance-amount" id="displayTotalBdt">৳ {{ number_format($totalBdt, 3) }}</div>
                 <div class="total-coins-sub">
                     <span>≈</span>
@@ -1123,7 +1154,7 @@
             <i class="fa-solid fa-house"></i>
             <span>Home</span>
         </a>
-        <a href="/" class="nav-item-btn">
+        <a href="/reels" class="nav-item-btn">
             <i class="fa-solid fa-clapperboard"></i>
             <span>Reels</span>
         </a>

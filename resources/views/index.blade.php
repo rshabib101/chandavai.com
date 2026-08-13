@@ -1253,6 +1253,7 @@
     <!-- FEED MAIN CONTAINER -->
     <div class="main-container">
 
+        @if(!($isReels ?? false))
         <!-- WHAT'S ON YOUR MIND? -->
         <div class="mind-bar">
             <a href="/user/profile" class="user-avatar-initial" style="text-decoration:none;">
@@ -1297,14 +1298,18 @@
                 @endif
             </div>
         </div>
+        @endif
 
         <!-- CATEGORY FILTER PILLS -->
         <div class="categories-section">
             <div class="categories-wrapper">
-                <a href="#" class="category-pill active">
+                <a href="/" class="category-pill {{ !($isReels ?? false) ? 'active' : '' }}">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> For you
                 </a>
-                <a href="#" class="category-pill">
+                <a href="/reels" class="category-pill {{ ($isReels ?? false) ? 'active' : '' }}">
+                    <i class="fa-solid fa-clapperboard" style="color: #ef4444;"></i> Reels
+                </a>
+                <a href="/tasks" class="category-pill {{ request()->is('tasks') ? 'active' : '' }}">
                     <i class="fa-regular fa-rectangle-list"></i> Tasks
                 </a>
                 <a href="#" class="category-pill">
@@ -1316,6 +1321,7 @@
             </div>
         </div>
 
+        @if(!($isReels ?? false))
         @auth
         <!-- DAILY CHALLENGE & INCOME ELIGIBILITY CARD -->
         <div class="daily-challenge-card" id="dailyChallengeWidget">
@@ -1401,6 +1407,24 @@
             <div class="sidebar-ad-card" style="background:#ffffff; border-radius:16px; padding:14px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,0.04); text-align:center;">
                 <span style="font-size:10px; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px;">Sponsored Ad</span>
                 {!! \App\Models\Setting::get('ad_script_sidebar') !!}
+            </div>
+        @endif
+        @endif
+
+        @if($isReels ?? false)
+            <div style="background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 20px; padding: 16px 20px; margin-bottom: 16px; color: #ffffff; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 16px rgba(0,0,0,0.2);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ff4757, #ef4444); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); flex-shrink: 0;">
+                        <i class="fa-solid fa-clapperboard"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 18px; font-weight: 800; margin: 0; line-height: 1.2; letter-spacing: -0.3px;">Facebook Reels</h2>
+                        <p style="font-size: 12px; color: #94a3b8; margin: 3px 0 0 0;">শুধুমাত্র ভিডিও পোষ্টসমূহ দেখুন</p>
+                    </div>
+                </div>
+                <a href="/" style="background: rgba(255,255,255,0.12); color: #ffffff; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 20px; text-decoration: none;">
+                    <i class="fa-solid fa-house" style="margin-right: 4px;"></i> Home
+                </a>
             </div>
         @endif
 
@@ -1600,11 +1624,11 @@
 
     <!-- FIXED BOTTOM APP NAVIGATION -->
     <div class="bottom-nav">
-        <a href="/" class="nav-item active">
+        <a href="/" class="nav-item {{ !($isReels ?? false) ? 'active' : '' }}">
             <i class="fa-solid fa-house"></i>
             <span>Home</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="/reels" class="nav-item {{ ($isReels ?? false) ? 'active' : '' }}">
             <i class="fa-solid fa-clapperboard"></i>
             <span>Reels</span>
         </a>
@@ -1961,7 +1985,10 @@
             loading = true;
             page++;
 
-            fetch("?page=" + page, {
+            let reqUrl = new URL(window.location.href);
+            reqUrl.searchParams.set('page', page);
+
+            fetch(reqUrl.toString(), {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }

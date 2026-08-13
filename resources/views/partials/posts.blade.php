@@ -650,6 +650,24 @@
     }
 </style>
 
+@if($reports->isEmpty())
+    <div style="background: #ffffff; border-radius: 16px; padding: 40px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; margin-bottom: 14px;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: #fef2f2; color: #ef4444; display: inline-flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 14px;">
+            <i class="fa-solid fa-clapperboard"></i>
+        </div>
+        @if($isReels ?? false)
+            <h4 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">কোন রিলস বা ভিডিও পোস্ট পাওয়া যায়নি</h4>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 18px;">প্রথম রিলস/ভিডিও পোস্টটি আপনিই তৈরি করুন!</p>
+        @else
+            <h4 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">কোন পোস্ট পাওয়া যায়নি</h4>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 18px;">নতুন পোস্ট তৈরি করে কমিউনিটির সাথে যুক্ত থাকুন।</p>
+        @endif
+        <button type="button" onclick="openCreatePostModal()" style="background: linear-gradient(135deg, #0284c7, #2563eb); color: #ffffff; border: none; border-radius: 20px; padding: 10px 22px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+            <i class="fa-solid fa-plus" style="margin-right: 6px;"></i> Create Post
+        </button>
+    </div>
+@endif
+
 @foreach($reports as $report)
 @php
     $reactionsCount = $report->reactions ? $report->reactions->count() : 0;
@@ -667,6 +685,146 @@
     }
     $isSelf = auth()->check() && auth()->id() == $authorUserId;
 @endphp
+
+@if($isReels ?? false)
+    <!-- FACEBOOK STYLE REEL CARD -->
+    <div class="post-card reel-card" id="post-card-{{ $report->id }}" style="background: #0f172a; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid #1e293b; padding: 0;">
+        <!-- REEL VIDEO PLAYER -->
+        <div class="reel-video-wrapper" style="position: relative; width: 100%; background: #000000; display: flex; align-items: center; justify-content: center; min-height: 320px; max-height: 560px;">
+            @if($report->video)
+                <video controls playsinline loop preload="metadata" src="{{ asset('storage/' . $report->video) }}" style="width: 100%; max-height: 540px; object-fit: contain; background: #000; display: block;"></video>
+            @elseif($report->video_url)
+                @php
+                    preg_match('/(?:youtube\.com.*(?:\\?|&)v=|youtu\.be\\/)([^&\\n?#]+)/', $report->video_url, $matches);
+                    $videoId = $matches[1] ?? null;
+                @endphp
+                @if($videoId)
+                    <iframe width="100%" height="340"
+                        src="https://www.youtube.com/embed/{{ $videoId }}?autoplay=0&rel=0"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        style="width: 100%; min-height: 340px; border: none; display: block;">
+                    </iframe>
+                @endif
+            @endif
+        </div>
+
+        <!-- REEL METADATA & ACTIONS -->
+        <div class="reel-overlay-info" style="padding: 16px; background: #0f172a; color: #ffffff;">
+            <!-- Author Row -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <a href="/user/profile/{{ $authorUserId }}" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                    @if($report->user && $report->user->profile_photo_url)
+                        <img src="{{ $report->user->profile_photo_url }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #2563eb;">
+                    @else
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #2563eb); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center;">
+                            {{ strtoupper(substr($authorName, 0, 1)) }}
+                        </div>
+                    @endif
+                    <div>
+                        <div style="color: #ffffff; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                            {{ $authorName }}
+                        </div>
+                        <span style="font-size: 11px; color: #94a3b8;">{{ $report->created_at ? $report->created_at->diffForHumans() : 'Just now' }}</span>
+                    </div>
+                </a>
+
+                @if(!$isSelf)
+                    <button type="button" class="follow-badge-btn {{ $isFollowingAuthor ? 'following' : '' }}" onclick="toggleFollowUser({{ $authorUserId }}, this, {{ $report->id }}); event.preventDefault(); event.stopPropagation();" style="border-radius: 20px; padding: 4px 14px; font-size: 12px;">
+                        {{ $isFollowingAuthor ? '✓ Following' : '+ Follow' }}
+                    </button>
+                @endif
+            </div>
+
+            <!-- Reel Caption / Title -->
+            @if($report->description)
+                <p style="font-size: 14px; color: #e2e8f0; margin: 0 0 10px 0; line-height: 1.4;">
+                    {{ $report->description }}
+                </p>
+            @elseif($report->title)
+                <p style="font-size: 14px; font-weight: 700; color: #ffffff; margin: 0 0 10px 0;">
+                    {{ $report->title }}
+                </p>
+            @endif
+
+            @if($report->destination_link)
+                <div style="background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px;">
+                    <div style="flex: 1; overflow: hidden;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            {{ parse_url($report->destination_link, PHP_URL_HOST) ?: 'SPONSORED' }}
+                        </div>
+                        <div style="font-size: 14px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
+                            {{ $report->title ?: 'Sponsored Ad' }}
+                        </div>
+                    </div>
+                    <a href="{{ $report->destination_link }}" target="_blank" onclick="trackAdClick({{ $report->sponsored_ad_id ?? 0 }})" style="background: #e4e6eb; color: #050505; border-radius: 6px; padding: 8px 16px; font-size: 13.5px; font-weight: 700; text-decoration: none; display: inline-block; white-space: nowrap;">
+                        {{ $report->cta_text ?: 'Order now' }}
+                    </a>
+                </div>
+            @endif
+
+            <!-- Reel Actions Bar -->
+            <div style="display: flex; align-items: center; justify-content: space-around; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 6px;">
+                <button class="action-button love-btn {{ $isLoved ? 'loved' : '' }}" id="react-btn-{{ $report->id }}" onclick="toggleLove({{ $report->id }})" title="Love" style="color: {{ $isLoved ? '#ff4757' : '#ffffff' }};">
+                    <i class="{{ $isLoved ? 'fa-solid' : 'fa-regular' }} fa-heart" id="react-icon-{{ $report->id }}"></i>
+                    <span id="react-count-{{ $report->id }}">{{ $reactionsCount }}</span>
+                </button>
+
+                <button class="action-button" onclick="toggleComments({{ $report->id }})" title="Comment" style="color: #ffffff;">
+                    <i class="fa-regular fa-comment"></i>
+                    <span id="comment-count-{{ $report->id }}">{{ $commentsCount }}</span>
+                </button>
+
+                <button class="action-button star-btn" onclick="openStarModal({{ $report->id }}, '{{ addslashes($authorName) }}', {{ $report->user_id ?? 0 }})" title="Send Stars" style="color: #f59e0b;">
+                    ⭐ <span id="star-count-{{ $report->id }}">{{ $report->star_transactions_count ?? 0 }}</span>
+                </button>
+
+                <div class="action-button view-btn" title="Unique Views" style="cursor:default; color:#94a3b8;">
+                    <i class="fa-regular fa-eye"></i>
+                    <span>{{ $report->views_count ?? 0 }}</span>
+                </div>
+
+                <button class="action-button" onclick="sharePost({{ $report->id }})" title="Share" style="color: #ffffff;">
+                    <i class="fa-regular fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <!-- COMMENTS DRAWER FOR REEL -->
+            <div class="comments-drawer" id="comments-drawer-{{ $report->id }}" style="display: none; background: #1e293b; border-radius: 12px; padding: 12px; margin-top: 10px;">
+                <div class="comments-list" id="comments-list-{{ $report->id }}">
+                    @if($report->comments && $report->comments->count() > 0)
+                        @foreach($report->comments as $c)
+                            @php
+                                $commentUserId = $c->user_id ?: 1;
+                                $isCommentAuthorFollowing = false;
+                                if (auth()->check()) {
+                                    $isCommentAuthorFollowing = auth()->user()->isFollowing($commentUserId);
+                                }
+                                $isCommentSelf = auth()->check() && auth()->id() == $commentUserId;
+                            @endphp
+                            <div class="comment-item" id="comment-row-{{ $c->id }}" style="margin-bottom: 8px;">
+                                <div class="comment-avatar">
+                                    {{ strtoupper(substr($c->user->name ?? 'U', 0, 1)) }}
+                                </div>
+                                <div class="comment-bubble" style="background: #334155; color: #fff;">
+                                    <div class="comment-author-name" style="color: #38bdf8;">{{ $c->user->name ?? 'User' }}</div>
+                                    <div class="comment-text" style="color: #f8fafc;">{{ $c->comment }}</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+                <div class="comment-input-row" style="margin-top: 8px;">
+                    <input type="text" class="comment-field" id="comment-input-{{ $report->id }}" placeholder="Write a comment..." onkeydown="if(event.key==='Enter') submitComment({{ $report->id }})" style="background: #334155; color: #fff; border: 1px solid #475569;">
+                    <button class="comment-submit-btn" onclick="submitComment({{ $report->id }})" title="Post comment">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+@else
 <div class="post-card" id="post-card-{{ $report->id }}">
 
     <!-- AUTHOR HEADER -->
@@ -691,7 +849,11 @@
                     @endif
                 </div>
                 <div class="author-sub">
-                    {{ $authorHandle }} · {{ $report->created_at ? $report->created_at->diffForHumans() : '25 min ago' }}
+                    @if($report->destination_link || $report->sponsored_ad_id)
+                        <span style="font-weight:700; color:#1877f2;">Sponsored</span> · <i class="fa-solid fa-earth-americas" style="font-size:10px;"></i> · {{ $report->created_at ? $report->created_at->diffForHumans() : 'Just now' }}
+                    @else
+                        {{ $authorHandle }} · {{ $report->created_at ? $report->created_at->diffForHumans() : '25 min ago' }}
+                    @endif
                 </div>
             </div>
         </a>
@@ -739,71 +901,111 @@
         </button>
     @endif
 
-    <!-- FACEBOOK MULTI-IMAGE GALLERY -->
-    @php
-        $imageList = $report->image_list;
-        $imgCount = count($imageList);
-    @endphp
-
-    @if($imgCount > 0)
-        @if($imgCount == 1)
-            <div class="post-media-container" style="margin-top: 10px;">
-                <img class="post-media-img"
-                     src="{{ asset('storage/' . $imageList[0]) }}"
-                     alt="Post image"
-                     onclick="openFbPostViewer({{ $report->id }})">
-            </div>
-        @else
-            @php
-                $gridClass = $imgCount == 2 ? 'grid-2' : ($imgCount == 3 ? 'grid-3' : ($imgCount == 4 ? 'grid-4' : 'grid-more'));
-                $displayImages = array_slice($imageList, 0, 4);
-                $remainingCount = $imgCount - 4;
-            @endphp
-            <div class="fb-gallery-grid {{ $gridClass }}">
-                @foreach($displayImages as $idx => $imgFile)
-                    <div class="gallery-item" onclick="openFbPostViewer({{ $report->id }})">
-                        <img src="{{ asset('storage/' . $imgFile) }}" alt="Post image {{ $idx + 1 }}">
-                        @if($idx === 3 && $remainingCount > 0)
-                            <div class="gallery-more-overlay">+{{ $remainingCount }}</div>
-                        @endif
+    <!-- MEDIA & SPONSORED AD CONTENT -->
+    @if($report->destination_link)
+        <!-- UNIFIED FACEBOOK SPONSORED AD CARD (ZERO GAP BETWEEN MEDIA & CTA BAR, CLICKABLE ANYWHERE) -->
+        <div class="fb-sponsored-unified-box" style="margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid #e4e6eb; background: #ffffff;">
+            <a href="{{ $report->destination_link }}" target="_blank" onclick="trackAdClick({{ $report->sponsored_ad_id ?? 0 }})" style="text-decoration: none; color: inherit; display: block;">
+                <!-- MEDIA IMAGE OR VIDEO -->
+                @if(!empty($report->image_list) && count($report->image_list) > 0)
+                    <img src="{{ asset('storage/' . $report->image_list[0]) }}" alt="{{ $report->title }}" style="width: 100%; max-height: 440px; object-fit: cover; display: block; margin: 0; border: none; border-radius: 0;">
+                @elseif($report->video)
+                    <div style="position: relative; width: 100%; background: #000;">
+                        <video playsinline controls src="{{ asset('storage/' . $report->video) }}" style="width: 100%; max-height: 440px; object-fit: contain; display: block; margin: 0;"></video>
                     </div>
-                @endforeach
-            </div>
-        @endif
-    @endif
+                @elseif($report->video_url)
+                    @php
+                        preg_match('/(?:youtube\.com.*(?:\\?|&)v=|youtu\.be\\/)([^&\\n?#]+)/', $report->video_url, $matches);
+                        $videoId = $matches[1] ?? null;
+                    @endphp
+                    @if($videoId)
+                        <iframe width="100%" height="260" src="https://www.youtube.com/embed/{{ $videoId }}" frameborder="0" allowfullscreen style="border: none; display: block; margin: 0; width: 100%;"></iframe>
+                    @endif
+                @endif
 
-    <!-- VIDEO MEDIA -->
-    @if($report->video)
-        <div class="post-media-container" style="margin-top: 10px;">
-            <video controls src="{{ asset('storage/' . $report->video) }}" style="width:100%; max-height:360px; border-radius:12px; background:#000; display:block;"></video>
+                <!-- SEAMLESS CTA BANNER BAR (JOINED WITH 0px GAP) -->
+                <div style="background: #f0f2f5; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #e4e6eb;">
+                    <div style="flex: 1; overflow: hidden;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: #65676b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            {{ parse_url($report->destination_link, PHP_URL_HOST) ?: 'SPONSORED' }}
+                        </div>
+                        <div style="font-size: 14.5px; font-weight: 700; color: #050505; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
+                            {{ $report->title ?: 'Special Offer' }}
+                        </div>
+                    </div>
+                    <div style="background: #e4e6eb; color: #050505; border-radius: 6px; padding: 8px 16px; font-size: 13.5px; font-weight: 700; white-space: nowrap; border: none; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        {{ $report->cta_text ?: 'Order now' }}
+                    </div>
+                </div>
+            </a>
         </div>
-    @elseif($report->video_url)
+    @else
+        <!-- FACEBOOK MULTI-IMAGE GALLERY -->
         @php
-            preg_match('/(?:youtube\.com.*(?:\\?|&)v=|youtu\.be\\/)([^&\\n?#]+)/', $report->video_url, $matches);
-            $videoId = $matches[1] ?? null;
+            $imageList = $report->image_list;
+            $imgCount = count($imageList);
         @endphp
 
-        @if($videoId)
-            <div class="post-media-container" style="margin-top: 10px;">
-                <iframe width="100%" height="260"
-                    src="https://www.youtube.com/embed/{{ $videoId }}"
-                    frameborder="0"
-                    allowfullscreen
-                    style="border-radius:12px; border:none; display:block;">
-                </iframe>
-            </div>
+        @if($imgCount > 0)
+            @if($imgCount == 1)
+                <div class="post-media-container" style="margin-top: 10px;">
+                    <img class="post-media-img"
+                         src="{{ asset('storage/' . $imageList[0]) }}"
+                         alt="Post image"
+                         onclick="openFbPostViewer({{ $report->id }})">
+                </div>
+            @else
+                @php
+                    $gridClass = $imgCount == 2 ? 'grid-2' : ($imgCount == 3 ? 'grid-3' : ($imgCount == 4 ? 'grid-4' : 'grid-more'));
+                    $displayImages = array_slice($imageList, 0, 4);
+                    $remainingCount = $imgCount - 4;
+                @endphp
+                <div class="fb-gallery-grid {{ $gridClass }}">
+                    @foreach($displayImages as $idx => $imgFile)
+                        <div class="gallery-item" onclick="openFbPostViewer({{ $report->id }})">
+                            <img src="{{ asset('storage/' . $imgFile) }}" alt="Post image {{ $idx + 1 }}">
+                            @if($idx === 3 && $remainingCount > 0)
+                                <div class="gallery-more-overlay">+{{ $remainingCount }}</div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         @endif
-    @endif
 
-    <!-- LOCATION & CATEGORY BADGES -->
-    <div class="post-tags-row">
-        @if($report->location)
-            <span class="post-tag-pill">📍 {{ $report->location }}</span>
+        <!-- VIDEO MEDIA -->
+        @if($report->video)
+            <div class="post-media-container" style="margin-top: 10px;">
+                <video controls src="{{ asset('storage/' . $report->video) }}" style="width:100%; max-height:360px; border-radius:12px; background:#000; display:block;"></video>
+            </div>
+        @elseif($report->video_url)
+            @php
+                preg_match('/(?:youtube\.com.*(?:\\?|&)v=|youtu\.be\\/)([^&\\n?#]+)/', $report->video_url, $matches);
+                $videoId = $matches[1] ?? null;
+            @endphp
+
+            @if($videoId)
+                <div class="post-media-container" style="margin-top: 10px;">
+                    <iframe width="100%" height="260"
+                        src="https://www.youtube.com/embed/{{ $videoId }}"
+                        frameborder="0"
+                        allowfullscreen
+                        style="border-radius:12px; border:none; display:block;">
+                    </iframe>
+                </div>
+            @endif
         @endif
-        @if($report->category)
-            <span class="post-tag-pill">🏷 {{ $report->category }}</span>
-        @endif
-    </div>
+
+        <!-- LOCATION & CATEGORY BADGES -->
+        <div class="post-tags-row">
+            @if($report->location)
+                <span class="post-tag-pill">📍 {{ $report->location }}</span>
+            @endif
+            @if($report->category)
+                <span class="post-tag-pill">🏷 {{ $report->category }}</span>
+            @endif
+        </div>
+    @endif
 
     <!-- INTERACTION BUTTONS (LOVE REACT, COMMENT, STARS, UNIQUE VIEWS, SHARE) -->
     <div class="post-actions-bar">
@@ -924,6 +1126,7 @@
     </div>
 
 </div>
+@endif
 
 @if($loop->iteration % 3 == 0 && \App\Models\Setting::get('ad_script_feed'))
     <div class="in-feed-ad-wrapper" style="background:#ffffff; border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,0.04); text-align:center;">
@@ -1398,6 +1601,16 @@
         }, { threshold: 0.3 });
 
         document.querySelectorAll('video').forEach(v => videoObserver.observe(v));
+    }
+
+    function trackAdClick(adId) {
+        if (!adId) return;
+        fetch('/sponsored-ad/' + adId + '/click', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        }).catch(e => {});
     }
 </script>
 

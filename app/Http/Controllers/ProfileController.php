@@ -142,6 +142,7 @@ class ProfileController extends Controller
 
         // Fetch User's Past Withdrawals
         $withdrawals = Withdrawal::where('user_id', $user->id)->latest()->take(20)->get();
+        $userAds = \App\Models\SponsoredAd::where('user_id', $user->id)->latest()->get();
 
         return view('profile.analytics', compact(
             'user',
@@ -156,7 +157,8 @@ class ProfileController extends Controller
             'monthBdt',
             'minCashoutCoins',
             'needsMoreCoins',
-            'withdrawals'
+            'withdrawals',
+            'userAds'
         ));
     }
 

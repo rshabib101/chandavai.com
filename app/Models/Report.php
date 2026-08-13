@@ -17,7 +17,10 @@ class Report extends Model
         'images',
         'video',
         'video_url',
-        'is_anonymous'
+        'is_anonymous',
+        'sponsored_ad_id',
+        'cta_text',
+        'destination_link',
     ];
 
     protected $casts = [
@@ -28,6 +31,11 @@ class Report extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function sponsoredAd()
+    {
+        return $this->belongsTo(SponsoredAd::class);
     }
 
     public function reactions()

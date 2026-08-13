@@ -50,6 +50,8 @@
                         <td>
                             @if($user->isCreatorAdmin())
                                 <span class="badge badge-warning px-2 py-1"><i class="fa fa-crown"></i> Creator Admin</span>
+                            @elseif($user->role === 'advertiser')
+                                <span class="badge badge-info px-2 py-1"><i class="fa fa-rectangle-ad"></i> Advertiser</span>
                             @elseif($user->isAdmin())
                                 <span class="badge badge-primary px-2 py-1"><i class="fa fa-user-shield"></i> Admin</span>
                             @else
@@ -78,6 +80,13 @@
                                             <input type="hidden" name="role" value="user">
                                             <button type="submit" class="dropdown-item {{ $user->role === 'user' || empty($user->role) ? 'active' : '' }}">
                                                 <i class="fa fa-user text-secondary mr-2"></i> Make User
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.user.toggle-role', $user->id) }}">
+                                            @csrf
+                                            <input type="hidden" name="role" value="advertiser">
+                                            <button type="submit" class="dropdown-item {{ $user->role === 'advertiser' ? 'active' : '' }}">
+                                                <i class="fa fa-rectangle-ad text-info mr-2"></i> Make Advertiser
                                             </button>
                                         </form>
                                         <form method="POST" action="{{ route('admin.user.toggle-role', $user->id) }}">

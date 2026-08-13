@@ -23,17 +23,40 @@ class ReportController extends Controller
 
     public function index(Request $request)
     {
-        $reports = Report::with([
+        return $this->getFeedPosts($request, false);
+    }
+
+    public function reels(Request $request)
+    {
+        return $this->getFeedPosts($request, true);
+    }
+
+    private function getFeedPosts(Request $request, bool $forceReels = false)
+    {
+        $isReels = $forceReels || $request->routeIs('reels') || $request->get('type') === 'reels';
+
+        $query = Report::with([
             'user',
             'reactions',
-            'comments' => function ($query) {
-                $query->whereNull('parent_id')->with(['user', 'replies.user'])->latest();
+            'comments' => function ($q) {
+                $q->whereNull('parent_id')->with(['user', 'replies.user'])->latest();
             }
         ])
         ->withCount(['views', 'starTransactions'])
-        ->where('status', 'approved')
-        ->latest()
-        ->paginate(6);
+        ->where('status', 'approved');
+
+        if ($isReels) {
+            $query->where(function($q) {
+                $q->whereNotNull('video')->where('video', '!=', '')
+                  ->orWhere(function($q2) {
+                      $q2->whereNotNull('video_url')->where('video_url', '!=', '');
+                  })
+                  ->orWhereNotNull('sponsored_ad_id')
+                  ->orWhereNotNull('destination_link');
+            });
+        }
+
+        $reports = $query->latest()->paginate(6);
 
         $userCountry = auth()->check() ? (auth()->user()->country ?: 'Bangladesh') : 'Bangladesh';
         foreach ($reports as $report) {
@@ -54,13 +77,108 @@ class ReportController extends Controller
             }
         }
 
+        // ====================================================
+        // SMART AD INJECTION ALGORITHM (Main Feed & Reels Feed)
+        // Inject active sponsored ads every 3-4 posts/reels
+        // ====================================================
+        $activeAds = \App\Models\SponsoredAd::with(['user', 'report.user', 'report.reactions', 'report.comments'])
+            ->where('is_active', true)
+            ->where(function($q) use ($isReels) {
+                if ($isReels) {
+                    $q->whereIn('placement', ['reels', 'both']);
+                } else {
+                    $q->whereIn('placement', ['feed', 'both']);
+                }
+            })
+            ->get();
+
+        if ($activeAds->isNotEmpty()) {
+            $rawItems = collect($reports->items());
+            $newItems = collect();
+            $postCountSinceLastAd = 0;
+            $targetInterval = rand(3, 4); // Random interval between 3 and 4
+
+            foreach ($rawItems as $reportItem) {
+                $newItems->push($reportItem);
+
+                if ($reportItem->sponsored_ad_id || $reportItem->destination_link) {
+                    $postCountSinceLastAd = 0;
+                } else {
+                    $postCountSinceLastAd++;
+                }
+
+                if ($postCountSinceLastAd >= $targetInterval) {
+                    $randomAd = $activeAds->random();
+
+                    if ($randomAd->report) {
+                        $adReport = $randomAd->report;
+                    } else {
+                        $adReport = new \App\Models\Report([
+                            'id' => 900000 + $randomAd->id,
+                            'user_id' => $randomAd->user_id,
+                            'title' => $randomAd->headline,
+                            'description' => $randomAd->primary_text,
+                            'status' => 'approved',
+                            'image' => $randomAd->media_type === 'image' ? $randomAd->media_path : null,
+                            'images' => $randomAd->media_type === 'image' ? [$randomAd->media_path] : null,
+                            'video' => $randomAd->media_type === 'video' ? $randomAd->media_path : null,
+                            'cta_text' => $randomAd->cta_text,
+                            'destination_link' => $randomAd->destination_link,
+                            'sponsored_ad_id' => $randomAd->id,
+                        ]);
+                        $adReport->setRelation('user', $randomAd->user);
+                        $adReport->setRelation('reactions', collect());
+                        $adReport->setRelation('comments', collect());
+                        $adReport->views_count = $randomAd->views_count;
+                        $adReport->star_transactions_count = 0;
+                    }
+
+                    try {
+                        $randomAd->increment('views_count');
+                    } catch (\Exception $e) {}
+
+                    $newItems->push($adReport);
+                    $postCountSinceLastAd = 0;
+                    $targetInterval = rand(3, 4);
+                }
+            }
+
+            // Fallback: Ensure at least 1 ad is present if active ads exist
+            if ($rawItems->count() > 0 && $newItems->where('destination_link', '!=', null)->isEmpty()) {
+                $randomAd = $activeAds->random();
+                $adReport = $randomAd->report ?: new \App\Models\Report([
+                    'id' => 900000 + $randomAd->id,
+                    'user_id' => $randomAd->user_id,
+                    'title' => $randomAd->headline,
+                    'description' => $randomAd->primary_text,
+                    'status' => 'approved',
+                    'image' => $randomAd->media_type === 'image' ? $randomAd->media_path : null,
+                    'images' => $randomAd->media_type === 'image' ? [$randomAd->media_path] : null,
+                    'video' => $randomAd->media_type === 'video' ? $randomAd->media_path : null,
+                    'cta_text' => $randomAd->cta_text,
+                    'destination_link' => $randomAd->destination_link,
+                    'sponsored_ad_id' => $randomAd->id,
+                ]);
+                if (!$randomAd->report) {
+                    $adReport->setRelation('user', $randomAd->user);
+                    $adReport->setRelation('reactions', collect());
+                    $adReport->setRelation('comments', collect());
+                    $adReport->views_count = $randomAd->views_count;
+                    $adReport->star_transactions_count = 0;
+                }
+                $newItems->push($adReport);
+            }
+
+            $reports->setCollection($newItems);
+        }
+
         if ($request->ajax()) {
-            return view('partials.posts', compact('reports'))->render();
+            return view('partials.posts', compact('reports', 'isReels'))->render();
         }
 
         $stories = Story::with('user')->where('expires_at', '>', now())->latest()->get();
 
-        return view('index', compact('reports', 'stories'));
+        return view('index', compact('reports', 'stories', 'isReels'));
     }
 
     public function toggleReaction(Request $request, $id)
@@ -365,13 +483,14 @@ class ReportController extends Controller
             $videoPath = $request->file('video')->store('videos', 'public');
         }
 
-        // Only set title if explicitly provided; DO NOT auto-fill title from description to prevent duplication
+        // Title and description handling (can be null)
         $title = !empty(trim($request->title ?? '')) ? trim($request->title) : null;
+        $description = !empty(trim($request->description ?? '')) ? trim($request->description) : null;
 
         Report::create([
             'user_id' => auth()->id(),
             'title' => $title,
-            'description' => $request->description,
+            'description' => $description,
             'location' => $fullLocation,
             'category' => $request->category,
             'image' => $firstImage,

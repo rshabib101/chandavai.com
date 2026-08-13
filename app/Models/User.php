@@ -88,9 +88,19 @@ class User extends Authenticatable
         return $this->role === 'admin' || $this->isCreatorAdmin();
     }
 
+    public function isAdvertiser(): bool
+    {
+        return $this->role === 'advertiser' || $this->isAdmin() || $this->isCreatorAdmin();
+    }
+
     public function isUser(): bool
     {
         return $this->role === 'user' || empty($this->role);
+    }
+
+    public function sponsoredAds()
+    {
+        return $this->hasMany(SponsoredAd::class);
     }
 
     public function reports()

@@ -533,8 +533,8 @@
 
         <!-- TABS FILTER BAR -->
         <div class="profile-tabs-bar">
-            <a href="#" class="profile-tab-pill active">All</a>
-            <a href="#" class="profile-tab-pill">Reels</a>
+            <a href="/" class="profile-tab-pill active">All</a>
+            <a href="/reels" class="profile-tab-pill">Reels</a>
             <a href="#" class="profile-tab-pill">Photos</a>
             <a href="#" class="profile-tab-pill">More ▾</a>
         </div>

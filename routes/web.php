@@ -11,11 +11,13 @@ use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\SponsoredAdController;
 use App\Models\User;
 use App\Models\Setting;
 
 // Public Routes
 Route::get('/', [ReportController::class, 'index']);
+Route::get('/reels', [ReportController::class, 'reels'])->name('reels');
 Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 Route::post('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
@@ -45,6 +47,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/analytics', [ProfileController::class, 'analytics'])->name('user.analytics');
     Route::get('/user/wallet', [ProfileController::class, 'analytics'])->name('user.wallet');
     Route::post('/user/cashout', [ProfileController::class, 'cashout'])->name('user.cashout');
+
+    // Ad Manager & Sponsored Ads Routes
+    Route::get('/user/ad-manager', [SponsoredAdController::class, 'index'])->name('user.ad-manager');
+    Route::post('/user/ads', [SponsoredAdController::class, 'store'])->name('user.ads.store');
+    Route::post('/user/ads/{id}/toggle', [SponsoredAdController::class, 'toggleActive'])->name('user.ads.toggle');
+    Route::delete('/user/ads/{id}', [SponsoredAdController::class, 'destroy'])->name('user.ads.destroy');
+    Route::post('/sponsored-ad/{id}/click', [SponsoredAdController::class, 'trackClick'])->name('sponsored-ad.click');
     Route::get('/settings', [ProfileController::class, 'settings'])->name('user.settings');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -81,6 +90,15 @@ Route::middleware('auth')->group(function () {
 
     // User Client Meta Route
     Route::post('/user/update-client-meta', [ProfileController::class, 'updateClientMeta'])->name('user.client-meta');
+});
+
+// Tasks Hub & Interactive Tasks Routes
+Route::get('/tasks', [\App\Http\Controllers\TaskHubController::class, 'index'])->name('tasks.index');
+Route::middleware(['auth'])->group(function () {
+    Route::post('/tasks/math', [\App\Http\Controllers\TaskHubController::class, 'submitMath'])->name('tasks.math');
+    Route::post('/tasks/typing', [\App\Http\Controllers\TaskHubController::class, 'submitTyping'])->name('tasks.typing');
+    Route::post('/tasks/link-hit', [\App\Http\Controllers\TaskHubController::class, 'submitLinkHit'])->name('tasks.link-hit');
+    Route::post('/tasks/work', [\App\Http\Controllers\TaskHubController::class, 'submitWork'])->name('tasks.work');
 });
 
 // Admin Only Routes (Protected by auth and admin middleware)

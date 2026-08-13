@@ -742,7 +742,7 @@
                 <p style="font-size: 14px; color: #e2e8f0; margin: 0 0 10px 0; line-height: 1.4;">
                     {{ $report->description }}
                 </p>
-            @elseif($report->title)
+            @elseif($report->title && !($report->destination_link || $report->sponsored_ad_id))
                 <p style="font-size: 14px; font-weight: 700; color: #ffffff; margin: 0 0 10px 0;">
                     {{ $report->title }}
                 </p>
@@ -754,7 +754,7 @@
                         <div style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             {{ parse_url($report->destination_link, PHP_URL_HOST) ?: 'SPONSORED' }}
                         </div>
-                        <div style="font-size: 14px; font-weight: 700; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
+                        <div style="font-size: 14px; font-weight: 700; color: #ffffff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; margin-top: 2px; word-break: break-word;">
                             {{ $report->title ?: 'Sponsored Ad' }}
                         </div>
                     </div>
@@ -884,8 +884,8 @@
         </div>
     </div>
 
-    <!-- TITLE (Render ONLY if distinct from description) -->
-    @if(!empty($report->title) && trim($report->title) !== trim($report->description ?? ''))
+    <!-- TITLE (Render ONLY if distinct from description and not a sponsored ad) -->
+    @if(!empty($report->title) && trim($report->title) !== trim($report->description ?? '') && !($report->destination_link || $report->sponsored_ad_id))
         <div class="post-content-title" onclick="openFbPostViewer({{ $report->id }})" style="cursor:pointer; font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #0f172a;">
             {{ $report->title }}
         </div>
@@ -929,7 +929,7 @@
                         <div style="font-size: 11px; text-transform: uppercase; color: #65676b; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             {{ parse_url($report->destination_link, PHP_URL_HOST) ?: 'SPONSORED' }}
                         </div>
-                        <div style="font-size: 14.5px; font-weight: 700; color: #050505; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
+                        <div style="font-size: 14.5px; font-weight: 700; color: #050505; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3; margin-top: 2px; word-break: break-word;">
                             {{ $report->title ?: 'Special Offer' }}
                         </div>
                     </div>

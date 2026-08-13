@@ -316,10 +316,13 @@
             font-size: 14px;
             font-weight: 700;
             color: #050505;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.3;
             margin-top: 2px;
+            word-break: break-word;
         }
 
         .fb-ad-cta-button {

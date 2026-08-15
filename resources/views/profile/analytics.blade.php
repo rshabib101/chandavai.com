@@ -968,7 +968,7 @@
                     </div>
                     <div class="earning-card-val">
                         <span>🪙</span>
-                        <span>600</span>
+                        <span>{{ number_format($minCashoutCoins) }}</span>
                     </div>
                     <div class="earning-card-sub">
                         {{ $needsMoreCoins > 0 ? number_format($needsMoreCoins, 1) . ' needs more' : 'Ready to withdraw!' }}
@@ -1037,33 +1037,33 @@
             <div class="white-card">
                 <div class="select-amount-header">
                     <span class="select-amount-title">Select Amount</span>
-                    <span class="selected-coins-badge">🪙 <span id="badgeSelectedCoins">600</span></span>
+                    <span class="selected-coins-badge">🪙 <span id="badgeSelectedCoins">{{ $minCashoutCoins }}</span></span>
                 </div>
 
                 <div class="amount-options-grid">
-                    <div class="amount-option-card selected" onclick="selectCoinsOption(600, 15.00, this)">
-                        <div class="option-coins-text">🪙 600</div>
-                        <div class="option-taka-text">≈ ৳15.00</div>
+                    <div class="amount-option-card selected" onclick="selectCoinsOption({{ $minCashoutCoins }}, {{ number_format($minCashoutCoins / $coinsPerTaka, 2) }}, this)">
+                        <div class="option-coins-text">🪙 {{ number_format($minCashoutCoins) }}</div>
+                        <div class="option-taka-text">≈ ৳{{ number_format($minCashoutCoins / $coinsPerTaka, 2) }}</div>
                     </div>
-                    <div class="amount-option-card" onclick="selectCoinsOption(2500, 62.50, this)">
+                    <div class="amount-option-card" onclick="selectCoinsOption(2500, {{ number_format(2500 / $coinsPerTaka, 2) }}, this)">
                         <div class="option-coins-text">🪙 2,500</div>
-                        <div class="option-taka-text">≈ ৳62.50</div>
+                        <div class="option-taka-text">≈ ৳{{ number_format(2500 / $coinsPerTaka, 2) }}</div>
                     </div>
-                    <div class="amount-option-card" onclick="selectCoinsOption(5000, 125.00, this)">
+                    <div class="amount-option-card" onclick="selectCoinsOption(5000, {{ number_format(5000 / $coinsPerTaka, 2) }}, this)">
                         <div class="option-coins-text">🪙 5,000</div>
-                        <div class="option-taka-text">≈ ৳125.00</div>
+                        <div class="option-taka-text">≈ ৳{{ number_format(5000 / $coinsPerTaka, 2) }}</div>
                     </div>
-                    <div class="amount-option-card" onclick="selectCoinsOption(10000, 250.00, this)">
+                    <div class="amount-option-card" onclick="selectCoinsOption(10000, {{ number_format(10000 / $coinsPerTaka, 2) }}, this)">
                         <div class="option-coins-text">🪙 10,000</div>
-                        <div class="option-taka-text">≈ ৳250.00</div>
+                        <div class="option-taka-text">≈ ৳{{ number_format(10000 / $coinsPerTaka, 2) }}</div>
                     </div>
-                    <div class="amount-option-card" onclick="selectCoinsOption(20000, 500.00, this)">
+                    <div class="amount-option-card" onclick="selectCoinsOption(20000, {{ number_format(20000 / $coinsPerTaka, 2) }}, this)">
                         <div class="option-coins-text">🪙 20,000</div>
-                        <div class="option-taka-text">≈ ৳500.00</div>
+                        <div class="option-taka-text">≈ ৳{{ number_format(20000 / $coinsPerTaka, 2) }}</div>
                     </div>
-                    <div class="amount-option-card" onclick="selectCoinsOption(30000, 750.00, this)">
+                    <div class="amount-option-card" onclick="selectCoinsOption(30000, {{ number_format(30000 / $coinsPerTaka, 2) }}, this)">
                         <div class="option-coins-text">🪙 30,000</div>
-                        <div class="option-taka-text">≈ ৳750.00</div>
+                        <div class="option-taka-text">≈ ৳{{ number_format(30000 / $coinsPerTaka, 2) }}</div>
                     </div>
                 </div>
             </div>

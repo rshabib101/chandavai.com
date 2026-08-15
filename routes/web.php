@@ -12,6 +12,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\StoryController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\SponsoredAdController;
+use App\Http\Controllers\Admin\AdminTaskController;
 use App\Models\User;
 use App\Models\Setting;
 
@@ -96,14 +97,32 @@ Route::middleware('auth')->group(function () {
 Route::get('/tasks', [\App\Http\Controllers\TaskHubController::class, 'index'])->name('tasks.index');
 Route::middleware(['auth'])->group(function () {
     Route::post('/tasks/math', [\App\Http\Controllers\TaskHubController::class, 'submitMath'])->name('tasks.math');
+    Route::post('/tasks/math/session', [\App\Http\Controllers\TaskHubController::class, 'submitMathSession'])->name('tasks.math.session');
     Route::post('/tasks/typing', [\App\Http\Controllers\TaskHubController::class, 'submitTyping'])->name('tasks.typing');
+    Route::post('/tasks/typing/session', [\App\Http\Controllers\TaskHubController::class, 'submitTypingSession'])->name('tasks.typing.session');
     Route::post('/tasks/link-hit', [\App\Http\Controllers\TaskHubController::class, 'submitLinkHit'])->name('tasks.link-hit');
     Route::post('/tasks/work', [\App\Http\Controllers\TaskHubController::class, 'submitWork'])->name('tasks.work');
+    Route::post('/tasks/work/submit', [\App\Http\Controllers\TaskHubController::class, 'submitWorkProof'])->name('tasks.work.submit');
 });
 
 // Admin Only Routes (Protected by auth and admin middleware)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Tasks Management Routes
+    Route::get('/tasks/work', [AdminTaskController::class, 'workIndex'])->name('tasks.work');
+    Route::post('/tasks/work/store', [AdminTaskController::class, 'workStore'])->name('tasks.work.store');
+    Route::put('/tasks/work/{id}', [AdminTaskController::class, 'workUpdate'])->name('tasks.work.update');
+    Route::delete('/tasks/work/{id}', [AdminTaskController::class, 'workDestroy'])->name('tasks.work.destroy');
+    Route::post('/tasks/work/{id}/toggle', [AdminTaskController::class, 'workToggle'])->name('tasks.work.toggle');
+    Route::post('/tasks/submission/{id}/approve', [AdminTaskController::class, 'submissionApprove'])->name('tasks.submission.approve');
+    Route::post('/tasks/submission/{id}/reject', [AdminTaskController::class, 'submissionReject'])->name('tasks.submission.reject');
+
+    Route::get('/tasks/link-hits', [AdminTaskController::class, 'linkHitsIndex'])->name('tasks.link-hits');
+    Route::post('/tasks/link-hits/store', [AdminTaskController::class, 'linkHitsStore'])->name('tasks.link-hits.store');
+    Route::put('/tasks/link-hits/{id}', [AdminTaskController::class, 'linkHitsUpdate'])->name('tasks.link-hits.update');
+    Route::delete('/tasks/link-hits/{id}', [AdminTaskController::class, 'linkHitsDestroy'])->name('tasks.link-hits.destroy');
+    Route::post('/tasks/link-hits/{id}/toggle', [AdminTaskController::class, 'linkHitsToggle'])->name('tasks.link-hits.toggle');
     
     Route::get('/users', function () {
         $users = User::latest()->get();
@@ -113,7 +132,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/user/{id}/toggle-block', [ChallengeController::class, 'toggleBlockUser'])->name('user.toggle-block');
     Route::post('/user/{id}/toggle-role', [ChallengeController::class, 'toggleRoleUser'])->name('user.toggle-role');
 
+    // Payment & Withdrawal Management Routes
+    Route::get('/withdrawals', [\App\Http\Controllers\Admin\AdminWithdrawalController::class, 'index'])->name('withdrawals.index');
+    Route::post('/withdrawals/{id}/approve', [\App\Http\Controllers\Admin\AdminWithdrawalController::class, 'approve'])->name('withdrawals.approve');
+    Route::post('/withdrawals/{id}/reject', [\App\Http\Controllers\Admin\AdminWithdrawalController::class, 'reject'])->name('withdrawals.reject');
+
     Route::get('/settings', function () {
+        $coinsPerTaka = Setting::get('coins_per_taka', 40);
+        $minCashoutCoins = Setting::get('min_cashout_coins', 600);
         $minFollowers = Setting::get('min_followers_for_income', 20);
         $rewardPoints = Setting::get('daily_challenge_reward_points', 100);
         $monthlyReferralReward = Setting::get('monthly_referral_reward', 1000);
@@ -122,6 +148,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         $adScriptSidebar = Setting::get('ad_script_sidebar', '');
         $users = User::latest()->get();
         return view('admin.settings', compact(
+            'coinsPerTaka',
+            'minCashoutCoins',
             'minFollowers',
             'rewardPoints',
             'monthlyReferralReward',

@@ -110,7 +110,7 @@ return [
     */
 
     'preloader' => [
-        'enabled' => true,
+        'enabled' => false,
         'mode' => 'fullscreen',
         'img' => [
             'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
@@ -332,6 +332,29 @@ return [
             'text' => 'Users Management',
             'url'  => 'admin/users',
             'icon' => 'fas fa-fw fa-user-shield',
+        ],
+
+        [
+            'text'    => 'Tasks',
+            'icon'    => 'fas fa-fw fa-tasks',
+            'submenu' => [
+                [
+                    'text'  => 'Work',
+                    'route' => 'admin.tasks.work',
+                    'icon'  => 'fas fa-fw fa-briefcase',
+                ],
+                [
+                    'text'  => 'Link Hits',
+                    'route' => 'admin.tasks.link-hits',
+                    'icon'  => 'fas fa-fw fa-link',
+                ],
+            ],
+        ],
+
+        [
+            'text'  => 'Payment',
+            'route' => 'admin.withdrawals.index',
+            'icon'  => 'fas fa-fw fa-money-bill-wave',
         ],
 
         [

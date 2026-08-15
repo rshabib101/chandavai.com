@@ -238,6 +238,8 @@ class ChallengeController extends Controller
     public function updateAdminSettings(Request $request)
     {
         $request->validate([
+            'coins_per_taka' => 'required|numeric|min:0.1',
+            'min_cashout_coins' => 'required|integer|min:1',
             'min_followers_for_income' => 'required|integer|min:1',
             'daily_challenge_reward_points' => 'nullable|integer|min:1',
             'monthly_referral_reward' => 'nullable|integer|min:0',
@@ -246,6 +248,8 @@ class ChallengeController extends Controller
             'ad_script_sidebar' => 'nullable|string',
         ]);
 
+        Setting::set('coins_per_taka', $request->coins_per_taka);
+        Setting::set('min_cashout_coins', $request->min_cashout_coins);
         Setting::set('min_followers_for_income', $request->min_followers_for_income);
         
         if ($request->has('daily_challenge_reward_points')) {

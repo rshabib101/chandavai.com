@@ -11,6 +11,8 @@ use Illuminate\View\View;
 use App\Models\Withdrawal;
 use App\Models\StarTransaction;
 use App\Models\DailyChallengeClaim;
+use App\Models\MicroWorkSubmission;
+use App\Models\Setting;
 use Carbon\Carbon;
 
 class ProfileController extends Controller
@@ -109,35 +111,79 @@ class ProfileController extends Controller
         }
 
         $userPoints = (float) ($user->points ?? 0);
-        $rate = 0.025; // 1 Coin = 0.025 BDT (600 coins = 15.00 BDT)
-        $totalBdt = $userPoints * $rate;
+
+        // Dynamic rate: coins_per_taka (Default: 40 coins = 1 BDT)
+        $coinsPerTaka = (float) Setting::get('coins_per_taka', 40);
+        if ($coinsPerTaka <= 0) {
+            $coinsPerTaka = 40;
+        }
+
+        $minCashoutCoins = (int) Setting::get('min_cashout_coins', 600);
+        $totalBdt = $userPoints / $coinsPerTaka;
+
+        $rewardPointsSetting = (int) Setting::get('daily_challenge_reward_points', 100);
 
         // Calculate Today's Earnings
-        $todayStars = (float) StarTransaction::where('receiver_id', $user->id)->whereDate('created_at', Carbon::today())->sum('stars');
-        $todayClaimsCount = DailyChallengeClaim::where('user_id', $user->id)->whereDate('claim_date', Carbon::today())->count();
-        $todayClaimsPoints = $todayClaimsCount * 100; // default daily reward points
-        $todayPoints = $todayStars + $todayClaimsPoints;
-        $todayBdt = $todayPoints * $rate;
+        $todayWorkCoins = (float) MicroWorkSubmission::where('micro_work_submissions.user_id', $user->id)
+            ->where('micro_work_submissions.status', 'approved')
+            ->whereDate('micro_work_submissions.updated_at', Carbon::today())
+            ->join('micro_works', 'micro_work_submissions.micro_work_id', '=', 'micro_works.id')
+            ->sum('micro_works.reward_coins');
+
+        $todayStars = (float) StarTransaction::where('receiver_id', $user->id)
+            ->whereDate('created_at', Carbon::today())
+            ->sum('stars');
+
+        $todayClaimsCount = DailyChallengeClaim::where('user_id', $user->id)
+            ->whereDate('claim_date', Carbon::today())
+            ->count();
+
+        $todayPoints = $todayWorkCoins + $todayStars + ($todayClaimsCount * $rewardPointsSetting);
+        $todayBdt = $todayPoints / $coinsPerTaka;
 
         // Calculate Yesterday's Earnings
-        $yesterdayStars = (float) StarTransaction::where('receiver_id', $user->id)->whereDate('created_at', Carbon::yesterday())->sum('stars');
-        $yesterdayClaimsCount = DailyChallengeClaim::where('user_id', $user->id)->whereDate('claim_date', Carbon::yesterday())->count();
-        $yesterdayClaimsPoints = $yesterdayClaimsCount * 100;
-        $yesterdayPoints = $yesterdayStars + $yesterdayClaimsPoints;
-        $yesterdayBdt = $yesterdayPoints * $rate;
+        $yesterdayWorkCoins = (float) MicroWorkSubmission::where('micro_work_submissions.user_id', $user->id)
+            ->where('micro_work_submissions.status', 'approved')
+            ->whereDate('micro_work_submissions.updated_at', Carbon::yesterday())
+            ->join('micro_works', 'micro_work_submissions.micro_work_id', '=', 'micro_works.id')
+            ->sum('micro_works.reward_coins');
+
+        $yesterdayStars = (float) StarTransaction::where('receiver_id', $user->id)
+            ->whereDate('created_at', Carbon::yesterday())
+            ->sum('stars');
+
+        $yesterdayClaimsCount = DailyChallengeClaim::where('user_id', $user->id)
+            ->whereDate('claim_date', Carbon::yesterday())
+            ->count();
+
+        $yesterdayPoints = $yesterdayWorkCoins + $yesterdayStars + ($yesterdayClaimsCount * $rewardPointsSetting);
+        $yesterdayBdt = $yesterdayPoints / $coinsPerTaka;
 
         // Calculate This Month's Earnings
-        $monthStars = (float) StarTransaction::where('receiver_id', $user->id)->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year)->sum('stars');
-        $monthClaimsCount = DailyChallengeClaim::where('user_id', $user->id)->whereMonth('claim_date', Carbon::now()->month)->whereYear('claim_date', Carbon::now()->year)->count();
-        $monthClaimsPoints = $monthClaimsCount * 100;
-        $monthPoints = $monthStars + $monthClaimsPoints;
+        $monthWorkCoins = (float) MicroWorkSubmission::where('micro_work_submissions.user_id', $user->id)
+            ->where('micro_work_submissions.status', 'approved')
+            ->whereMonth('micro_work_submissions.updated_at', Carbon::now()->month)
+            ->whereYear('micro_work_submissions.updated_at', Carbon::now()->year)
+            ->join('micro_works', 'micro_work_submissions.micro_work_id', '=', 'micro_works.id')
+            ->sum('micro_works.reward_coins');
+
+        $monthStars = (float) StarTransaction::where('receiver_id', $user->id)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('stars');
+
+        $monthClaimsCount = DailyChallengeClaim::where('user_id', $user->id)
+            ->whereMonth('claim_date', Carbon::now()->month)
+            ->whereYear('claim_date', Carbon::now()->year)
+            ->count();
+
+        $monthPoints = $monthWorkCoins + $monthStars + ($monthClaimsCount * $rewardPointsSetting);
         if ($monthPoints < $userPoints) {
             $monthPoints = $userPoints;
         }
-        $monthBdt = $monthPoints * $rate;
+        $monthBdt = $monthPoints / $coinsPerTaka;
 
         // Min Cashout Info
-        $minCashoutCoins = 600;
         $needsMoreCoins = max(0, $minCashoutCoins - $userPoints);
 
         // Fetch User's Past Withdrawals
@@ -147,7 +193,7 @@ class ProfileController extends Controller
         return view('profile.analytics', compact(
             'user',
             'userPoints',
-            'rate',
+            'coinsPerTaka',
             'totalBdt',
             'todayPoints',
             'todayBdt',
@@ -181,16 +227,20 @@ class ProfileController extends Controller
         $coins = (float) $request->coins;
         $userPoints = (float) $user->points;
 
+        $coinsPerTaka = (float) Setting::get('coins_per_taka', 40);
+        if ($coinsPerTaka <= 0) {
+            $coinsPerTaka = 40;
+        }
+
         if ($userPoints < $coins) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Your balance is insufficient for this amount',
+                'message' => 'পর্যাপ্ত ব্যালেন্স নেই! আপনার বর্তমান ব্যালেন্স: ' . number_format($userPoints, 1) . ' কয়েন।',
                 'user_points' => $userPoints,
             ], 400);
         }
 
-        $rate = 0.025;
-        $amountBdt = $coins * $rate;
+        $amountBdt = $coins / $coinsPerTaka;
 
         // Deduct points
         $user->points = max(0, $userPoints - $coins);
@@ -208,9 +258,9 @@ class ProfileController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Cash out request for ৳' . number_format($amountBdt, 2) . ' submitted successfully!',
+            'message' => '🎉 ৳' . number_format($amountBdt, 2) . ' টাকা উইথড্রল রিকোয়েস্ট জমা হয়েছে! অ্যাডমিন ভেরিফাই করে পেমেন্ট পাঠিয়ে দেবেন।',
             'new_points' => $user->points,
-            'new_bdt' => number_format($user->points * $rate, 3),
+            'new_bdt' => number_format($user->points / $coinsPerTaka, 2),
             'withdrawal' => $withdrawal,
         ]);
     }

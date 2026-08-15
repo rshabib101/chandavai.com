@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\MicroWork;
+use App\Models\MicroWorkSubmission;
+use App\Models\LinkHit;
 use Illuminate\Http\Request;
 
 class TaskHubController extends Controller
@@ -15,11 +18,130 @@ class TaskHubController extends Controller
         $user = auth()->user();
         $userPoints = $user ? ($user->points ?? 0) : 0;
 
-        return view('tasks.index', compact('user', 'userPoints'));
+        $microWorks = MicroWork::withCount(['approvedSubmissions'])->where('is_active', true)->latest()->get();
+        $linkHits = LinkHit::where('is_active', true)->latest()->get();
+
+        $mySubmissions = $user 
+            ? MicroWorkSubmission::with('microWork')->where('user_id', $user->id)->latest()->get()
+            : collect();
+
+        return view('tasks.index', compact('user', 'userPoints', 'microWorks', 'mySubmissions', 'linkHits'));
     }
 
     /**
-     * Process Math Solve task submission.
+     * Process user proof submission for a micro work task.
+     */
+    public function submitWorkProof(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'প্রুফ সাবমিট করতে লগইন করুন!'], 401);
+        }
+
+        $validated = $request->validate([
+            'micro_work_id' => 'required|exists:micro_works,id',
+            'proof_screenshot' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+        ]);
+
+        $work = MicroWork::withCount('approvedSubmissions')->findOrFail($validated['micro_work_id']);
+
+        if (!$work->is_active) {
+            return response()->json(['status' => 'error', 'message' => 'এই কাজটির প্রুফ জমা নেওয়া বন্ধ রয়েছে।'], 422);
+        }
+
+        if ($work->approved_submissions_count >= $work->total_slots) {
+            return response()->json(['status' => 'error', 'message' => 'দুঃখিত, এই কাজের সব স্লট পূর্ণ হয়ে গেছে!'], 422);
+        }
+
+        // Check if user already submitted pending or approved proof for this task
+        $existing = MicroWorkSubmission::where('micro_work_id', $work->id)
+            ->where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->first();
+
+        if ($existing) {
+            $msg = $existing->status === 'approved' 
+                ? 'আপনি ইতিমধ্যে এই কাজটি সফলভাবে সম্পন্ন করেছেন!' 
+                : 'আপনার এই কাজের প্রুফ জমা দেওয়া আছে এবং পেন্ডিং অবস্থায় রয়েছে।';
+            return response()->json(['status' => 'error', 'message' => $msg], 422);
+        }
+
+        $path = $request->file('proof_screenshot')->store('proofs', 'public');
+
+        $submission = MicroWorkSubmission::create([
+            'micro_work_id' => $work->id,
+            'user_id' => $user->id,
+            'proof_screenshot' => $path,
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => '🎉 আপনার প্রুফ সফলভাবে জমা হয়েছে! অ্যাডমিন অ্যাপ্রুভ করলেই কয়েন অ্যাকাউন্টে যোগ হবে।',
+            'submission' => $submission
+        ]);
+    }
+
+    /**
+     * Process Math Solve 10-questions round session submission.
+     */
+    public function submitMathSession(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated'], 401);
+        }
+
+        $validated = $request->validate([
+            'correct_count' => 'required|integer|min:0|max:10',
+        ]);
+
+        $correct = (int)$validated['correct_count'];
+        $earnedPoints = $correct * 10;
+
+        if ($earnedPoints > 0) {
+            $user->increment('points', $earnedPoints);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "🎉 কুইজ সম্পূর্ণ! আপনি {$correct}/10 টি সঠিক উত্তর দিয়ে {$earnedPoints} পয়েন্ট রিওয়ার্ড পেয়েছেন।",
+            'earned_points' => $earnedPoints,
+            'new_points' => $user->fresh()->points
+        ]);
+    }
+
+    /**
+     * Process Typing 10-words round session submission.
+     */
+    public function submitTypingSession(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated'], 401);
+        }
+
+        $validated = $request->validate([
+            'correct_count' => 'required|integer|min:0|max:10',
+        ]);
+
+        $correct = (int)$validated['correct_count'];
+        $earnedPoints = $correct * 10;
+
+        if ($earnedPoints > 0) {
+            $user->increment('points', $earnedPoints);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "⚡ টাইপিং চ্যালেঞ্জ সম্পূর্ণ! আপনি {$correct}/10 টি সঠিক শব্দ টাইপ করে {$earnedPoints} পয়েন্ট রিওয়ার্ড পেয়েছেন।",
+            'earned_points' => $earnedPoints,
+            'new_points' => $user->fresh()->points
+        ]);
+    }
+
+    /**
+     * Legacy Math Solve handler.
      */
     public function submitMath(Request $request)
     {
@@ -28,34 +150,7 @@ class TaskHubController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthenticated'], 401);
         }
 
-        $validated = $request->validate([
-            'num1' => 'required|integer',
-            'num2' => 'required|integer',
-            'operator' => 'required|string',
-            'user_answer' => 'required|integer',
-        ]);
-
-        $num1 = $validated['num1'];
-        $num2 = $validated['num2'];
-        $operator = $validated['operator'];
-        $expected = 0;
-
-        if ($operator === '+') {
-            $expected = $num1 + $num2;
-        } elseif ($operator === '-') {
-            $expected = $num1 - $num2;
-        } elseif ($operator === '×' || $operator === '*') {
-            $expected = $num1 * $num2;
-        }
-
-        if ((int)$validated['user_answer'] !== (int)$expected) {
-            return response()->json([
-                'status' => 'error',
-                'message' => "❌ ভুল উত্তর! সঠিক উত্তর ছিল: $expected। আবার চেষ্টা করুন।"
-            ], 422);
-        }
-
-        $earnedPoints = 15;
+        $earnedPoints = 10;
         $user->increment('points', $earnedPoints);
 
         return response()->json([
@@ -67,7 +162,7 @@ class TaskHubController extends Controller
     }
 
     /**
-     * Process Typing task submission.
+     * Legacy Typing handler.
      */
     public function submitTyping(Request $request)
     {
@@ -76,27 +171,12 @@ class TaskHubController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthenticated'], 401);
         }
 
-        $validated = $request->validate([
-            'target_text' => 'required|string',
-            'typed_text' => 'required|string',
-        ]);
-
-        $target = trim(preg_replace('/\s+/', ' ', $validated['target_text']));
-        $typed = trim(preg_replace('/\s+/', ' ', $validated['typed_text']));
-
-        if (mb_strtolower($target) !== mb_strtolower($typed)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => '❌ টাইপিং সম্পূর্ণ নির্ভুল হয়নি! সব শব্দ মিলিয়ে আবার চেষ্টা করুন।'
-            ], 422);
-        }
-
-        $earnedPoints = 25;
+        $earnedPoints = 10;
         $user->increment('points', $earnedPoints);
 
         return response()->json([
             'status' => 'success',
-            'message' => "⚡ অসাধারণ স্পিড! আপনি $earnedPoints পয়েন্ট রিওয়ার্ড পেয়েছেন।",
+            'message' => "⚡ টাইপিং সম্পূর্ণ! আপনি $earnedPoints পয়েন্ট রিওয়ার্ড পেয়েছেন।",
             'earned_points' => $earnedPoints,
             'new_points' => $user->fresh()->points
         ]);
@@ -112,7 +192,7 @@ class TaskHubController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Unauthenticated'], 401);
         }
 
-        $earnedPoints = 20;
+        $earnedPoints = $request->input('reward', 20);
         $user->increment('points', $earnedPoints);
 
         return response()->json([
@@ -124,7 +204,7 @@ class TaskHubController extends Controller
     }
 
     /**
-     * Process Works task completion.
+     * Legacy Works task handler.
      */
     public function submitWork(Request $request)
     {

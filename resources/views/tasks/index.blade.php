@@ -269,9 +269,9 @@
             transform: scale(0.98);
         }
 
-        /* COLOR THEMES FOR 4 CARDS */
+        /* COLOR THEMES FOR CARDS */
         .card-works .icon-box { background: #eff6ff; color: #2563eb; }
-        .card-works .btn-start-task { background: linear-gradient(135deg, #2563eb, #1d4ed8); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+        .card-works .btn-start-task { background: linear-gradient(135deg, #0099ff, #0077ff); box-shadow: 0 4px 12px rgba(0, 153, 255, 0.25); }
 
         .card-math .icon-box { background: #fdf2f8; color: #db2777; }
         .card-math .btn-start-task { background: linear-gradient(135deg, #db2777, #be185d); box-shadow: 0 4px 12px rgba(219, 39, 119, 0.25); }
@@ -292,15 +292,15 @@
             z-index: 2500;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 12px;
         }
 
         .modal-card {
-            background: #ffffff;
-            border-radius: 24px;
+            background: #f8fafc;
+            border-radius: 28px;
             width: 100%;
-            max-width: 500px;
-            max-height: 85vh;
+            max-width: 480px;
+            max-height: 92vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -313,13 +313,82 @@
             to { transform: scale(1); opacity: 1; }
         }
 
+        /* WORKS MODAL HEADER */
+        .works-modal-header {
+            background: #0099ff;
+            color: #ffffff;
+            padding: 20px 18px 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .works-top-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .works-close-btn {
+            background: rgba(255, 255, 255, 0.25);
+            border: none;
+            color: #ffffff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .works-close-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .works-header-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .works-tab-pills {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .works-tab-pill {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .works-tab-pill.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .works-tab-pill:not(.active) {
+            background: #ffffff;
+            color: #0099ff;
+        }
+
         .modal-header {
-            padding: 18px 20px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #f8fafc;
+            background: #ffffff;
         }
 
         .modal-title {
@@ -332,10 +401,10 @@
         }
 
         .modal-close-btn {
-            background: #e2e8f0;
+            background: #f1f5f9;
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             cursor: pointer;
             font-weight: 700;
@@ -351,6 +420,280 @@
             flex: 1;
         }
 
+        /* WORK CARDS STYLING */
+        .work-task-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .work-task-card:hover {
+            border-color: #0099ff;
+            box-shadow: 0 4px 12px rgba(0, 153, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .work-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .work-card-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .work-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: #e0f2fe;
+            color: #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .work-title-text {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .work-cat-badge {
+            background: #e0f2fe;
+            color: #0284c7;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 8px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        .work-reward-text {
+            color: #10b981;
+            font-size: 15px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .work-card-bottom {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12.5px;
+        }
+
+        .work-slots-count {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .work-remaining-slots {
+            color: #0099ff;
+            font-weight: 700;
+        }
+
+        /* ==================== QUIZ & MATH STYLING (MATCHING SCREENSHOT) ==================== */
+        .quiz-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .quiz-back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+
+        .quiz-back-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .quiz-header-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .quiz-coin-badge {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13.5px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* QUESTION CARD */
+        .quiz-question-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 24px 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .quiz-progress-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .quiz-progress-track {
+            flex: 1;
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .quiz-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ec4899, #db2777);
+            border-radius: 10px;
+            width: 10%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-progress-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .quiz-solve-label {
+            font-size: 13.5px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .quiz-math-equation {
+            font-size: 38px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 1px;
+        }
+
+        /* 2x2 OPTIONS GRID */
+        .quiz-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .math-option-btn {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 16px 10px;
+            font-size: 24px;
+            font-weight: 800;
+            color: #0f172a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 64px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .math-option-btn:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .math-option-btn.correct {
+            background: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #15803d !important;
+        }
+
+        .math-option-btn.wrong {
+            background: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #b91c1c !important;
+        }
+
+        .quiz-feedback-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 13.5px;
+            font-weight: 700;
+            margin-top: 4px;
+            margin-bottom: 12px;
+        }
+
+        .quiz-feedback-pill.correct {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .quiz-feedback-pill.wrong {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .btn-quiz-next {
+            width: 100%;
+            padding: 14px;
+            border-radius: 26px;
+            font-size: 16px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ec4899, #db2777);
+            box-shadow: 0 4px 14px rgba(219, 39, 119, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-quiz-next:active {
+            transform: scale(0.98);
+        }
+
         /* TOAST NOTIFICATION */
         .toast-msg {
             position: fixed;
@@ -364,7 +707,7 @@
             font-size: 14px;
             font-weight: 600;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            z-index: 3500;
+            z-index: 5500;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             align-items: center;
@@ -453,12 +796,12 @@
                         <div class="icon-box">
                             <i class="fa-solid fa-calculator"></i>
                         </div>
-                        <span class="reward-badge">15 Pts / Correct</span>
+                        <span class="reward-badge">10 Pts / Question (100 Pts Max)</span>
                     </div>
                     <div class="card-cat-title">Math Solve</div>
-                    <div class="card-cat-sub">ম্যাথ কুইজ ও ব্রোেইন চ্যালেঞ্জ</div>
+                    <div class="card-cat-sub">১০টি ম্যাথ সলভ সেশন</div>
                     <div class="card-cat-desc">
-                        সহজ গাণিতিক যোগ, বিয়োগ ও গুণ ধাঁধা সলভ করুন এবং তাৎক্ষণিক ১৫ পয়েন্ট রিওয়ার্ড জিতুন।
+                        প্রতিটি ম্যাথ সলভ করে বিজ্ঞাপন শেষে পয়েন্ট পান। ১০টি ম্যাথ সলভ করে সর্বোচ্চ ১০০ পয়েন্ট আয় করুন!
                     </div>
                 </div>
                 <button type="button" class="btn-start-task" onclick="openMathModal()">
@@ -473,12 +816,12 @@
                         <div class="icon-box">
                             <i class="fa-solid fa-keyboard"></i>
                         </div>
-                        <span class="reward-badge">25 Pts / Test</span>
+                        <span class="reward-badge">10 Pts / Word (100 Pts Max)</span>
                     </div>
                     <div class="card-cat-title">Typing</div>
-                    <div class="card-cat-sub">স্পিড ও একুরেসি চ্যালেঞ্জ</div>
+                    <div class="card-cat-sub">১০টি ছোট ওয়ার্ড টাইপিং সেশন</div>
                     <div class="card-cat-desc">
-                        দেওয়া বাক্যটি দ্রুত ও নির্ভুলভাবে টাইপ করে আপনার টাইপিং স্কিল টেস্ট করুন এবং ২৫ পয়েন্ট পান।
+                        সহজ ছোট ছোট শব্দ (যেমন: football, sky) টাইপ করে ১০টি রাউন্ডে ১০০ পয়েন্ট রিওয়ার্ড আয় করুন।
                     </div>
                 </div>
                 <button type="button" class="btn-start-task" onclick="openTypingModal()">
@@ -512,101 +855,242 @@
 
     <!-- ==================== MODALS FOR 4 OPTIONS ==================== -->
 
-    <!-- 1. WORKS MODAL -->
+    <!-- 1. DYNAMIC WORKS MODAL -->
     <div id="worksModal" class="modal-overlay">
         <div class="modal-card">
-            <div class="modal-header">
-                <div class="modal-title">
-                    💼 Available Micro Works
+            <!-- BLUE HEADER WITH TAB SWITCHER -->
+            <div class="works-modal-header">
+                <div class="works-top-row">
+                    <button type="button" class="works-close-btn" onclick="closeModal('worksModal')">✕</button>
+                    <div class="works-header-title">টাস্ক মার্কেট</div>
                 </div>
-                <button type="button" class="modal-close-btn" onclick="closeModal('worksModal')">✕</button>
+                <div class="works-tab-pills">
+                    <button type="button" id="tabBtnAvailable" class="works-tab-pill active" onclick="switchWorksTab('available')">উপলব্ধ কাজ</button>
+                    <button type="button" id="tabBtnSubmissions" class="works-tab-pill" onclick="switchWorksTab('submissions')">আমার সাবমিশন</button>
+                </div>
             </div>
+
             <div class="modal-body">
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Join Official Telegram Channel</div>
-                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Join channel & stay active for rewards</div>
-                        </div>
-                        <button type="button" onclick="doWorkTask('Join Telegram Channel', 50)" style="background: #2563eb; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; white-space: nowrap;">+50 Pts</button>
+                <!-- TAB 1: AVAILABLE WORKS LIST VIEW -->
+                <div id="worksAvailableTab">
+                    <!-- TASK LIST VIEW -->
+                    <div id="worksListView">
+                        @forelse($microWorks as $work)
+                            <div class="work-task-card" onclick="openWorkDetail({{ $work->id }})">
+                                <div class="work-card-top">
+                                    <div class="work-card-left">
+                                        <div class="work-icon-box">
+                                            <i class="fa-solid fa-globe"></i>
+                                        </div>
+                                        <div>
+                                            <div class="work-title-text">{{ $work->title }}</div>
+                                            <span class="work-cat-badge">{{ $work->category }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="work-reward-text">{{ $work->reward_coins }} কয়েন</div>
+                                </div>
+                                <div class="work-card-bottom">
+                                    <span class="work-slots-count">{{ $work->approved_submissions_count }}/{{ $work->total_slots }}</span>
+                                    <span class="work-remaining-slots">বাকি স্লট: {{ $work->remaining_slots }} জন</span>
+                                </div>
+                            </div>
+                        @empty
+                            <div style="text-align: center; padding: 40px 10px; color: #64748b;">
+                                <i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 10px; color: #cbd5e1;"></i>
+                                <div style="font-weight: 700; font-size: 15px;">বর্তমানে কোনো কাজ উপলব্ধ নেই</div>
+                                <div style="font-size: 13px; margin-top: 4px;">অল্প কিছুক্ষন পর আবার চেষ্টা করুন।</div>
+                            </div>
+                        @endforelse
                     </div>
 
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Follow Facebook Page</div>
-                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Like & follow official Facebook page</div>
-                        </div>
-                        <button type="button" onclick="doWorkTask('Follow Facebook Page', 40)" style="background: #2563eb; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; white-space: nowrap;">+40 Pts</button>
-                    </div>
+                    <!-- TASK DETAIL & PROOF SUBMISSION VIEW -->
+                    <div id="workDetailView" style="display: none;">
+                        <button type="button" onclick="showWorksList()" style="background: none; border: none; font-size: 14px; font-weight: 700; color: #0099ff; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 14px;">
+                            <i class="fa-solid fa-arrow-left"></i> সকল কাজে ফিরে যান
+                        </button>
 
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Share Post on Profile</div>
-                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Share today's featured post</div>
+                        <div id="workDetailContent">
+                            <!-- Populated dynamically via JS -->
                         </div>
-                        <button type="button" onclick="doWorkTask('Share Post on Profile', 35)" style="background: #2563eb; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; white-space: nowrap;">+35 Pts</button>
                     </div>
+                </div>
 
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Complete Profile Setup</div>
-                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">Add photo, bio & social links</div>
+                <!-- TAB 2: MY SUBMISSIONS VIEW -->
+                <div id="worksSubmissionsTab" style="display: none;">
+                    @forelse($mySubmissions as $sub)
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                <strong style="font-size: 14.5px; color: #0f172a;">{{ $sub->microWork ? $sub->microWork->title : 'Task' }}</strong>
+                                @if($sub->status === 'pending')
+                                    <span style="background: #fef3c7; color: #d97706; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 12px;">⏳ পেন্ডিং</span>
+                                @elseif($sub->status === 'approved')
+                                    <span style="background: #d1fae5; color: #059669; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 12px;">✅ অনুমোদিত (+{{ $sub->microWork ? $sub->microWork->reward_coins : 0 }} Pts)</span>
+                                @else
+                                    <span style="background: #fee2e2; color: #dc2626; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 12px;">❌ বাতিল</span>
+                                @endif
+                            </div>
+                            <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">
+                                📅 {{ $sub->created_at->format('d M Y, h:i A') }}
+                            </div>
+                            @if($sub->proof_screenshot_url)
+                                <div style="margin-top: 8px;">
+                                    <a href="{{ $sub->proof_screenshot_url }}" target="_blank" style="font-size: 12px; color: #0099ff; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                                        <i class="fa-solid fa-image"></i> জমা দেওয়া প্রুফ স্ক্রিনশট দেখুন
+                                    </a>
+                                </div>
+                            @endif
+                            @if($sub->status === 'rejected' && $sub->rejection_reason)
+                                <div style="margin-top: 6px; font-size: 12px; color: #dc2626; background: #fff5f5; padding: 8px; border-radius: 8px;">
+                                    <strong>বাতিলের কারণ:</strong> {{ $sub->rejection_reason }}
+                                </div>
+                            @endif
                         </div>
-                        <button type="button" onclick="doWorkTask('Complete Profile Setup', 100)" style="background: #2563eb; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; white-space: nowrap;">+100 Pts</button>
-                    </div>
+                    @empty
+                        <div style="text-align: center; padding: 40px 10px; color: #64748b;">
+                            <i class="fa-solid fa-paper-plane" style="font-size: 40px; margin-bottom: 10px; color: #cbd5e1;"></i>
+                            <div style="font-weight: 700; font-size: 15px;">আপনি এখনো কোনো কাজ জমা দেননি</div>
+                            <div style="font-size: 13px; margin-top: 4px;">"উপলব্ধ কাজ" থেকে কাজ সম্পন্ন করুন।</div>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 2. MATH SOLVE MODAL -->
+    <!-- 2. MATH SOLVE MODAL (MATCHING SCREENSHOT) -->
     <div id="mathModal" class="modal-overlay">
         <div class="modal-card">
-            <div class="modal-header">
-                <div class="modal-title">
-                    🧮 Math Solve Challenge
-                </div>
-                <button type="button" class="modal-close-btn" onclick="closeModal('mathModal')">✕</button>
-            </div>
-            <div class="modal-body" style="text-align: center;">
-                <div style="font-size: 13px; color: #64748b; margin-bottom: 12px;">অংকটির সঠিক উত্তর দিয়ে ১৫ পয়েন্ট ইনকাম করুন:</div>
-
-                <div style="background: #fdf2f8; border: 2px solid #fbcfe8; border-radius: 16px; padding: 20px; margin-bottom: 16px;">
-                    <div style="font-size: 32px; font-weight: 800; color: #db2777;" id="mathEquation">
-                        15 + 27 = ?
-                    </div>
-                </div>
-
-                <input type="number" id="mathAnswerInput" placeholder="আপনার উত্তর লিখুন..." style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 16px; outline: none;" onkeydown="if(event.key==='Enter') submitMathAnswer()">
-
-                <button type="button" onclick="submitMathAnswer()" style="width: 100%; background: linear-gradient(135deg, #db2777, #be185d); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(219,39,119,0.3);">
-                    Submit Answer 🎯
+            <!-- HEADER matching screenshot -->
+            <div class="quiz-header-bar">
+                <button type="button" class="quiz-back-btn" onclick="closeModal('mathModal')" title="Close">
+                    <i class="fa-solid fa-arrow-left"></i>
                 </button>
+                <div class="quiz-header-title">Math Solve</div>
+                <div class="quiz-coin-badge">
+                    🪙 <span id="mathUserCoinsDisplay">{{ $userPoints }}</span>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <!-- QUESTION SCREEN (1/10 to 10/10) -->
+                <div id="mathQuestionScreen">
+                    <div class="quiz-question-card">
+                        <div class="quiz-progress-row">
+                            <div class="quiz-progress-track">
+                                <div id="mathProgressBar" class="quiz-progress-fill" style="width: 10%;"></div>
+                            </div>
+                            <div id="mathStepText" class="quiz-progress-text">1/10</div>
+                        </div>
+
+                        <div class="quiz-solve-label">Solve this</div>
+                        <div id="mathEquationText" class="quiz-math-equation">
+                            41 - 25 = ?
+                        </div>
+                    </div>
+
+                    <!-- 2x2 OPTIONS GRID -->
+                    <div id="mathOptionsGrid" class="quiz-options-grid">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+
+                    <!-- FEEDBACK BADGE -->
+                    <div style="text-align: center;">
+                        <div id="mathFeedbackBadge" class="quiz-feedback-pill" style="display: none;">
+                            <i class="fa-solid fa-check"></i> Correct answer!
+                        </div>
+                    </div>
+
+                    <!-- NEXT BUTTON -->
+                    <button type="button" id="mathNextBtn" class="btn-quiz-next" onclick="onMathNextClick()">
+                        Next →
+                    </button>
+                </div>
+
+                <!-- RESULT SUMMARY SCREEN -->
+                <div id="mathResultScreen" style="display: none; text-align: center; padding: 20px 10px;">
+                    <div style="font-size: 60px; margin-bottom: 10px;">🏆</div>
+                    <h3 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">ম্যাথ কুইজ সম্পন্ন হয়েছে!</h3>
+                    <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">১০টি গাণিতিক প্রশ্নের সেশন শেষ হয়েছে।</p>
+
+                    <div style="background: #ffffff; border: 2px solid #f1f5f9; border-radius: 20px; padding: 20px; margin-bottom: 20px;">
+                        <div style="font-size: 13px; font-weight: 700; color: #64748b;">আপনার স্কোর:</div>
+                        <div id="mathScoreText" style="font-size: 38px; font-weight: 800; color: #db2777; margin: 4px 0;">8 / 10</div>
+                        <div id="mathEarnedPointsText" style="font-size: 16px; font-weight: 800; color: #16a34a;">+80 Pts</div>
+                    </div>
+
+                    <button type="button" onclick="startMathSession()" class="btn-quiz-next">
+                        নতুন রাউন্ড খেলুন 🔄
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 3. TYPING MODAL -->
+    <!-- 3. TYPING MODAL (MATCHING 10-WORD SESSION) -->
     <div id="typingModal" class="modal-overlay">
         <div class="modal-card">
-            <div class="modal-header">
-                <div class="modal-title">
-                    ⌨️ Typing Speed Challenge
-                </div>
-                <button type="button" class="modal-close-btn" onclick="closeModal('typingModal')">✕</button>
-            </div>
-            <div class="modal-body">
-                <div style="font-size: 13px; color: #64748b; margin-bottom: 10px;">নিচের বাক্যটি দেখে হুবহু টাইপ করুন:</div>
-
-                <div style="background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; color: #166534; margin-bottom: 14px; user-select: none;" id="typingTargetText">
-                    Chanda Vai is the best platform to earn rewards and connect with creators.
-                </div>
-
-                <textarea id="typingInputField" rows="3" placeholder="এখানে টাইপ করা শুরু করুন..." style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 14px; margin-bottom: 16px; outline: none; resize: none;"></textarea>
-
-                <button type="button" onclick="submitTypingAnswer()" style="width: 100%; background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 12px rgba(22,163,74,0.3);">
-                    Submit Typing ⚡
+            <!-- HEADER -->
+            <div class="quiz-header-bar">
+                <button type="button" class="quiz-back-btn" onclick="closeModal('typingModal')" title="Close">
+                    <i class="fa-solid fa-arrow-left"></i>
                 </button>
+                <div class="quiz-header-title">Typing Challenge</div>
+                <div class="quiz-coin-badge">
+                    🪙 <span id="typingUserCoinsDisplay">{{ $userPoints }}</span>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <!-- QUESTION SCREEN -->
+                <div id="typingQuestionScreen">
+                    <div class="quiz-question-card">
+                        <div class="quiz-progress-row">
+                            <div class="quiz-progress-track">
+                                <div id="typingProgressBar" class="quiz-progress-fill" style="width: 10%; background: linear-gradient(90deg, #22c55e, #16a34a);"></div>
+                            </div>
+                            <div id="typingStepText" class="quiz-progress-text">1/10</div>
+                        </div>
+
+                        <div class="quiz-solve-label">Type this word</div>
+                        <div id="typingTargetWordText" class="quiz-math-equation" style="color: #16a34a; font-size: 34px;">
+                            football
+                        </div>
+                    </div>
+
+                    <!-- INPUT FIELD -->
+                    <div style="margin-bottom: 16px;">
+                        <input type="text" id="typingInputWordField" placeholder="শব্দটি টাইপ করুন..." style="width: 100%; padding: 16px; border-radius: 18px; border: 2px solid #e2e8f0; font-size: 20px; font-weight: 700; text-align: center; outline: none; background: #ffffff;" onkeydown="if(event.key==='Enter') submitTypingWordAnswer()">
+                    </div>
+
+                    <!-- FEEDBACK BADGE -->
+                    <div style="text-align: center;">
+                        <div id="typingFeedbackBadge" class="quiz-feedback-pill" style="display: none;">
+                            <i class="fa-solid fa-check"></i> Correct word!
+                        </div>
+                    </div>
+
+                    <!-- SUBMIT / NEXT BUTTON -->
+                    <button type="button" id="typingSubmitBtn" class="btn-quiz-next" style="background: linear-gradient(135deg, #16a34a, #15803d); box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);" onclick="submitTypingWordAnswer()">
+                        Submit Answer ⚡
+                    </button>
+                </div>
+
+                <!-- RESULT SUMMARY SCREEN -->
+                <div id="typingResultScreen" style="display: none; text-align: center; padding: 20px 10px;">
+                    <div style="font-size: 60px; margin-bottom: 10px;">⚡</div>
+                    <h3 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">টাইপিং সেশন সম্পন্ন হয়েছে!</h3>
+                    <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">১০টি শব্দের টাইপিং স্পিড টেস্ট শেষ হয়েছে।</p>
+
+                    <div style="background: #ffffff; border: 2px solid #f1f5f9; border-radius: 20px; padding: 20px; margin-bottom: 20px;">
+                        <div style="font-size: 13px; font-weight: 700; color: #64748b;">আপনার স্কোর:</div>
+                        <div id="typingScoreText" style="font-size: 38px; font-weight: 800; color: #16a34a; margin: 4px 0;">9 / 10</div>
+                        <div id="typingEarnedPointsText" style="font-size: 16px; font-weight: 800; color: #16a34a;">+90 Pts</div>
+                    </div>
+
+                    <button type="button" onclick="startTypingSession()" class="btn-quiz-next" style="background: linear-gradient(135deg, #16a34a, #15803d);">
+                        পুনরায় টাইপ খেলুন 🔄
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -621,24 +1105,20 @@
                 <button type="button" class="modal-close-btn" onclick="closeModal('linkHitModal')">✕</button>
             </div>
             <div class="modal-body">
-                <div style="font-size: 13px; color: #64748b; margin-bottom: 14px;">লিংক ভিজিট করে ১০ সেকেন্ড অপেক্ষা করলেই পাবেন ২০ পয়েন্ট:</div>
+                <div style="font-size: 13px; color: #64748b; margin-bottom: 14px;">লিংক ভিজিট করে নির্দিষ্ট সময় অপেক্ষা করলেই পাবেন পয়েন্ট:</div>
 
                 <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="background: #fff7ed; border: 1px solid #ffedd5; border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 14px; color: #9a3412;">Chanda Vai Store Offer</div>
-                            <div style="font-size: 11px; color: #ea580c; margin-top: 2px;">https://chandavai.com/shop</div>
+                    @forelse($linkHits as $hit)
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                            <div>
+                                <div style="font-weight: 700; font-size: 14px; color: #9a3412;">{{ $hit->title }}</div>
+                                <div style="font-size: 11px; color: #ea580c; margin-top: 2px;">{{ Str::limit($hit->url, 35) }}</div>
+                            </div>
+                            <button type="button" onclick="startLinkHit('{{ $hit->url }}', {{ $hit->reward_points }}, {{ $hit->timer_seconds }})" style="background: #ea580c; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; white-space: nowrap;">+{{ $hit->reward_points }} Pts</button>
                         </div>
-                        <button type="button" onclick="startLinkHit('https://chandavai.com/shop')" style="background: #ea580c; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; white-space: nowrap;">Visit & Earn</button>
-                    </div>
-
-                    <div style="background: #fff7ed; border: 1px solid #ffedd5; border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 14px; color: #9a3412;">Tech News & Gadgets</div>
-                            <div style="font-size: 11px; color: #ea580c; margin-top: 2px;">https://example.com/tech</div>
-                        </div>
-                        <button type="button" onclick="startLinkHit('https://example.com/tech')" style="background: #ea580c; color: #fff; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12.5px; cursor: pointer; white-space: nowrap;">Visit & Earn</button>
-                    </div>
+                    @empty
+                        <div style="text-align: center; padding: 20px; color: #64748b;">কোনো লিংক হিট উপলব্ধ নেই।</div>
+                    @endforelse
                 </div>
 
                 <div id="linkCountdownBox" style="display: none; margin-top: 16px; background: #fff7ed; border: 1.5px dashed #ea580c; border-radius: 14px; padding: 16px; text-align: center;">
@@ -646,6 +1126,26 @@
                     <div style="font-size: 28px; font-weight: 800; color: #ea580c; margin: 6px 0;" id="linkTimerVal">10s</div>
                     <div style="font-size: 11px; color: #64748b;">টাইমার শেষ হওয়া পর্যন্ত অপেক্ষা করুন</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTERSTITIAL AD OVERLAY FOR MATH & TYPING -->
+    <div id="adInterstitialOverlay" class="modal-overlay" style="z-index: 4000; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);">
+        <div class="modal-card" style="max-width: 400px; border-radius: 24px; text-align: center; padding: 24px; background: #ffffff; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);">
+            <div style="background: #eff6ff; color: #2563eb; width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; font-size: 28px;">
+                <i class="fa-solid fa-rectangle-ad"></i>
+            </div>
+            <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">স্পন্সরড বিজ্ঞাপন চলছে...</h3>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 18px;">পরবর্তী প্রশ্নে যেতে বিজ্ঞাপনটি শেষ হওয়া পর্যন্ত অপেক্ষা করুন</p>
+            
+            <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 20px; padding: 20px; margin-bottom: 18px;">
+                <div style="font-size: 42px; font-weight: 800; color: #2563eb; margin-bottom: 4px;" id="adTimerCount">5s</div>
+                <div style="font-size: 12.5px; color: #64748b; font-weight: 600;">কাউন্টডাউন চলছে...</div>
+            </div>
+
+            <div style="font-size: 11.5px; color: #94a3b8; font-weight: 600;">
+                <i class="fa-solid fa-shield-halved"></i> Ad Verification Active
             </div>
         </div>
     </div>
@@ -658,19 +1158,7 @@
 
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        // CURRENT MATH DATA
-        let currentMathNum1 = 15;
-        let currentMathNum2 = 27;
-        let currentMathOperator = '+';
-
-        // TYPING SENTENCES LIST
-        const typingSentences = [
-            "Chanda Vai is the best platform to earn rewards and connect with creators.",
-            "Practice typing daily to improve your speed and precision.",
-            "Fast typing skills help you complete tasks quickly and efficiently.",
-            "Earn points every single day by participating in interactive challenges."
-        ];
+        const worksData = @json($microWorks);
 
         function openModal(id) {
             document.getElementById(id).style.display = 'flex';
@@ -680,146 +1168,452 @@
             document.getElementById(id).style.display = 'none';
         }
 
-        // 1. WORKS MODAL HANDLERS
+        // ==================== 1. WORKS TAB & DETAIL HANDLERS ====================
         function openWorksModal() {
+            showWorksList();
+            switchWorksTab('available');
             openModal('worksModal');
         }
 
-        function doWorkTask(title, reward) {
-            fetch('/tasks/work', {
+        function switchWorksTab(tab) {
+            const tabAvail = document.getElementById('worksAvailableTab');
+            const tabSubs = document.getElementById('worksSubmissionsTab');
+            const btnAvail = document.getElementById('tabBtnAvailable');
+            const btnSubs = document.getElementById('tabBtnSubmissions');
+
+            if (tab === 'available') {
+                tabAvail.style.display = 'block';
+                tabSubs.style.display = 'none';
+                btnAvail.classList.add('active');
+                btnSubs.classList.remove('active');
+            } else {
+                tabAvail.style.display = 'none';
+                tabSubs.style.display = 'block';
+                btnSubs.classList.add('active');
+                btnAvail.classList.remove('active');
+            }
+        }
+
+        function showWorksList() {
+            document.getElementById('worksListView').style.display = 'block';
+            document.getElementById('workDetailView').style.display = 'none';
+        }
+
+        function openWorkDetail(id) {
+            const work = worksData.find(w => w.id === id);
+            if (!work) return;
+
+            const container = document.getElementById('workDetailContent');
+
+            let demoHtml = '';
+            if (work.demo_screenshot) {
+                const demoUrl = '/storage/' + work.demo_screenshot;
+                demoHtml = `
+                    <div style="font-weight: 800; font-size: 13.5px; color: #1e293b; margin-top: 16px; margin-bottom: 8px;">
+                        ডেমো স্ক্রিনশট (এমন করে প্রুফ দিন):
+                    </div>
+                    <div style="border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; max-height: 280px; text-align: center; background: #ffffff; padding: 6px;">
+                        <img src="${demoUrl}" style="max-width: 100%; max-height: 260px; border-radius: 12px; object-fit: contain;">
+                    </div>
+                `;
+            }
+
+            let linkBtnHtml = '';
+            if (work.task_link) {
+                linkBtnHtml = `
+                    <a href="${work.task_link}" target="_blank" style="display: flex; align-items: center; justify-content: center; background: #e0f2fe; color: #0284c7; font-weight: 800; font-size: 15px; padding: 14px; border-radius: 14px; text-decoration: none; margin-top: 18px; transition: all 0.2s;">
+                        কাজের লিংকে যান
+                    </a>
+                `;
+            }
+
+            container.innerHTML = `
+                <div style="font-size: 13.5px; color: #334155; line-height: 1.6; white-space: pre-line; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px;">
+                    <strong style="color: #0f172a; font-size: 14.5px;">প্রমাণ চাই: নির্দেশনা:</strong> ${work.instruction || 'কাজের বিবরণ অনুসরণ করুন।'}
+                </div>
+
+                <div style="font-weight: 800; font-size: 14px; color: #0f172a; margin-top: 14px;">
+                    রেট: <span style="color: #0099ff;">${work.reward_coins} কয়েন</span>
+                </div>
+
+                ${demoHtml}
+                ${linkBtnHtml}
+
+                <div style="margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+                    <div style="font-weight: 800; font-size: 13.5px; color: #0099ff; margin-bottom: 12px;">
+                        এই কাজে ${work.required_proofs_count || 1}টি স্ক্রিনশট প্রুফ আপলোড করতে হবে
+                    </div>
+
+                    <label style="font-size: 13px; font-weight: 700; color: #475569; display: block; margin-bottom: 6px;">
+                        স্ক্রিনশট ১ আপলোড করুন
+                    </label>
+                    <input type="file" id="proofFileInput" accept="image/*" style="width: 100%; padding: 10px; border: 1.5px solid #cbd5e1; border-radius: 12px; background: #ffffff; font-size: 13px;" onchange="previewProofImage(this)">
+
+                    <div id="proofPreviewBox" style="display: none; margin-top: 10px; text-align: center;">
+                        <img id="proofPreviewImg" src="" style="max-height: 150px; border-radius: 10px; border: 1px solid #cbd5e1;">
+                    </div>
+
+                    <button type="button" id="submitProofBtn" onclick="submitTaskProof(${work.id})" style="width: 100%; background: #10b981; color: #ffffff; border: none; padding: 14px; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; margin-top: 18px; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+                        প্রুফ সাবমিট করুন
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('worksListView').style.display = 'none';
+            document.getElementById('workDetailView').style.display = 'block';
+        }
+
+        function previewProofImage(input) {
+            const previewBox = document.getElementById('proofPreviewBox');
+            const previewImg = document.getElementById('proofPreviewImg');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewBox.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function submitTaskProof(workId) {
+            const fileInput = document.getElementById('proofFileInput');
+            if (!fileInput || !fileInput.files[0]) {
+                showToast("দয়া করে প্রুফ স্ক্রিনশট ফাইল নির্বাচন করুন!");
+                return;
+            }
+
+            const btn = document.getElementById('submitProofBtn');
+            btn.disabled = true;
+            btn.innerText = 'আপলোড হচ্ছে...';
+
+            const formData = new FormData();
+            formData.append('micro_work_id', workId);
+            formData.append('proof_screenshot', fileInput.files[0]);
+
+            fetch('/tasks/work/submit', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({ work_title: title, reward: reward })
+                body: formData
             })
             .then(res => res.json())
             .then(data => {
+                btn.disabled = false;
+                btn.innerText = 'প্রুফ সাবমিট করুন';
                 if (data.status === 'success') {
                     showToast(data.message);
-                    updatePointsDisplay(data.new_points);
-                    closeModal('worksModal');
+                    showWorksList();
+                    switchWorksTab('submissions');
+                    setTimeout(() => location.reload(), 1500);
                 } else {
-                    showToast(data.message || 'Error completing work');
+                    showToast(data.message || 'প্রুফ সাবমিট ব্যর্থ হয়েছে!');
                 }
             })
-            .catch(err => showToast('Error completing work task'));
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerText = 'প্রুফ সাবমিট করুন';
+                showToast('প্রুফ সাবমিট করার সময় সমস্যা হয়েছে।');
+            });
         }
 
-        // 2. MATH SOLVE HANDLERS
+        // ==================== INTERSTITIAL AD TIMER HANDLER ====================
+        function showAdInterstitial(seconds, callback) {
+            const overlay = document.getElementById('adInterstitialOverlay');
+            const timerEl = document.getElementById('adTimerCount');
+            overlay.style.display = 'flex';
+
+            let count = seconds;
+            timerEl.innerText = count + 's';
+
+            const interval = setInterval(() => {
+                count--;
+                timerEl.innerText = count + 's';
+                if (count <= 0) {
+                    clearInterval(interval);
+                    overlay.style.display = 'none';
+                    if (callback) callback();
+                }
+            }, 1000);
+        }
+
+        // ==================== 2. MATH SOLVE 10-STEP SESSION HANDLERS ====================
+        let mathStep = 1;
+        let mathCorrectCount = 0;
+        let currentMathObj = null;
+        let mathSelectedOption = null;
+
         function openMathModal() {
-            generateNewMath();
+            startMathSession();
             openModal('mathModal');
         }
 
-        function generateNewMath() {
-            const ops = ['+', '-', '×'];
-            currentMathOperator = ops[Math.floor(Math.random() * ops.length)];
-            
-            if (currentMathOperator === '×') {
-                currentMathNum1 = Math.floor(Math.random() * 12) + 2;
-                currentMathNum2 = Math.floor(Math.random() * 10) + 2;
-            } else if (currentMathOperator === '-') {
-                currentMathNum1 = Math.floor(Math.random() * 50) + 20;
-                currentMathNum2 = Math.floor(Math.random() * 20) + 1;
-            } else {
-                currentMathNum1 = Math.floor(Math.random() * 60) + 10;
-                currentMathNum2 = Math.floor(Math.random() * 40) + 5;
-            }
-
-            document.getElementById('mathEquation').innerText = `${currentMathNum1} ${currentMathOperator} ${currentMathNum2} = ?`;
-            document.getElementById('mathAnswerInput').value = '';
+        function startMathSession() {
+            mathStep = 1;
+            mathCorrectCount = 0;
+            renderMathQuestion();
         }
 
-        function submitMathAnswer() {
-            const ans = document.getElementById('mathAnswerInput').value.trim();
-            if (!ans) {
-                showToast("দয়া করে আপনার উত্তরটি লিখুন!");
-                return;
+        function renderMathQuestion() {
+            mathSelectedOption = null;
+            document.getElementById('mathResultScreen').style.display = 'none';
+            document.getElementById('mathQuestionScreen').style.display = 'block';
+
+            document.getElementById('mathStepText').innerText = `${mathStep}/10`;
+            const percent = (mathStep / 10) * 100;
+            document.getElementById('mathProgressBar').style.width = `${percent}%`;
+
+            // Random math equation
+            const ops = ['+', '-', '×'];
+            const op = ops[Math.floor(Math.random() * ops.length)];
+            let num1, num2, correctAns;
+
+            if (op === '×') {
+                num1 = Math.floor(Math.random() * 12) + 2;
+                num2 = Math.floor(Math.random() * 9) + 2;
+                correctAns = num1 * num2;
+            } else if (op === '-') {
+                num1 = Math.floor(Math.random() * 50) + 20;
+                num2 = Math.floor(Math.random() * (num1 - 5)) + 1;
+                correctAns = num1 - num2;
+            } else {
+                num1 = Math.floor(Math.random() * 50) + 10;
+                num2 = Math.floor(Math.random() * 40) + 5;
+                correctAns = num1 + num2;
             }
 
-            fetch('/tasks/math', {
+            // Generate 3 wrong options
+            const optionsSet = new Set();
+            optionsSet.add(correctAns);
+            while (optionsSet.size < 4) {
+                const offset = (Math.floor(Math.random() * 10) + 1) * (Math.random() < 0.5 ? 1 : -1);
+                const wrongOpt = correctAns + offset;
+                if (wrongOpt >= 0 && wrongOpt !== correctAns) {
+                    optionsSet.add(wrongOpt);
+                }
+            }
+
+            const options = Array.from(optionsSet).sort(() => Math.random() - 0.5);
+            currentMathObj = { num1, num2, op, correctAns, options };
+
+            document.getElementById('mathEquationText').innerText = `${num1} ${op} ${num2} = ?`;
+
+            const optionsGrid = document.getElementById('mathOptionsGrid');
+            optionsGrid.innerHTML = '';
+            document.getElementById('mathFeedbackBadge').style.display = 'none';
+
+            options.forEach((optVal) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'math-option-btn';
+                btn.innerText = optVal;
+                btn.onclick = () => selectMathOption(optVal, btn);
+                optionsGrid.appendChild(btn);
+            });
+
+            const nextBtn = document.getElementById('mathNextBtn');
+            nextBtn.disabled = true;
+            nextBtn.style.opacity = '0.5';
+        }
+
+        function selectMathOption(val, btnEl) {
+            if (mathSelectedOption !== null) return;
+            mathSelectedOption = val;
+
+            const isCorrect = (val === currentMathObj.correctAns);
+            const optionsGrid = document.getElementById('mathOptionsGrid');
+            const allBtns = optionsGrid.querySelectorAll('.math-option-btn');
+
+            allBtns.forEach(b => {
+                const bVal = parseInt(b.innerText.replace(/[^0-9-]/g, ''));
+                b.style.pointerEvents = 'none';
+                if (bVal === currentMathObj.correctAns) {
+                    b.classList.add('correct');
+                    b.innerHTML = `✓ ${bVal}`;
+                } else if (b === btnEl && !isCorrect) {
+                    b.classList.add('wrong');
+                    b.innerHTML = `✕ ${bVal}`;
+                }
+            });
+
+            const feedbackBadge = document.getElementById('mathFeedbackBadge');
+            feedbackBadge.style.display = 'inline-flex';
+            if (isCorrect) {
+                mathCorrectCount++;
+                feedbackBadge.className = 'quiz-feedback-pill correct';
+                feedbackBadge.innerHTML = `<i class="fa-solid fa-check"></i> Correct answer!`;
+            } else {
+                feedbackBadge.className = 'quiz-feedback-pill wrong';
+                feedbackBadge.innerHTML = `<i class="fa-solid fa-xmark"></i> Incorrect answer`;
+            }
+
+            const nextBtn = document.getElementById('mathNextBtn');
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+        }
+
+        function onMathNextClick() {
+            if (mathSelectedOption === null) return;
+
+            showAdInterstitial(5, () => {
+                if (mathStep < 10) {
+                    mathStep++;
+                    renderMathQuestion();
+                } else {
+                    finishMathSession();
+                }
+            });
+        }
+
+        function finishMathSession() {
+            document.getElementById('mathQuestionScreen').style.display = 'none';
+            document.getElementById('mathResultScreen').style.display = 'block';
+
+            const pointsEarned = mathCorrectCount * 10;
+            document.getElementById('mathScoreText').innerText = `${mathCorrectCount} / 10`;
+            document.getElementById('mathEarnedPointsText').innerText = `+${pointsEarned} Pts`;
+
+            fetch('/tasks/math/session', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({
-                    num1: currentMathNum1,
-                    num2: currentMathNum2,
-                    operator: currentMathOperator,
-                    user_answer: parseInt(ans)
-                })
+                body: JSON.stringify({ correct_count: mathCorrectCount })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    showToast(data.message);
                     updatePointsDisplay(data.new_points);
-                    generateNewMath();
-                } else {
-                    showToast(data.message || 'ভুল উত্তর!');
+                    showToast(data.message);
                 }
-            })
-            .catch(err => showToast('Error checking math answer'));
+            });
         }
 
-        // 3. TYPING HANDLERS
+        // ==================== 3. TYPING 10-STEP SESSION HANDLERS ====================
+        let typingStep = 1;
+        let typingCorrectCount = 0;
+        let currentTypingTarget = '';
+
+        const typingWords = [
+            'football', 'cricket', 'sky', 'galaxy', 'laptop', 'python',
+            'planet', 'river', 'champion', 'guitar', 'rocket', 'freedom',
+            'flower', 'sunshine', 'coffee', 'cloud', 'ocean', 'tiger',
+            'lion', 'orange', 'silver', 'golden', 'magic', 'heroes'
+        ];
+
         function openTypingModal() {
-            const randomSentence = typingSentences[Math.floor(Math.random() * typingSentences.length)];
-            document.getElementById('typingTargetText').innerText = randomSentence;
-            document.getElementById('typingInputField').value = '';
+            startTypingSession();
             openModal('typingModal');
         }
 
-        function submitTypingAnswer() {
-            const target = document.getElementById('typingTargetText').innerText;
-            const typed = document.getElementById('typingInputField').value;
+        function startTypingSession() {
+            typingStep = 1;
+            typingCorrectCount = 0;
+            renderTypingQuestion();
+        }
 
-            if (!typed.trim()) {
-                showToast("দয়া করে বাক্যটি টাইপ করুন!");
+        function renderTypingQuestion() {
+            document.getElementById('typingResultScreen').style.display = 'none';
+            document.getElementById('typingQuestionScreen').style.display = 'block';
+
+            document.getElementById('typingStepText').innerText = `${typingStep}/10`;
+            const percent = (typingStep / 10) * 100;
+            document.getElementById('typingProgressBar').style.width = `${percent}%`;
+
+            currentTypingTarget = typingWords[Math.floor(Math.random() * typingWords.length)];
+            document.getElementById('typingTargetWordText').innerText = currentTypingTarget;
+
+            const inputField = document.getElementById('typingInputWordField');
+            inputField.value = '';
+            inputField.disabled = false;
+            setTimeout(() => inputField.focus(), 100);
+
+            document.getElementById('typingFeedbackBadge').style.display = 'none';
+            const submitBtn = document.getElementById('typingSubmitBtn');
+            submitBtn.innerText = 'Submit Answer ⚡';
+            submitBtn.onclick = submitTypingWordAnswer;
+        }
+
+        function submitTypingWordAnswer() {
+            const inputField = document.getElementById('typingInputWordField');
+            const typed = inputField.value.trim().toLowerCase();
+            if (!typed) {
+                showToast("দয়া করে শব্দটি টাইপ করুন!");
                 return;
             }
 
-            fetch('/tasks/typing', {
+            inputField.disabled = true;
+            const isCorrect = (typed === currentTypingTarget.toLowerCase());
+
+            const feedbackBadge = document.getElementById('typingFeedbackBadge');
+            feedbackBadge.style.display = 'inline-flex';
+
+            if (isCorrect) {
+                typingCorrectCount++;
+                feedbackBadge.className = 'quiz-feedback-pill correct';
+                feedbackBadge.innerHTML = `<i class="fa-solid fa-check"></i> Correct word!`;
+            } else {
+                feedbackBadge.className = 'quiz-feedback-pill wrong';
+                feedbackBadge.innerHTML = `<i class="fa-solid fa-xmark"></i> Incorrect (Target: ${currentTypingTarget})`;
+            }
+
+            const submitBtn = document.getElementById('typingSubmitBtn');
+            submitBtn.innerText = 'Next →';
+            submitBtn.onclick = onTypingNextClick;
+        }
+
+        function onTypingNextClick() {
+            showAdInterstitial(5, () => {
+                if (typingStep < 10) {
+                    typingStep++;
+                    renderTypingQuestion();
+                } else {
+                    finishTypingSession();
+                }
+            });
+        }
+
+        function finishTypingSession() {
+            document.getElementById('typingQuestionScreen').style.display = 'none';
+            document.getElementById('typingResultScreen').style.display = 'block';
+
+            const pointsEarned = typingCorrectCount * 10;
+            document.getElementById('typingScoreText').innerText = `${typingCorrectCount} / 10`;
+            document.getElementById('typingEarnedPointsText').innerText = `+${pointsEarned} Pts`;
+
+            fetch('/tasks/typing/session', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({
-                    target_text: target,
-                    typed_text: typed
-                })
+                body: JSON.stringify({ correct_count: typingCorrectCount })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    showToast(data.message);
                     updatePointsDisplay(data.new_points);
-                    closeModal('typingModal');
-                } else {
-                    showToast(data.message || 'টাইপিং ভুল হয়েছে!');
+                    showToast(data.message);
                 }
-            })
-            .catch(err => showToast('Error submitting typing'));
+            });
         }
 
-        // 4. LINK HITS HANDLERS
+        // ==================== 4. LINK HITS HANDLERS ====================
         function openLinkHitModal() {
             document.getElementById('linkCountdownBox').style.display = 'none';
             openModal('linkHitModal');
         }
 
-        function startLinkHit(url) {
+        function startLinkHit(url, reward = 20, seconds = 10) {
             window.open(url, '_blank');
 
             const box = document.getElementById('linkCountdownBox');
             const timerEl = document.getElementById('linkTimerVal');
             box.style.display = 'block';
 
-            let count = 10;
+            let count = seconds;
             timerEl.innerText = count + 's';
 
             const interval = setInterval(() => {
@@ -832,7 +1626,8 @@
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': csrfToken
-                        }
+                        },
+                        body: JSON.stringify({ reward: reward })
                     })
                     .then(res => res.json())
                     .then(data => {
@@ -849,8 +1644,12 @@
 
         // POINTS & TOAST HELPERS
         function updatePointsDisplay(newPoints) {
-            const el = document.getElementById('headerPointsVal');
-            if (el) el.innerText = newPoints;
+            const el1 = document.getElementById('headerPointsVal');
+            const el2 = document.getElementById('mathUserCoinsDisplay');
+            const el3 = document.getElementById('typingUserCoinsDisplay');
+            if (el1) el1.innerText = newPoints;
+            if (el2) el2.innerText = newPoints;
+            if (el3) el3.innerText = newPoints;
         }
 
         function showToast(msg) {

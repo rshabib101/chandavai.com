@@ -30,6 +30,30 @@
                 @csrf
                 <div class="card-body">
 
+                    <!-- COIN TO TAKA CONVERSION RATE -->
+                    <div class="form-group bg-light p-3 rounded border border-warning">
+                        <label for="coins_per_taka" class="font-weight-bold text-dark">🪙 Coin to BDT (৳) Rate: Coins required for ৳1 Taka</label>
+                        <div class="input-group">
+                            <input type="number" step="0.1" name="coins_per_taka" id="coins_per_taka" class="form-control font-weight-bold" value="{{ $coinsPerTaka ?? 40 }}" min="0.1" required>
+                            <div class="input-group-append">
+                                <span class="input-group-text font-weight-bold">Coins = ৳1 BDT</span>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">উদাহরণ: <strong>40</strong> দিলে ৪০টি কয়েনে ১ টাকা (যেমন: ৬০০ কয়েন = ৳১৫.০০ টাকা)।</small>
+                    </div>
+
+                    <!-- MIN CASHOUT COINS -->
+                    <div class="form-group">
+                        <label for="min_cashout_coins">💳 Minimum Coins Required for Cashout</label>
+                        <div class="input-group">
+                            <input type="number" name="min_cashout_coins" id="min_cashout_coins" class="form-control" value="{{ $minCashoutCoins ?? 600 }}" min="1" required>
+                            <div class="input-group-append">
+                                <span class="input-group-text">Coins</span>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">ইউজার সর্বনিম্ন কত কয়েন জমলে ক্যাশআউট রিকোয়েস্ট করতে পারবে। ডিফল্ট: 600 Coins.</small>
+                    </div>
+
                     <!-- MIN FOLLOWERS FOR INCOME -->
                     <div class="form-group">
                         <label for="min_followers_for_income">👥 Minimum Followers Required to Start Earning Income</label>

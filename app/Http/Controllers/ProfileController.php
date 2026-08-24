@@ -321,16 +321,27 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         if (!$user) {
-            if ($request->ajax() || $request->wantsJson()) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                 return response()->json(['error' => 'Unauthenticated'], 401);
             }
             return redirect()->route('login');
         }
 
-        $request->validate([
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
-            'cover_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
-        ]);
+        try {
+            $request->validate([
+                'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,heic|max:10240',
+                'cover_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,heic|max:10240',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => collect($e->errors())->flatten()->first() ?? 'Invalid image file.',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        }
 
         $updated = false;
 
@@ -354,7 +365,7 @@ class ProfileController extends Controller
             $user->save();
         }
 
-        if ($request->ajax() || $request->wantsJson()) {
+        if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
             return response()->json([
                 'status' => 'success',
                 'message' => 'ছবি সফলভাবে আপডেট করা হয়েছে!',

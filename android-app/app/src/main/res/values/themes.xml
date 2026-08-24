@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.ChandaVai" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#0099ff</item>
+        <item name="colorPrimaryVariant">#0077ff</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="android:statusBarColor">#0099ff</item>
+    </style>
+</resources>

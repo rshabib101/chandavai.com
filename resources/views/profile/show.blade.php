@@ -79,10 +79,12 @@
         .cover-banner-box {
             width: 100%;
             height: 200px;
-            background: linear-gradient(135deg, #1877f2 0%, #0052cc 100%);
+            background-color: #1877f2;
+            background-image: linear-gradient(135deg, #1877f2 0%, #0052cc 100%);
             position: relative;
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
         }
 
         .cover-camera-btn {
@@ -101,6 +103,12 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            z-index: 10;
+            transition: background 0.2s ease;
+        }
+
+        .cover-camera-btn:hover {
+            background: rgba(0, 0, 0, 0.85);
         }
 
         /* HEADER AVATAR & INFO AREA */
@@ -631,6 +639,15 @@
             </div>
 
             <div class="modal-field-group">
+                <label>Cover Photo 🖼️</label>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button type="button" onclick="document.getElementById('coverPhotoInput').click()" style="background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 14px; border-radius:18px; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-camera"></i> Change Cover Photo
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-field-group">
                 <label>Category / Title</label>
                 <input type="text" id="editCategory" value="{{ $user->category ?: 'Digital creator' }}" placeholder="e.g. Digital creator, Entrepreneur">
             </div>
@@ -725,24 +742,53 @@
 
         function uploadPhoto(type) {
             const fileInput = document.getElementById(type + 'PhotoInput');
-            if (fileInput && fileInput.files[0]) {
-                const formData = new FormData();
-                formData.append(type + '_photo', fileInput.files[0]);
+            if (!fileInput || !fileInput.files[0]) return;
 
-                fetch('{{ route("user.profile.photos") }}', {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrfToken },
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        window.location.reload();
-                    } else {
-                        alert(data.message || 'Upload failed');
-                    }
-                });
+            const formData = new FormData();
+            formData.append(type + '_photo', fileInput.files[0]);
+
+            const triggerBtn = type === 'cover'
+                ? document.querySelector('.cover-camera-btn')
+                : document.querySelector('.avatar-camera-overlay');
+            const originalHTML = triggerBtn ? triggerBtn.innerHTML : '';
+
+            if (triggerBtn) {
+                triggerBtn.disabled = true;
+                triggerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Uploading...';
             }
+
+            fetch('{{ route("user.profile.photos") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(async res => {
+                const data = await res.json().catch(() => null);
+                if (res.ok && data && data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    const errorMsg = (data && (data.message || (data.errors && Object.values(data.errors).flat().join('\n')))) 
+                        || 'Photo upload failed. Please choose a valid image file (max 10MB).';
+                    alert(errorMsg);
+                    if (triggerBtn) {
+                        triggerBtn.disabled = false;
+                        triggerBtn.innerHTML = originalHTML;
+                    }
+                    fileInput.value = '';
+                }
+            })
+            .catch(err => {
+                alert('Network error occurred during photo upload.');
+                if (triggerBtn) {
+                    triggerBtn.disabled = false;
+                    triggerBtn.innerHTML = originalHTML;
+                }
+                fileInput.value = '';
+            });
         }
 
         function toggleFollowUser(userId) {

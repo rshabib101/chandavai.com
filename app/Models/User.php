@@ -243,6 +243,9 @@ class User extends Authenticatable
     public function getProfilePhotoUrlAttribute(): ?string
     {
         if (!empty($this->profile_photo)) {
+            if (str_starts_with($this->profile_photo, 'http://') || str_starts_with($this->profile_photo, 'https://')) {
+                return $this->profile_photo;
+            }
             return asset('storage/' . $this->profile_photo);
         }
         return null;
@@ -251,6 +254,9 @@ class User extends Authenticatable
     public function getCoverPhotoUrlAttribute(): ?string
     {
         if (!empty($this->cover_photo)) {
+            if (str_starts_with($this->cover_photo, 'http://') || str_starts_with($this->cover_photo, 'https://')) {
+                return $this->cover_photo;
+            }
             return asset('storage/' . $this->cover_photo);
         }
         return null;

@@ -1250,6 +1250,9 @@
         </div>
     </div>
 
+    <!-- WEBSITE ENTRANCE POPUP AD -->
+    @include('partials.popup_ad_modal')
+
     <!-- FEED MAIN CONTAINER -->
     <div class="main-container">
 

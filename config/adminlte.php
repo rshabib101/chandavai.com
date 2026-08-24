@@ -371,6 +371,11 @@ return [
 
         ['header' => 'ADMIN SETTINGS'],
         [
+            'text' => 'AmarFeed Ads',
+            'url'  => 'admin/amarfeed-ads',
+            'icon' => 'fas fa-fw fa-ad',
+        ],
+        [
             'text' => 'Settings',
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-cog',

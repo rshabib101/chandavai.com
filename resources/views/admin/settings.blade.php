@@ -90,35 +90,11 @@
                         <small class="form-text text-muted">Reward money awarded to top monthly referrer. Default: 1000 Taka.</small>
                     </div>
 
-                    <hr>
-                    <h5 class="font-weight-bold text-dark mt-3">📢 Ad Script Manager (Google Ads / Adsterra)</h5>
-
-                    <!-- HEAD AD SCRIPT -->
-                    <div class="form-group">
-                        <label for="ad_script_head">1. Header Ad Script (&lt;head&gt; section)</label>
-                        <textarea name="ad_script_head" id="ad_script_head" class="form-control" rows="3" placeholder="Paste Google Adsense or Adsterra head script here...">{{ $adScriptHead ?? '' }}</textarea>
-                        <small class="form-text text-muted">Executed inside &lt;head&gt; element of every page.</small>
-                    </div>
-
-                    <!-- IN-FEED AD SCRIPT -->
-                    <div class="form-group">
-                        <label for="ad_script_feed">2. In-Feed Ad Script (Home Feed Posts)</label>
-                        <textarea name="ad_script_feed" id="ad_script_feed" class="form-control" rows="3" placeholder="Paste In-Feed Ad HTML/JS code here...">{{ $adScriptFeed ?? '' }}</textarea>
-                        <small class="form-text text-muted">Rendered between posts in the home feed.</small>
-                    </div>
-
-                    <!-- SIDEBAR AD SCRIPT -->
-                    <div class="form-group">
-                        <label for="ad_script_sidebar">3. Sidebar Ad Script (Sidebar Widget)</label>
-                        <textarea name="ad_script_sidebar" id="ad_script_sidebar" class="form-control" rows="3" placeholder="Paste Sidebar Ad HTML/JS code here...">{{ $adScriptSidebar ?? '' }}</textarea>
-                        <small class="form-text text-muted">Rendered inside sidebar widget box.</small>
-                    </div>
-
                 </div>
 
                 <div class="card-footer">
                     <button type="submit" class="btn btn-primary btn-block font-weight-bold">
-                        💾 Save Settings & Ad Scripts
+                        💾 Save Settings
                     </button>
                 </div>
             </form>

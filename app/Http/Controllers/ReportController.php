@@ -173,10 +173,20 @@ class ReportController extends Controller
         }
 
         if ($request->ajax()) {
+            if ($isReels) {
+                return response()->json([
+                    'html' => view('partials.reels_list', compact('reports'))->render(),
+                    'next_page_url' => $reports->nextPageUrl()
+                ]);
+            }
             return view('partials.posts', compact('reports', 'isReels'))->render();
         }
 
         $stories = Story::with('user')->where('expires_at', '>', now())->latest()->get();
+
+        if ($isReels) {
+            return view('reels', compact('reports'));
+        }
 
         return view('index', compact('reports', 'stories', 'isReels'));
     }

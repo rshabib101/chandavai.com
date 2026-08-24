@@ -243,9 +243,6 @@ class ChallengeController extends Controller
             'min_followers_for_income' => 'required|integer|min:1',
             'daily_challenge_reward_points' => 'nullable|integer|min:1',
             'monthly_referral_reward' => 'nullable|integer|min:0',
-            'ad_script_head' => 'nullable|string',
-            'ad_script_feed' => 'nullable|string',
-            'ad_script_sidebar' => 'nullable|string',
         ]);
 
         Setting::set('coins_per_taka', $request->coins_per_taka);
@@ -260,10 +257,6 @@ class ChallengeController extends Controller
             Setting::set('monthly_referral_reward', $request->monthly_referral_reward);
         }
 
-        Setting::set('ad_script_head', $request->ad_script_head ?? '');
-        Setting::set('ad_script_feed', $request->ad_script_feed ?? '');
-        Setting::set('ad_script_sidebar', $request->ad_script_sidebar ?? '');
-
         // Update all users monetization status based on new threshold
         $minFollowers = (int) $request->min_followers_for_income;
         $users = User::all();
@@ -271,7 +264,44 @@ class ChallengeController extends Controller
             $u->checkMonetizationEligibility();
         }
 
-        return redirect()->back()->with('success', 'Admin settings and Ad scripts updated successfully!');
+        return redirect()->back()->with('success', 'Admin settings updated successfully!');
+    }
+
+    /**
+     * Admin Panel: Update AmarFeed Ad Scripts & Entrance Popup Ad.
+     */
+    public function updateAmarFeedAds(Request $request)
+    {
+        $request->validate([
+            'ad_script_head' => 'nullable|string',
+            'ad_script_feed' => 'nullable|string',
+            'ad_script_sidebar' => 'nullable|string',
+            'popup_ad_enabled' => 'nullable|string',
+            'popup_ad_image' => 'nullable|string',
+            'popup_ad_image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'popup_ad_headline' => 'nullable|string|max:500',
+            'popup_ad_button_text' => 'nullable|string|max:100',
+            'popup_ad_button_link' => 'nullable|string|max:1000',
+        ]);
+
+        Setting::set('ad_script_head', $request->ad_script_head ?? '');
+        Setting::set('ad_script_feed', $request->ad_script_feed ?? '');
+        Setting::set('ad_script_sidebar', $request->ad_script_sidebar ?? '');
+
+        // Website Entrance Popup Ad Settings
+        Setting::set('popup_ad_enabled', $request->has('popup_ad_enabled') ? '1' : '0');
+        Setting::set('popup_ad_headline', $request->popup_ad_headline ?? '');
+        Setting::set('popup_ad_button_text', $request->popup_ad_button_text ?? '');
+        Setting::set('popup_ad_button_link', $request->popup_ad_button_link ?? '');
+
+        if ($request->hasFile('popup_ad_image_file') && $request->file('popup_ad_image_file')->isValid()) {
+            $path = $request->file('popup_ad_image_file')->store('popup_ads', 'public');
+            Setting::set('popup_ad_image', $path);
+        } elseif ($request->filled('popup_ad_image')) {
+            Setting::set('popup_ad_image', $request->popup_ad_image);
+        }
+
+        return redirect()->back()->with('success', 'AmarFeed Ad scripts and Entrance Popup Ad updated successfully!');
     }
 
     /**

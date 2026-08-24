@@ -137,15 +137,36 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/withdrawals/{id}/approve', [\App\Http\Controllers\Admin\AdminWithdrawalController::class, 'approve'])->name('withdrawals.approve');
     Route::post('/withdrawals/{id}/reject', [\App\Http\Controllers\Admin\AdminWithdrawalController::class, 'reject'])->name('withdrawals.reject');
 
+    Route::get('/amarfeed-ads', function () {
+        $adScriptHead = Setting::get('ad_script_head', '');
+        $adScriptFeed = Setting::get('ad_script_feed', '');
+        $adScriptSidebar = Setting::get('ad_script_sidebar', '');
+        $popupAdEnabled = Setting::get('popup_ad_enabled', '0');
+        $popupAdImage = Setting::get('popup_ad_image', '');
+        $popupAdHeadline = Setting::get('popup_ad_headline', '');
+        $popupAdButtonText = Setting::get('popup_ad_button_text', '');
+        $popupAdButtonLink = Setting::get('popup_ad_button_link', '');
+
+        return view('admin.amarfeed_ads', compact(
+            'adScriptHead',
+            'adScriptFeed',
+            'adScriptSidebar',
+            'popupAdEnabled',
+            'popupAdImage',
+            'popupAdHeadline',
+            'popupAdButtonText',
+            'popupAdButtonLink'
+        ));
+    })->name('amarfeed-ads');
+
+    Route::post('/amarfeed-ads/update', [ChallengeController::class, 'updateAmarFeedAds'])->name('amarfeed-ads.update');
+
     Route::get('/settings', function () {
         $coinsPerTaka = Setting::get('coins_per_taka', 40);
         $minCashoutCoins = Setting::get('min_cashout_coins', 600);
         $minFollowers = Setting::get('min_followers_for_income', 20);
         $rewardPoints = Setting::get('daily_challenge_reward_points', 100);
         $monthlyReferralReward = Setting::get('monthly_referral_reward', 1000);
-        $adScriptHead = Setting::get('ad_script_head', '');
-        $adScriptFeed = Setting::get('ad_script_feed', '');
-        $adScriptSidebar = Setting::get('ad_script_sidebar', '');
         $users = User::latest()->get();
         return view('admin.settings', compact(
             'coinsPerTaka',
@@ -153,9 +174,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             'minFollowers',
             'rewardPoints',
             'monthlyReferralReward',
-            'adScriptHead',
-            'adScriptFeed',
-            'adScriptSidebar',
             'users'
         ));
     })->name('settings');
